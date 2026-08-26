@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/layout/Navbar";
 import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
+import { createClient } from "@/lib/supabase/server";
 import { FloatingButtons } from "@/components/layout/FloatingButtons";
 import { AuthProvider } from "@/components/layout/AuthProvider";
 
@@ -49,11 +50,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = createClient();
+  const { data: { session } } = await supabase.auth.getSession();
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -63,7 +67,7 @@ export default function RootLayout({
           fontSerif.variable
         )}
       >
-        <AuthProvider>
+        <AuthProvider accessToken={session?.access_token || null}>
           <Navbar />
           <main className="flex-1">
             {children}

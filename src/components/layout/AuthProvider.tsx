@@ -4,14 +4,14 @@ import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ accessToken, children }: { accessToken: string | null, children: React.ReactNode }) {
   const router = useRouter()
 
   useEffect(() => {
     const supabase = createClient()
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+      if (session?.access_token !== accessToken) {
         router.refresh()
       }
     })
@@ -19,7 +19,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe()
     }
-  }, [router])
+  }, [accessToken, router])
 
   return <>{children}</>
 }

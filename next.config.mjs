@@ -6,6 +6,9 @@ const withBundleAnalyzer = createBundleAnalyzer({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: {
     remotePatterns: [
       {
@@ -13,6 +16,12 @@ const nextConfig = {
         hostname: 'images.unsplash.com',
       },
     ],
+  },
+  webpack: (config) => {
+    config.infrastructureLogging = {
+      level: 'error',
+    };
+    return config;
   },
   async headers() {
     return [

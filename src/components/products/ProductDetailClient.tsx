@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState, useMemo } from "react";
@@ -12,7 +14,7 @@ import { QuoteRequestModal } from "@/components/products/QuoteRequestModal";
 import { ProductReviews } from "@/components/products/ProductReviews";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Star, Heart, ShoppingBag, ShoppingCart, Share2, MessageCircle, Ghost, Link2 } from "lucide-react";
+import { ChevronRight, Star, Heart, ShoppingCart, Share2, MessageCircle, Ghost, Link2 } from "lucide-react";
 import { addToCart, toggleWishlist, toggleLike } from "@/app/products/actions";
 import { toast } from "sonner";
 import { useTransition } from "react";
@@ -23,13 +25,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export function ProductDetailClient({ 
-  product, 
+export function ProductDetailClient({
+  product,
   relatedProducts,
   initialIsWishlisted = false,
+  initialIsLiked = false,
   isLoggedIn = false
-}: { 
-  product: any, 
+}: {
+  product: any,
   relatedProducts: any[],
   initialIsWishlisted?: boolean,
   initialIsLiked?: boolean,
@@ -49,7 +52,7 @@ export function ProductDetailClient({
 
   const [selectedPlacements, setSelectedPlacements] = useState<Record<string, string>>({});
   const [isWishlisted, setIsWishlisted] = useState(initialIsWishlisted);
-  const [isLiked, setIsLiked] = useState(initialIsLiked || false);
+  const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(product.likes || 0);
   const [isLiking, setIsLiking] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -67,10 +70,10 @@ export function ProductDetailClient({
       toast.error("Please log in to save items to your wishlist.");
       return;
     }
-    
+
     // Optimistic UI update
     setIsWishlisted(!isWishlisted);
-    
+
     startTransition(async () => {
       const res = await toggleWishlist(product.id);
       if (!res.success) {
@@ -207,7 +210,7 @@ export function ProductDetailClient({
       {/* Main PDP Grid */}
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          
+
           <div className="lg:col-span-7 flex flex-col gap-10">
             <ProductGallery
               images={product.media?.map((m: any) => m.url) || []}
@@ -270,11 +273,10 @@ export function ProductDetailClient({
                         key={variant.id}
                         type="button"
                         onClick={() => setSelectedVariantId(variant.id)}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
-                          isSelected
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${isSelected
                             ? "border-primary bg-primary text-primary-foreground shadow-xs"
                             : "border-border/60 bg-background text-foreground hover:bg-secondary/60"
-                        }`}
+                          }`}
                       >
                         {variant.colorHex && (
                           <span
@@ -289,14 +291,14 @@ export function ProductDetailClient({
                 </div>
               </div>
             )}
-            
+
             <div className="flex flex-col gap-1 text-xs text-muted-foreground mt-2">
-               <div><span className="font-semibold text-foreground">SKU:</span> {displaySku}</div>
-               <div><span className="font-semibold text-foreground">Availability:</span> {product.stockStatus === 'IN_STOCK' ? <span className="text-emerald-600 font-semibold">In Stock</span> : <span className="text-amber-600 font-semibold">{product.stockStatus}</span>}</div>
+              <div><span className="font-semibold text-foreground">SKU:</span> {displaySku}</div>
+              <div><span className="font-semibold text-foreground">Availability:</span> {product.stockStatus === 'IN_STOCK' ? <span className="text-emerald-600 font-semibold">In Stock</span> : <span className="text-amber-600 font-semibold">{product.stockStatus}</span>}</div>
             </div>
 
             <div className="pt-2 border-t border-border/50 flex flex-col sm:flex-row gap-3">
-              <Button 
+              <Button
                 onClick={handleAddToCart}
                 disabled={isPending}
                 className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 h-12 shadow-sm font-semibold"
@@ -304,8 +306,8 @@ export function ProductDetailClient({
                 <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
               </Button>
               <div className="flex gap-2">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className={`h-12 flex-1 sm:flex-none sm:w-16 flex items-center justify-center gap-1 transition-all ${isLiked ? "border-red-200 bg-red-50/50 dark:bg-red-950/20" : ""}`}
                   onClick={handleLike}
                   aria-label="Like Product"
@@ -329,14 +331,14 @@ export function ProductDetailClient({
                       Twitter (X)
                     </DropdownMenuItem>
                     <DropdownMenuItem className="cursor-pointer gap-2 py-2.5" onClick={() => {
-                        handleCopyLink();
-                        window.open('https://instagram.com', '_blank');
+                      handleCopyLink();
+                      window.open('https://instagram.com', '_blank');
                     }}>
                       Instagram
                     </DropdownMenuItem>
                     <DropdownMenuItem className="cursor-pointer gap-2 py-2.5" onClick={() => {
-                        handleCopyLink();
-                        window.open('https://snapchat.com', '_blank');
+                      handleCopyLink();
+                      window.open('https://snapchat.com', '_blank');
                     }}>
                       <Ghost className="h-4 w-4 text-yellow-500" /> Snapchat
                     </DropdownMenuItem>
@@ -373,7 +375,7 @@ export function ProductDetailClient({
             </div>
 
             <QuoteRequestModal
-              product={{...product, moq: product.minimumOrderQuantity, price: displayPrice}}
+              product={{ ...product, moq: product.minimumOrderQuantity, price: displayPrice }}
               quantity={quantity}
               onQuantityChange={setQuantity}
               selectedVariant={selectedVariant}
@@ -381,10 +383,10 @@ export function ProductDetailClient({
               quoteCalculation={quoteCalculation}
             />
 
-            <ProductReviews 
-              productId={product.id} 
-              reviews={product.reviews || []} 
-              isLoggedIn={isLoggedIn} 
+            <ProductReviews
+              productId={product.id}
+              reviews={product.reviews || []}
+              isLoggedIn={isLoggedIn}
             />
 
           </div>
@@ -407,7 +409,7 @@ export function ProductDetailClient({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {relatedProducts.map((p) => (
-                <ProductCard key={p.id || p.slug} product={{...p, category: p.category?.name, moq: p.minimumOrderQuantity, price: p.price}} />
+                <ProductCard key={p.id || p.slug} product={{ ...p, category: p.category?.name, moq: p.minimumOrderQuantity, price: p.price }} />
               ))}
             </div>
           </section>

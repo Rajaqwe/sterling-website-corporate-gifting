@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/layout/Navbar";
 import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
 import { FloatingButtons } from "@/components/layout/FloatingButtons";
+import { AuthProvider } from "@/components/layout/AuthProvider";
 
 const fontSans = Inter({
   subsets: ["latin"],
@@ -62,12 +63,14 @@ export default function RootLayout({
           fontSerif.variable
         )}
       >
-        <Navbar />
-        <main className="flex-1">
-          {children}
-        </main>
-        <ConditionalFooter />
-        <FloatingButtons />
+        <AuthProvider>
+          <Navbar />
+          <main className="flex-1">
+            {children}
+          </main>
+          <ConditionalFooter />
+          <FloatingButtons />
+        </AuthProvider>
       </body>
     </html>
   );

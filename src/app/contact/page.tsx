@@ -1,16 +1,15 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle, AlertCircle } from "lucide-react";
-import { submitContactForm, type FormState } from "@/app/actions/forms";
+import { createQuote } from "@/app/actions/quotes";
+import { useState } from "react";
 
-function SubmitButton() {
-  const { pending } = useFormStatus();
+function SubmitButton({ pending }: { pending: boolean }) {
   return (
     <Button type="submit" disabled={pending} className="w-full sm:w-auto h-12 px-8 text-base font-semibold">
       {pending ? (
@@ -29,12 +28,38 @@ function SubmitButton() {
 }
 
 export default function ContactPage() {
-  const [state, formAction] = useFormState<FormState, FormData>(submitContactForm, null);
+  const [state, setState] = useState<{ success: boolean; message: string } | null>(null);
+  const [isPending, setIsPending] = useState(false);
+
+  async function handleSubmit(formData: FormData) {
+    setIsPending(true);
+    
+    // Map contact form to quote request shape
+    const fullName = `${formData.get('firstName')} ${formData.get('lastName') || ''}`.trim();
+    
+    const mappedData = new FormData();
+    mappedData.append('fullName', fullName);
+    mappedData.append('workEmail', formData.get('email') as string);
+    mappedData.append('phone', formData.get('phone') as string || '0000000000');
+    mappedData.append('companyName', formData.get('company') as string || 'N/A');
+    mappedData.append('additionalRequirements', formData.get('message') as string);
+    mappedData.append('numberOfRecipients', '1');
+    mappedData.append('quantity', '1');
+
+    const result = await createQuote(mappedData);
+    
+    if (result.success) {
+      setState({ success: true, message: "Thank you for reaching out! We will get back to you shortly." });
+    } else {
+      setState({ success: false, message: result.error || "An error occurred. Please try again." });
+    }
+    setIsPending(false);
+  }
 
   return (
     <div className="min-h-screen bg-secondary/20">
       {/* Header */}
-      <section className="relative bg-primary text-white py-20 md:py-28 overflow-hidden">
+      <section className="relative bg-primary text-white py-20 md:py-15	  overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
@@ -135,7 +160,7 @@ export default function ContactPage() {
                   </div>
                 )}
 
-                <form action={formAction} className="space-y-6">
+                <form action={handleSubmit} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="firstName">First Name *</Label>
@@ -150,7 +175,7 @@ export default function ContactPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="email">Work Email *</Label>
-                      <Input id="email" name="email" type="email" placeholder="you@company.com" required />
+                      <Input id="email" name="email" type="email" placeholder="example@gmail.com" required />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="phone">Phone Number</Label>
@@ -174,7 +199,7 @@ export default function ContactPage() {
                     />
                   </div>
 
-                  <SubmitButton />
+                  <SubmitButton pending={isPending} />
                 </form>
               </CardContent>
             </Card>

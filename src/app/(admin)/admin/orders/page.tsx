@@ -1,18 +1,40 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Package, Search, Eye } from "lucide-react";
+import { Package, Download } from "lucide-react";
 import { formatINR } from "@/lib/currency";
 import { prisma } from "@/lib/prisma/client";
-import { Input } from "@/components/ui/input";
+import { AdminSearchInput } from "@/components/admin/AdminSearchInput";
+import { AdminPagination } from "@/components/admin/AdminPagination";
 
-export default async function AdminOrders() {
-  const orders = await prisma.order.findMany({
-    include: {
-      user: { select: { fullName: true, email: true } },
-      company: { select: { name: true } }
-    },
-    orderBy: { createdAt: 'desc' }
-  });
+export default async function AdminOrders({ searchParams }: { searchParams: { page?: string, q?: string } }) {
+  const page = Number(searchParams.page) || 1;
+  const q = searchParams.q || "";
+  const take = 10;
+  const skip = (page - 1) * take;
+
+  const where = q ? {
+    OR: [
+      { orderNumber: { contains: q, mode: 'insensitive' as const } },
+      { user: { email: { contains: q, mode: 'insensitive' as const } } },
+      { company: { name: { contains: q, mode: 'insensitive' as const } } },
+    ]
+  } : {};
+
+  const [orders, totalOrders] = await Promise.all([
+    prisma.order.findMany({
+      where,
+      include: {
+        user: { select: { fullName: true, email: true } },
+        company: { select: { name: true } }
+      },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take,
+    }),
+    prisma.order.count({ where })
+  ]);
+
+  const totalPages = Math.ceil(totalOrders / take);
 
   return (
     <div className="space-y-6">
@@ -24,10 +46,7 @@ export default async function AdminOrders() {
       </div>
 
       <div className="flex items-center gap-4 bg-white p-4 border rounded-md shadow-sm">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input placeholder="Search by order ID or client..." className="pl-9 h-10" />
-        </div>
+        <AdminSearchInput placeholder="Search by order ID or client..." />
       </div>
 
       <div className="border border-slate-200 rounded-md bg-white overflow-x-auto">
@@ -37,18 +56,19 @@ export default async function AdminOrders() {
               <TableHead>Order Number</TableHead>
               <TableHead>Client</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Total Amount</TableHead>
+              <TableHead>Total</TableHead>
               <TableHead>Date</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {orders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-64 text-center">
+                <TableCell colSpan={6} className="h-64 text-center">
                   <div className="flex flex-col items-center justify-center space-y-3">
                     <Package className="h-12 w-12 text-slate-300" />
                     <h3 className="text-lg font-medium text-slate-900">No orders found</h3>
-                    <p className="text-slate-500 max-w-sm text-center">There are currently no active orders in the system.</p>
+                    <p className="text-slate-500 max-w-sm text-center">There are currently no active orders matching your search.</p>
                   </div>
                 </TableCell>
               </TableRow>
@@ -70,10 +90,15 @@ export default async function AdminOrders() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {formatINR(order.total)}
+                    {formatINR(Number(order.total))}
                   </TableCell>
                   <TableCell className="text-sm text-slate-500">
                     {order.createdAt.toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <a href={`/api/orders/${order.id}/pdf`} target="_blank" className="inline-flex items-center justify-center p-2 rounded-md hover:bg-slate-100 text-slate-500 hover:text-slate-900 transition-colors" title="Download Invoice">
+                      <Download className="h-4 w-4" />
+                    </a>
                   </TableCell>
                 </TableRow>
               ))
@@ -81,6 +106,8 @@ export default async function AdminOrders() {
           </TableBody>
         </Table>
       </div>
+
+      <AdminPagination totalPages={totalPages} currentPage={page} />
     </div>
   );
 }

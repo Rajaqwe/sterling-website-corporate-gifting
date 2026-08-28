@@ -7,15 +7,15 @@ export const metadata: Metadata = {
 
 export default function RefundPolicyPage() {
   return (
-    <div className="container mx-auto px-4 py-16 md:py-24 max-w-4xl min-h-[80vh]">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 max-w-4xl min-h-[80vh]">
       <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-8 tracking-tight">Refund & Return Policy</h1>
       <div className="prose prose-slate max-w-none">
         
       <h2 className="text-2xl font-semibold mt-8 mb-4 text-slate-900">Eligible Returns</h2>
-      <p className="mb-4 text-slate-700 leading-relaxed">We accept returns for standard, non-customized products within 7 days of delivery if the items are defective, damaged in transit, or incorrect. The items must be unused and in original packaging.</p>
+      <p className="mb-4 text-slate-700 leading-relaxed">non-customized products within 7 days of delivery if the items are defective or damaged. The items must be unused and in original packaging. We do not accept returns for standard products.</p>
       
       <h2 className="text-2xl font-semibold mt-8 mb-4 text-slate-900">Customized Products</h2>
-      <p className="mb-4 text-slate-700 leading-relaxed">Due to the personalized nature of our corporate gifts, <strong>custom-branded products cannot be returned or refunded</strong> unless there is a clear manufacturing defect or a deviation from the approved digital proof.</p>
+      <p className="mb-4 text-slate-700 leading-relaxed">Due to the personalized nature of our corporate gifts, <strong>custom-branded products cannot be returned or refunded</strong> unless there is a clear manufacturing defect.</p>
       
       <h2 className="text-2xl font-semibold mt-8 mb-4 text-slate-900">Refund Processing</h2>
       <p className="mb-4 text-slate-700 leading-relaxed">Approved refunds will be processed within 5-7 business days to the original payment method. For corporate bank transfers, processing times may vary based on banking cycles.</p>

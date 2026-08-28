@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma/client";
 import { redirect } from "next/navigation";
+import { SpendAnalyticsChart } from "@/components/dashboard/SpendAnalyticsChart";
 
 export default async function DashboardOverview() {
   const supabase = createClient();
@@ -138,7 +139,7 @@ export default async function DashboardOverview() {
                 <p className="text-sm text-muted-foreground">Find new corporate gifts</p>
               </div>
             </Link>
-            <Link href="/request-quote" className="flex items-center p-4 border rounded-lg hover:bg-secondary/50 transition-colors">
+            <Link href="/request-a-quote" className="flex items-center p-4 border rounded-lg hover:bg-secondary/50 transition-colors">
               <FileText className="h-8 w-8 text-primary p-1.5 bg-primary/10 rounded mr-4" />
               <div>
                 <p className="font-medium">Request a Custom Quote</p>
@@ -148,6 +149,17 @@ export default async function DashboardOverview() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Enterprise Spend Analytics */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Spend Analytics</CardTitle>
+          <p className="text-sm text-muted-foreground">Your corporate gifting expenditure over the last 12 months.</p>
+        </CardHeader>
+        <CardContent>
+          <SpendAnalyticsChart />
+        </CardContent>
+      </Card>
     </div>
   );
 }

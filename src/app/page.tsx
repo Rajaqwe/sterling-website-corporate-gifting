@@ -1,83 +1,83 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Briefcase, Gift, ShieldCheck, Truck, Star, Quote, ArrowRight } from "lucide-react";
+import { Briefcase, Gift, ShieldCheck, Truck, Star, Quote, ArrowRight, Building2 } from "lucide-react";
 import Link from "next/link";
+import { DemoVideoCarousel } from "@/components/home/DemoVideoCarousel";
+import { Reveal, StaggerContainer } from "@/components/ui/reveal";
+import { InteractiveLogos } from "@/components/home/InteractiveLogos";
 
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       
       {/* Hero Section */}
-      <section className="relative pt-24 pb-32 lg:pt-36 lg:pb-40 overflow-hidden">
-        <div className="absolute inset-0 -z-10 bg-[url('https://images.unsplash.com/photo-1577969145618-9fc31a8bc83c?q=80&w=2940&auto=format&fit=crop')] bg-cover bg-center" />
-        <div className="absolute inset-0 -z-10 bg-primary/80 backdrop-blur-sm" />
+      <section className="relative pt-24 pb-32 lg:pt-36 lg:pb-40 overflow-hidden min-h-[80vh] flex flex-col justify-center">
+        {/* Dynamic Video Carousel Background */}
+        <div className="absolute inset-0 -z-20">
+          <DemoVideoCarousel />
+        </div>
         
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-          <span className="inline-block mb-4 text-sm font-medium tracking-widest text-accent uppercase animate-fade-in">
-            Premium B2B Gifting
-          </span>
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold mb-6 max-w-4xl mx-auto leading-tight animate-fade-in-up">
-            Corporate Gifting, <br className="hidden md:block" />Elevated.
-          </h1>
-          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-in-up-delay">
-            Thoughtfully curated corporate gifts designed to strengthen relationships, 
-            celebrate milestones, and leave a lasting impression.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up-delay-2">
-            <Link href="/corporate-gifts">
-              <Button size="lg" className="w-full sm:w-auto bg-accent text-primary hover:bg-accent/90 h-12 px-8 text-base font-semibold">
-                Explore Corporate Gifts
-              </Button>
-            </Link>
-            <Link href="/request-a-quote">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-primary hover:bg-white h-12 px-8 text-base">
-                Request a Corporate Quote
-              </Button>
-            </Link>
-          </div>
+        {/* Additional gradient overlay for text legibility (fades to black at the bottom to blend with background) */}
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/40 via-transparent to-background/95" />
+        
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center text-white relative z-10 pointer-events-none">
+          <StaggerContainer staggerDelay={120}>
+            <Reveal>
+              <span className="inline-block mb-4 text-sm font-bold tracking-widest text-accent uppercase">
+                Premium B2B Gifting
+              </span>
+            </Reveal>
+            <Reveal>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-serif font-bold mb-6 max-w-4xl mx-auto leading-tight">
+                Corporate Gifting, <br className="hidden md:block" />Elevated.
+              </h1>
+            </Reveal>
+            <Reveal>
+              <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10 leading-relaxed">
+                Thoughtfully curated corporate gifts designed to strengthen relationships, 
+                celebrate milestones, and leave a lasting impression.
+              </p>
+            </Reveal>
+            <Reveal>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pointer-events-auto">
+                <Link href="/corporate-gifts">
+                  <Button size="lg" className="w-full sm:w-auto bg-accent text-primary hover:bg-accent/90 h-12 px-8 text-base font-semibold shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    Explore Corporate Gifts
+                  </Button>
+                </Link>
+              </div>
+            </Reveal>
+          </StaggerContainer>
         </div>
       </section>
 
       {/* Stats Bar */}
       <section className="relative z-10 -mt-10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StaggerContainer staggerDelay={100} className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { number: "500+", label: "Corporate Clients" },
               { number: "10,000+", label: "Gifts Delivered" },
               { number: "50+", label: "Product Categories" },
               { number: "98%", label: "Client Satisfaction" },
             ].map((stat, i) => (
-              <Card key={i} className="border-none shadow-lg bg-white text-center">
-                <CardContent className="py-5 px-4">
-                  <div className="text-2xl md:text-3xl font-serif font-bold text-primary mb-0.5">
-                    {stat.number}
-                  </div>
-                  <div className="text-xs text-muted-foreground font-medium">
-                    {stat.label}
-                  </div>
-                </CardContent>
-              </Card>
+              <Reveal key={i}>
+                <Card className="border-none shadow-lg bg-white text-center hover:-translate-y-1 hover:shadow-xl transition-all duration-400 ease-out">
+                  <CardContent className="py-5 px-4">
+                    <div className="text-2xl md:text-3xl font-serif font-bold text-primary mb-0.5">
+                      {stat.number}
+                    </div>
+                    <div className="text-xs text-muted-foreground font-medium">
+                      {stat.label}
+                    </div>
+                  </CardContent>
+                </Card>
+              </Reveal>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
-      {/* Trusted By */}
-      <section className="pt-20 pb-8 bg-background">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-sm font-medium text-muted-foreground tracking-wider uppercase mb-8">
-            Trusted by leading companies across India
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-14 opacity-40">
-            {["TCS", "Wipro", "Infosys", "Reliance", "Tata Group", "HCL"].map((name, i) => (
-              <span key={i} className="text-lg md:text-xl font-bold tracking-wide text-primary/80 font-serif">
-                {name}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Why Sterling Section */}
       <section className="py-24 bg-background">
@@ -89,24 +89,26 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <StaggerContainer staggerDelay={150} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               { icon: ShieldCheck, title: "Premium Quality", desc: "Every item is rigorously tested and curated to reflect your brand's high standards." },
               { icon: Briefcase, title: "Custom Branding", desc: "Elegant logo placement, custom packaging, and personalized notes for every recipient." },
               { icon: Truck, title: "Global Logistics", desc: "Seamless bulk shipping to a single office or individual addresses worldwide." },
               { icon: Gift, title: "Dedicated Support", desc: "Your dedicated account manager handles the end-to-end gifting process." },
             ].map((feature, i) => (
-              <Card key={i} className="border-none shadow-none bg-secondary/50 text-center p-6 hover:shadow-md hover:bg-secondary/70 transition-all duration-300">
-                <CardContent className="pt-6">
-                  <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/5 text-primary mb-6">
-                    <feature.icon className="h-8 w-8" />
-                  </div>
-                  <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
-                </CardContent>
-              </Card>
+              <Reveal key={i}>
+                <Card className="group border-none shadow-none bg-secondary/50 text-center p-6 hover:shadow-lg hover:bg-white hover:-translate-y-2 transition-all duration-500 ease-out">
+                  <CardContent className="pt-6">
+                    <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/5 text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-colors duration-500">
+                      <feature.icon className="h-8 w-8 transition-transform duration-500 group-hover:scale-110" />
+                    </div>
+                    <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
+                    <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
+                  </CardContent>
+                </Card>
+              </Reveal>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
@@ -126,7 +128,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Category 1 */}
             <Link href="/corporate-gifts" className="group block relative h-[400px] rounded-2xl overflow-hidden">
-              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-[url('/videos/posters/demo-1.jpg')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent" />
               <div className="absolute bottom-0 left-0 p-8">
                 <h3 className="text-2xl font-serif font-bold text-white mb-2">Executive Gifts</h3>
@@ -136,7 +138,7 @@ export default function Home() {
 
             {/* Category 2 */}
             <Link href="/employee-gifting" className="group block relative h-[400px] rounded-2xl overflow-hidden">
-              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1513201099705-a9746e1e201f?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-[url('/videos/posters/demo-2.jpg')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent" />
               <div className="absolute bottom-0 left-0 p-8">
                 <h3 className="text-2xl font-serif font-bold text-white mb-2">Employee Appreciation</h3>
@@ -146,7 +148,7 @@ export default function Home() {
 
             {/* Category 3 */}
             <Link href="/employee-gifting" className="group block relative h-[400px] rounded-2xl overflow-hidden">
-              <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1606830733744-0ad778449672?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-[url('/videos/posters/demo-3.jpg')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent" />
               <div className="absolute bottom-0 left-0 p-8">
                 <h3 className="text-2xl font-serif font-bold text-white mb-2">Welcome Kits</h3>
@@ -156,6 +158,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Interactive Trusted By Section */}
+      <InteractiveLogos />
 
       {/* Testimonials */}
       <section className="py-24 bg-background">

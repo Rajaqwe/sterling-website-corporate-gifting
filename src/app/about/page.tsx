@@ -1,3 +1,4 @@
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
@@ -13,7 +14,7 @@ export default function AboutPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-primary text-white py-20 md:py-28 overflow-hidden">
+      <section className="relative bg-primary text-white py-20 md:py-15 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
@@ -36,7 +37,7 @@ export default function AboutPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { number: "500+", label: "Corporate Clients" },
+              { number: "40+", label: "Corporate Clients" },
               { number: "10,000+", label: "Gifts Delivered" },
               { number: "50+", label: "Product Categories" },
               { number: "98%", label: "Client Satisfaction" },

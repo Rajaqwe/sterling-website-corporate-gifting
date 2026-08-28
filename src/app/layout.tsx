@@ -7,6 +7,8 @@ import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
 import { createClient } from "@/lib/supabase/server";
 import { FloatingButtons } from "@/components/layout/FloatingButtons";
 import { AuthProvider } from "@/components/layout/AuthProvider";
+import { CartProvider } from "@/components/cart/CartContext";
+import { prisma } from "@/lib/prisma/client";
 
 const fontSans = Inter({
   subsets: ["latin"],
@@ -57,6 +59,16 @@ export default async function RootLayout({
 }>) {
   const supabase = createClient();
   const { data: { session } } = await supabase.auth.getSession();
+  const user = session?.user;
+
+  let initialCartCount = 0;
+  if (user) {
+    const result = await prisma.cartItem.aggregate({
+      _sum: { quantity: true },
+      where: { cart: { userId: user.id } }
+    });
+    initialCartCount = result._sum.quantity || 0;
+  }
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -68,12 +80,14 @@ export default async function RootLayout({
         )}
       >
         <AuthProvider accessToken={session?.access_token || null}>
-          <Navbar />
-          <main className="flex-1">
-            {children}
-          </main>
-          <ConditionalFooter />
-          <FloatingButtons />
+          <CartProvider initialCount={initialCartCount}>
+            <Navbar />
+            <main className="flex-1">
+              {children}
+            </main>
+            <ConditionalFooter />
+            <FloatingButtons />
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>

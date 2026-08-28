@@ -44,7 +44,7 @@ export default function CareersPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero */}
-      <section className="relative bg-primary text-white py-20 md:py-28 overflow-hidden">
+      <section className="relative bg-primary text-white py-20 md:py-15 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
@@ -66,10 +66,10 @@ export default function CareersPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             {[
-              { label: "Fast Growth", value: "3x YoY" },
-              { label: "Team Size", value: "50+" },
-              { label: "Remote OK", value: "Yes" },
-              { label: "Learning Budget", value: "₹50K/yr" },
+              { label: "Fast Growth", value: "5x YoY" },
+              { label: "Team Size", value: "10+" },
+              { label: "Work Type", value: "Hybrid" },
+              { label: "Learning Budget", value: "₹80K/yr" },
             ].map((stat, i) => (
               <div key={i} className="p-5 rounded-xl bg-secondary/30">
                 <div className="text-xl md:text-2xl font-serif font-bold text-primary mb-1">{stat.value}</div>

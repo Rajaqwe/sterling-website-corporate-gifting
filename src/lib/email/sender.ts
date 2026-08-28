@@ -1,11 +1,16 @@
 import { Resend } from 'resend';
 import { QuoteReceivedEmail } from '@/components/emails/QuoteReceivedEmail';
 import * as React from 'react';
+import { assertEnv } from '@/lib/env';
 
-const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_key');
+// Fetch key lazily so Next.js build doesn't crash on missing environment variables
+function getResendClient() {
+  return new Resend(assertEnv('RESEND_API_KEY'));
+}
 
 export async function sendQuoteReceivedEmail(email: string, details: { quoteNumber: string, customerName: string, companyName: string }) {
   try {
+    const resend = getResendClient();
     const { data, error } = await resend.emails.send({
       from: 'Sterling Corporate <quotes@sterlinggifting.com>',
       to: [email],

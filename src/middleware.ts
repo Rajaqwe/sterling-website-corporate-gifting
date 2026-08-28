@@ -62,16 +62,24 @@ export async function middleware(request: NextRequest) {
   // Protect Dashboard and Admin routes
   const isDashboard = request.nextUrl.pathname.startsWith('/dashboard')
   const isAdmin = request.nextUrl.pathname.startsWith('/admin')
+  const isAdminApi = request.nextUrl.pathname.startsWith('/api/admin')
   const isAuthPage = request.nextUrl.pathname.startsWith('/login') || request.nextUrl.pathname.startsWith('/register')
 
-  if ((isDashboard || isAdmin) && !user) {
+  if ((isDashboard || isAdmin || isAdminApi) && !user) {
+    // For API routes return JSON 401; for pages redirect to login
+    if (isAdminApi) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     return NextResponse.redirect(new URL('/login?message=Please sign in to access this page&type=error', request.url))
   }
 
   // Strictly enforce Admin isolation
-  if (isAdmin && user) {
-    const role = user.user_metadata?.role || 'CUSTOMER'
+  if ((isAdmin || isAdminApi) && user) {
+    const role = user.app_metadata?.role || 'CUSTOMER'
     if (role !== 'ADMIN' && role !== 'SUPER_ADMIN') {
+      if (isAdminApi) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      }
       return NextResponse.redirect(new URL('/dashboard?message=Unauthorized. Administrator access required.&type=error', request.url))
     }
   }

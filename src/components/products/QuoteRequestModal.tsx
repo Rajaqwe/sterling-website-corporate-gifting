@@ -19,6 +19,21 @@ import {
 import { submitQuoteRequest } from "@/app/products/actions";
 import { toast } from "sonner";
 import { formatINR } from "@/lib/currency";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+const quoteFormSchema = z.object({
+  fullName: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  companyName: z.string().min(2, "Company name is required"),
+  phone: z.string().optional(),
+  deliveryDate: z.string().optional(),
+  isMultiAddress: z.boolean(),
+  notes: z.string().optional(),
+});
+
+type QuoteFormValues = z.infer<typeof quoteFormSchema>;
 
 interface QuoteRequestModalProps {
   product: Product;
@@ -41,16 +56,20 @@ export function QuoteRequestModal({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [quoteReference, setQuoteReference] = useState("");
-
-  // Form State
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
-  const [isMultiAddress, setIsMultiAddress] = useState(false);
-  const [notes, setNotes] = useState("");
   const [mockFileName, setMockFileName] = useState<string | null>(null);
+
+  const { register, handleSubmit, formState: { errors }, reset, getValues } = useForm<QuoteFormValues>({
+    resolver: zodResolver(quoteFormSchema),
+    defaultValues: {
+      fullName: "",
+      email: "",
+      companyName: "",
+      phone: "",
+      deliveryDate: "",
+      isMultiAddress: false,
+      notes: "",
+    }
+  });
 
   const title = product.title || product.name || "Corporate Gift";
   const isBelowMoq = quantity < product.moq;
@@ -74,22 +93,20 @@ export function QuoteRequestModal({
     }
   };
 
-  const handleSubmitQuote = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: QuoteFormValues) => {
     setIsSubmitting(true);
     
     try {
       const res = await submitQuoteRequest({
         productId: product.id,
         quantity,
-        fullName,
-        workEmail: email,
-        companyName,
-        phone,
-        requiredDeliveryDate: deliveryDate,
-        notes,
+        fullName: data.fullName,
+        workEmail: data.email,
+        companyName: data.companyName,
+        phone: data.phone || "",
+        requiredDeliveryDate: data.deliveryDate,
+        notes: data.notes,
         customizationIds: selectedCustomizations.map(c => c.id),
-        quoteCalculation,
       });
 
       if (res.success && res.quoteNumber) {
@@ -108,6 +125,7 @@ export function QuoteRequestModal({
   const handleResetModal = () => {
     setIsSubmitted(false);
     setIsOpen(false);
+    reset();
   };
 
   return (
@@ -134,53 +152,66 @@ export function QuoteRequestModal({
         </div>
       </div>
 
-      {/* Quantity Stepper Input */}
-      <div className="flex flex-col gap-2">
+      {/* Quantity Stepper & Slider */}
+      <div className="flex flex-col gap-4">
         <label htmlFor="pdp-quantity-input" className="text-xs font-bold uppercase tracking-wider text-foreground">
           Order Quantity
         </label>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center rounded-xl border border-border/80 bg-background overflow-hidden shadow-2xs">
-            <button
-              type="button"
-              data-testid="qty-decrement"
-              onClick={handleDecrement}
-              aria-label="Decrease quantity"
-              className="h-11 w-11 flex items-center justify-center text-lg font-bold hover:bg-secondary/80 text-foreground transition-colors disabled:opacity-40"
-              disabled={quantity <= 1}
-            >
-              -
-            </button>
-            <input
-              id="pdp-quantity-input"
-              data-testid="quantity-input"
-              type="number"
-              min={1}
-              value={quantity || ""}
-              onChange={handleInputChange}
-              aria-label="Order Quantity"
-              className="h-11 w-20 text-center font-bold text-base bg-transparent border-x border-border/80 focus:outline-none focus:ring-1 focus:ring-accent text-foreground"
-            />
-            <button
-              type="button"
-              data-testid="qty-increment"
-              onClick={handleIncrement}
-              aria-label="Increase quantity"
-              className="h-11 w-11 flex items-center justify-center text-lg font-bold hover:bg-secondary/80 text-foreground transition-colors"
-            >
-              +
-            </button>
-          </div>
+        
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center rounded-xl border border-border/80 bg-background overflow-hidden shadow-2xs">
+              <button
+                type="button"
+                data-testid="qty-decrement"
+                onClick={handleDecrement}
+                aria-label="Decrease quantity"
+                className="h-11 w-11 flex items-center justify-center text-lg font-bold hover:bg-secondary/80 text-foreground transition-colors disabled:opacity-40"
+                disabled={quantity <= 1}
+              >
+                -
+              </button>
+              <input
+                id="pdp-quantity-input"
+                data-testid="quantity-input"
+                type="number"
+                min={1}
+                value={quantity || ""}
+                onChange={handleInputChange}
+                aria-label="Order Quantity"
+                className="h-11 w-20 text-center font-bold text-base bg-transparent border-x border-border/80 focus:outline-none focus:ring-1 focus:ring-accent text-foreground"
+              />
+              <button
+                type="button"
+                data-testid="qty-increment"
+                onClick={handleIncrement}
+                aria-label="Increase quantity"
+                className="h-11 w-11 flex items-center justify-center text-lg font-bold hover:bg-secondary/80 text-foreground transition-colors"
+              >
+                +
+              </button>
+            </div>
 
-          <div className="text-xs text-muted-foreground leading-tight">
-            <span>
-              {quoteCalculation.activeTier
-                ? quoteCalculation.activeTier.maxQuantity
-                  ? `Active Tier: ${quoteCalculation.activeTier.minQuantity}-${quoteCalculation.activeTier.maxQuantity} pcs`
-                  : `Active Tier: ${quoteCalculation.activeTier.minQuantity}+ pcs`
-                : ""}
-            </span>
+            <div className="text-xs text-muted-foreground leading-tight">
+              <span>
+                {quoteCalculation.activeTier
+                  ? quoteCalculation.activeTier.maxQuantity
+                    ? `Active Tier: ${quoteCalculation.activeTier.minQuantity}-${quoteCalculation.activeTier.maxQuantity} pcs`
+                    : `Active Tier: ${quoteCalculation.activeTier.minQuantity}+ pcs`
+                  : ""}
+              </span>
+            </div>
           </div>
+          
+          <input 
+            type="range" 
+            min={1} 
+            max={Math.max(product.moq * 10, 1000)} 
+            step={Math.max(1, Math.floor(product.moq / 10))}
+            value={quantity || 0}
+            onChange={(e) => onQuantityChange(Number(e.target.value))}
+            className="w-full h-2 bg-secondary rounded-lg appearance-none cursor-pointer accent-accent outline-none"
+          />
         </div>
 
         {/* Below MOQ Warning Notice */}
@@ -241,15 +272,17 @@ export function QuoteRequestModal({
       </div>
 
       {/* Primary Request Quote CTA Button */}
-      <Button
-        data-testid="request-quote-button"
-        size="lg"
-        onClick={() => setIsOpen(true)}
-        className="w-full bg-accent text-primary hover:bg-accent/90 h-12 text-base font-serif font-bold shadow-md gap-2"
-      >
-        <Send className="h-4 w-4" />
-        Request Corporate Quote
-      </Button>
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-md border-t border-border/60 z-40 sm:relative sm:bottom-auto sm:left-auto sm:right-auto sm:p-0 sm:bg-transparent sm:border-0 sm:backdrop-blur-none sm:z-auto shadow-[0_-10px_40px_rgba(0,0,0,0.1)] sm:shadow-none">
+        <Button
+          data-testid="request-quote-button"
+          size="lg"
+          onClick={() => setIsOpen(true)}
+          className="w-full bg-accent text-primary hover:bg-gold-hover h-14 font-bold shadow-md transition-colors text-[15px]"
+        >
+          <Send className="mr-2 h-4 w-4" />
+          Request Corporate Quote
+        </Button>
+      </div>
 
       {/* Interactive Modal Dialog */}
       {isOpen && (
@@ -266,7 +299,7 @@ export function QuoteRequestModal({
             </button>
 
             {!isSubmitted ? (
-              <form onSubmit={handleSubmitQuote} className="flex flex-col gap-4">
+              <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
                 <div className="mb-2">
                   <span className="text-xs font-bold uppercase tracking-wider text-accent">
                     Direct Corporate Quotation
@@ -322,11 +355,11 @@ export function QuoteRequestModal({
                         required
                         type="text"
                         placeholder="Sarah Jenkins"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        className="pl-8 h-9 text-xs"
+                        {...register("fullName")}
+                        className={`pl-8 h-9 text-xs ${errors.fullName ? "border-destructive" : ""}`}
                       />
                     </div>
+                    {errors.fullName && <span className="text-[10px] text-destructive mt-1 block">{errors.fullName.message}</span>}
                   </div>
 
                   <div>
@@ -339,11 +372,11 @@ export function QuoteRequestModal({
                         required
                         type="email"
                         placeholder="sarah@acme-corp.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="pl-8 h-9 text-xs"
+                        {...register("email")}
+                        className={`pl-8 h-9 text-xs ${errors.email ? "border-destructive" : ""}`}
                       />
                     </div>
+                    {errors.email && <span className="text-[10px] text-destructive mt-1 block">{errors.email.message}</span>}
                   </div>
 
                   <div>
@@ -356,11 +389,11 @@ export function QuoteRequestModal({
                         required
                         type="text"
                         placeholder="Acme Enterprises"
-                        value={companyName}
-                        onChange={(e) => setCompanyName(e.target.value)}
-                        className="pl-8 h-9 text-xs"
+                        {...register("companyName")}
+                        className={`pl-8 h-9 text-xs ${errors.companyName ? "border-destructive" : ""}`}
                       />
                     </div>
+                    {errors.companyName && <span className="text-[10px] text-destructive mt-1 block">{errors.companyName.message}</span>}
                   </div>
 
                   <div>
@@ -372,9 +405,8 @@ export function QuoteRequestModal({
                       <Input
                         type="tel"
                         placeholder="+1 (555) 019-2834"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="pl-8 h-9 text-xs"
+                        {...register("phone")}
+                        className={`pl-8 h-9 text-xs ${errors.phone ? "border-destructive" : ""}`}
                       />
                     </div>
                   </div>
@@ -387,8 +419,7 @@ export function QuoteRequestModal({
                       <Calendar className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                       <Input
                         type="date"
-                        value={deliveryDate}
-                        onChange={(e) => setDeliveryDate(e.target.value)}
+                        {...register("deliveryDate")}
                         className="pl-8 h-9 text-xs"
                       />
                     </div>
@@ -398,8 +429,7 @@ export function QuoteRequestModal({
                     <input
                       type="checkbox"
                       id="multi-address"
-                      checked={isMultiAddress}
-                      onChange={(e) => setIsMultiAddress(e.target.checked)}
+                      {...register("isMultiAddress")}
                       className="rounded border-border h-4 w-4 text-primary focus:ring-accent"
                     />
                     <label htmlFor="multi-address" className="text-xs text-foreground cursor-pointer">
@@ -438,8 +468,7 @@ export function QuoteRequestModal({
                   <textarea
                     rows={2}
                     placeholder="e.g., We need Pantone 281C logo color matching and 25 individual recipient note cards."
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
+                    {...register("notes")}
                     className="w-full rounded-lg border border-input bg-transparent px-3 py-2 text-xs focus:ring-1 focus:ring-accent focus:outline-none"
                   />
                 </div>
@@ -475,7 +504,7 @@ export function QuoteRequestModal({
                     Quote Request Received
                   </h3>
                   <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
-                    Thank you, <strong>{fullName || "Corporate Buyer"}</strong>. Your enquiry for{" "}
+                    Thank you, <strong>{getValues("fullName") || "Corporate Buyer"}</strong>. Your enquiry for{" "}
                     <strong>{quantity} units</strong> of {title} has been routed to your dedicated Sterling account manager.
                   </p>
                 </div>

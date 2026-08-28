@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
-import { requireAdmin } from "@/lib/auth/server";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   await requireAdmin();

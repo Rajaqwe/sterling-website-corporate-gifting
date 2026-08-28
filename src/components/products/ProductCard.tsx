@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useState } from "react";
@@ -5,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/types/product";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { ArrowRight, Layers, Sparkles } from "lucide-react";
 import { formatINR } from "@/lib/currency";
 
@@ -25,8 +28,7 @@ export function ProductCard({ product, className = "", priority = false }: Produ
   const title = product.title || product.name || "Corporate Gift";
   const displayCategory = (product as any).category?.name || "Corporate Gift";
   const lowestBulkPrice = Number(product.startingPrice ?? product.lowestPrice ?? (product as any).basePrice ?? (product as any).price ?? 0);
-  const startingBulkFormatted = lowestBulkPrice.toFixed(2);
-  const basePriceFormatted = (product as any).basePrice ? Number((product as any).basePrice).toFixed(2) : Number((product as any).price ?? 0).toFixed(2);
+  const basePrice = (product as any).basePrice ? Number((product as any).basePrice) : Number((product as any).price ?? 0);
 
   // Customization methods
   const customizations = product.customizations || product.customizationOptions || [];
@@ -35,10 +37,10 @@ export function ProductCard({ product, className = "", priority = false }: Produ
   return (
     <Card
       data-testid="product-card"
-      className={`group/card flex flex-col h-full overflow-hidden border border-border/60 bg-card hover:border-accent/40 hover:shadow-lg transition-all duration-300 rounded-xl ${className}`}
+      className={cn("group flex flex-col h-full bg-white rounded-xl border border-border/40 overflow-hidden hover:-translate-y-1.5 hover:shadow-xl transition-all duration-500 ease-out", className)}
     >
       {/* Product Image Stage */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-secondary/30">
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-secondary/30">
         <Link
           href={`/products/${product.slug}`}
           className="block w-full h-full"
@@ -56,7 +58,7 @@ export function ProductCard({ product, className = "", priority = false }: Produ
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               priority={priority}
-              className="object-cover object-center transition-transform duration-500 ease-out group-hover/card:scale-105"
+              className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.03]"
               onError={() => {
                 setImageError(true);
                 setImageSrc("/placeholder-product.jpg");
@@ -74,7 +76,7 @@ export function ProductCard({ product, className = "", priority = false }: Produ
               {product.badge}
             </span>
           ) : (
-            <span className="inline-flex items-center rounded-full bg-background/90 px-2.5 py-0.5 text-xs font-medium text-foreground backdrop-blur-sm border border-border/40 shadow-sm">
+            <span className="inline-flex items-center rounded-full bg-accent/20 px-2.5 py-0.5 text-xs font-medium text-accent-foreground backdrop-blur-sm border border-accent/20 shadow-sm">
               {displayCategory}
             </span>
           )}
@@ -84,15 +86,18 @@ export function ProductCard({ product, className = "", priority = false }: Produ
             data-testid="moq-badge"
             className="inline-flex items-center rounded-full bg-accent text-primary px-2.5 py-0.5 text-xs font-bold shadow-sm"
           >
-            MOQ: {(product as any).minimumOrderQuantity || product.moq || 1} units
+            MOQ: {(product as any).minimumOrderQuantity || product.moq || 1}
           </span>
         </div>
 
-        {/* Quick hover indicator */}
-        <div className="absolute bottom-2 right-2 opacity-0 transform translate-y-1 transition-all duration-300 group-hover/card:opacity-100 group-hover/card:translate-y-0 pointer-events-none">
-          <span className="inline-flex items-center gap-1 text-xs font-semibold bg-background/95 text-primary px-2.5 py-1 rounded-md shadow-md border border-border/40">
-            View Details <ArrowRight className="h-3 w-3" />
-          </span>
+        {/* Hover / Mobile CTA */}
+        <div className="absolute bottom-3 inset-x-3 flex justify-center pointer-events-none">
+          <Link 
+            href={`/request-a-quote?product=${product.slug}`}
+            className="pointer-events-auto w-full md:opacity-0 md:translate-y-2 md:group-hover/card:opacity-100 md:group-hover/card:translate-y-0 transition-all duration-300 flex items-center justify-center gap-1.5 text-sm font-semibold bg-accent hover:bg-gold-hover text-primary py-2.5 px-4 rounded-lg shadow-md [@media(hover:none)]:opacity-100 [@media(hover:none)]:translate-y-0"
+          >
+            Request Quote <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
 
@@ -155,16 +160,16 @@ export function ProductCard({ product, className = "", priority = false }: Produ
             <div className="flex items-baseline gap-1.5">
               <span className="text-xs text-muted-foreground">From</span>
               <span data-testid="product-price" className="text-lg font-bold text-primary">
-                ${startingBulkFormatted}
+                {formatINR(lowestBulkPrice)}
               </span>
               <span className="text-xs text-muted-foreground">/ unit</span>
             </div>
           </div>
 
-          {basePriceFormatted && Number((product as any).price) !== lowestBulkPrice && (
+          {basePrice > 0 && basePrice !== lowestBulkPrice && (
             <div className="text-right">
               <span className="text-[10px] text-muted-foreground block line-through">
-                ${basePriceFormatted} / unit
+                {formatINR(basePrice)} / unit
               </span>
               <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
                 Save up to {product.priceTiers?.[product.priceTiers.length - 1]?.savingsPercent || 25}%

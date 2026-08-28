@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { prisma } from "@/lib/prisma/client";
 
 export interface ParsedProductFilters {

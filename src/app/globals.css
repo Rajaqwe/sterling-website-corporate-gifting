@@ -26,6 +26,10 @@
     /* Sterling Gold / Champagne Accent */
     --accent: 33 40% 59%;
     --accent-foreground: 210 40% 98%;
+    --gold-hover: 33 40% 49%;
+    
+    /* Elevated surface for depth */
+    --surface-elevated: 40 33% 98%;
     
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -55,6 +59,9 @@
     
     --accent: 33 40% 59%;
     --accent-foreground: 222.2 47.4% 11.2%;
+    --gold-hover: 33 40% 49%;
+
+    --surface-elevated: 222 47% 13%;
     
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;

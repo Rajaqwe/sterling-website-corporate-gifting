@@ -1,10 +1,13 @@
-export const dynamic = 'force-dynamic';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+export const revalidate = 3600; // 1 hour ISR
 
 import { ProductFilterSidebar, MobileFilterDrawer } from "@/components/products/ProductFilterSidebar";
-import { Card, CardContent } from "@/components/ui/card";
-import Link from "next/link";
-import { Package, Star, Clock } from "lucide-react";
+import { ProductCard } from "@/components/products/ProductCard";
+import { ActiveFilters, SortDropdown } from "@/components/products/ProductCatalogFilters";
+import { Package } from "lucide-react";
 import { Suspense } from "react";
+import { Reveal, StaggerContainer } from "@/components/ui/reveal";
 
 import { prisma } from "@/lib/prisma/client";
 import { parseSearchParams, buildPrismaWhereClause, buildPrismaOrderBy, getAvailableFilters } from "@/lib/products/filter-utils";
@@ -32,7 +35,7 @@ export default async function CorporateGiftsPage({
   ]);
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 space-y-4 md:space-y-0">
         <div>
           <h1 className="text-4xl font-serif font-bold text-primary mb-2">Corporate Catalog</h1>
@@ -59,50 +62,37 @@ export default async function CorporateGiftsPage({
           />
         </Suspense>
 
-        <div className="flex-1 w-full">
+        <div className="flex-1 w-full min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
+            <div className="text-sm text-muted-foreground">
+              Showing <span className="font-medium text-foreground">{products.length}</span> products
+            </div>
+            <Suspense fallback={<div className="h-9 w-40 bg-muted animate-pulse rounded-md" />}>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Sort by:</span>
+                <SortDropdown />
+              </div>
+            </Suspense>
+          </div>
+
+          <Suspense fallback={<div className="h-8 w-64 bg-muted animate-pulse rounded-full mb-6" />}>
+            <ActiveFilters />
+          </Suspense>
+
           {products.length === 0 ? (
-            <div className="text-center py-20 border rounded-lg bg-secondary/10">
+            <div className="text-center py-20 border rounded-lg bg-surface-elevated">
               <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-xl font-medium text-primary">No products found</h3>
               <p className="text-muted-foreground mt-2">Try adjusting your filters or search query.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            <StaggerContainer staggerDelay={100} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
               {products.map((product) => (
-                <Link key={product.id} href={`/products/${product.slug}`} className="group block">
-                  <Card className="h-full flex flex-col overflow-hidden transition-all hover:shadow-md border-transparent hover:border-primary/20">
-                    <div className="aspect-square bg-secondary/20 relative flex items-center justify-center p-6">
-                      <Package className="h-16 w-16 text-primary/40 group-hover:scale-110 transition-transform duration-300" />
-                      {product.isDiscounted && (
-                        <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">Sale</span>
-                      )}
-                    </div>
-                    <CardContent className="p-5 flex-1 flex flex-col">
-                      <div className="text-xs font-medium text-muted-foreground mb-2 flex justify-between items-center">
-                        <span>{(product as any).category?.name}</span>
-                        {product.rating && (
-                           <span className="flex items-center text-amber-500 font-bold">
-                             {product.rating.toString()} <Star className="w-3 h-3 ml-0.5 fill-current" />
-                           </span>
-                        )}
-                      </div>
-                      <h3 className="font-medium text-primary mb-2 line-clamp-2 group-hover:text-amber-600 transition-colors flex-1">
-                        {product.name}
-                      </h3>
-                      <div className="flex items-center justify-between mt-4 border-t pt-4">
-                        <div className="flex flex-col">
-                           <span className="font-bold text-lg">₹{product.price.toString()}</span>
-                           <span className="text-xs text-muted-foreground line-clamp-1"><Clock className="w-3 h-3 inline mr-1" />{product.leadTimeDays} Days</span>
-                        </div>
-                        <span className="text-xs px-2 py-1 bg-secondary text-secondary-foreground rounded border">
-                          MOQ: {product.minimumOrderQuantity}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                <Reveal key={product.id}>
+                  <ProductCard product={product as any} />
+                </Reveal>
               ))}
-            </div>
+            </StaggerContainer>
           )}
         </div>
       </div>

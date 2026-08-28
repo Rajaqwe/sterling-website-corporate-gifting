@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -432,7 +433,7 @@ model Order {
   orderNumber         String      @unique
   userId              String
   companyId           String?
-  quoteId             String?
+  quoteId             String?    @unique
   status              OrderStatus @default(PENDING)
   subtotal            Decimal     @db.Decimal(10, 2)
   tax                 Decimal     @db.Decimal(10, 2)
@@ -477,7 +478,7 @@ model Payment {
   id                String          @id @default(uuid())
   orderId           String
   provider          PaymentProvider
-  providerPaymentId String?
+  providerPaymentId String?         @unique
   providerOrderId   String?
   amount            Decimal         @db.Decimal(10, 2)
   currency          String          @default("INR")
@@ -611,6 +612,8 @@ model Review {
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, userId])
 }
 
 model ProductLike {
@@ -623,4 +626,17 @@ model ProductLike {
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([userId, productId])
+}
+
+// ------------------------------------------------------
+// WEBHOOK IDEMPOTENCY
+// ------------------------------------------------------
+
+model PaymentWebhookEvent {
+  id         String   @id @default(uuid())
+  provider   String
+  eventId    String
+  receivedAt DateTime @default(now())
+
+  @@unique([provider, eventId])
 }

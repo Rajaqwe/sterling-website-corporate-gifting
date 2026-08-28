@@ -4,14 +4,38 @@ import Link from "next/link";
 import { Package, Plus } from "lucide-react";
 import { formatINR } from "@/lib/currency";
 import { prisma } from "@/lib/prisma/client";
+import { AdminSearchInput } from "@/components/admin/AdminSearchInput";
+import { AdminPagination } from "@/components/admin/AdminPagination";
+import { BulkProductImport } from "@/components/admin/BulkProductImport";
 
-export default async function AdminProducts() {
-  const products = await prisma.product.findMany({
-    include: {
-      category: { select: { name: true } }
-    },
-    orderBy: { createdAt: 'desc' }
-  });
+export default async function AdminProducts({ searchParams }: { searchParams: { page?: string, q?: string } }) {
+  const page = Number(searchParams.page) || 1;
+  const q = searchParams.q || "";
+  const take = 10;
+  const skip = (page - 1) * take;
+
+  const where = q ? {
+    OR: [
+      { name: { contains: q, mode: 'insensitive' as const } },
+      { sku: { contains: q, mode: 'insensitive' as const } },
+      { category: { name: { contains: q, mode: 'insensitive' as const } } }
+    ]
+  } : {};
+
+  const [products, totalProducts] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      include: {
+        category: { select: { name: true } }
+      },
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take,
+    }),
+    prisma.product.count({ where })
+  ]);
+
+  const totalPages = Math.ceil(totalProducts / take);
 
   return (
     <div className="space-y-6">
@@ -20,12 +44,19 @@ export default async function AdminProducts() {
           <h1 className="text-3xl font-bold text-slate-900">Product Catalog</h1>
           <p className="mt-2 text-slate-500">Manage your B2B gifting inventory and pricing tiers.</p>
         </div>
-        <Link 
-          href="/admin/products/new" 
-          className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 h-10 px-4 py-2 shrink-0"
-        >
-          <Plus className="mr-2 h-4 w-4" /> Add Product
-        </Link>
+        <div className="flex items-center gap-2 shrink-0">
+          <BulkProductImport />
+          <Link 
+            href="/admin/products/new" 
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 h-10 px-4 py-2 shrink-0"
+          >
+            <Plus className="mr-2 h-4 w-4" /> Add Product
+          </Link>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4 bg-white p-4 border rounded-md shadow-sm">
+        <AdminSearchInput placeholder="Search products by name, SKU, or category..." />
       </div>
 
       <div className="border border-slate-200 rounded-md bg-white overflow-x-auto">
@@ -48,7 +79,7 @@ export default async function AdminProducts() {
                   <div className="flex flex-col items-center justify-center space-y-3">
                     <Package className="h-12 w-12 text-slate-300" />
                     <h3 className="text-lg font-medium text-slate-900">No products found</h3>
-                    <p className="text-slate-500 max-w-sm text-center">Your catalog is currently empty. Start building your corporate gifting inventory by adding your first product.</p>
+                    <p className="text-slate-500 max-w-sm text-center">Your catalog search returned no results.</p>
                     <Link 
                       href="/admin/products/new" 
                       className="mt-4 inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
@@ -91,6 +122,8 @@ export default async function AdminProducts() {
           </TableBody>
         </Table>
       </div>
+
+      <AdminPagination totalPages={totalPages} currentPage={page} />
     </div>
   );
 }

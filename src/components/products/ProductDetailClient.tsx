@@ -10,6 +10,7 @@ import { ProductGallery } from "@/components/products/ProductGallery";
 import { TieredPricingTable } from "@/components/products/TieredPricingTable";
 import { ProductCustomization } from "@/components/products/ProductCustomization";
 import { ProductSpecifications } from "@/components/products/ProductSpecifications";
+import { LogoMockupPreview } from "@/components/products/LogoMockupPreview";
 import { QuoteRequestModal } from "@/components/products/QuoteRequestModal";
 import { ProductReviews } from "@/components/products/ProductReviews";
 import { ProductCard } from "@/components/products/ProductCard";
@@ -24,6 +25,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useCart } from "@/components/cart/CartContext";
 
 export function ProductDetailClient({
   product,
@@ -56,6 +58,7 @@ export function ProductDetailClient({
   const [likeCount, setLikeCount] = useState(product.likes || 0);
   const [isLiking, setIsLiking] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const { incrementCart } = useCart();
 
   const selectedVariant = product.variants?.find((v: any) => v.id === selectedVariantId);
   const selectedCustomizations = availableCustomizations.filter((c: any) =>
@@ -91,11 +94,15 @@ export function ProductDetailClient({
       return;
     }
 
+    // Optimistic UI Update
+    incrementCart(quantity);
+    
     startTransition(async () => {
       const res = await addToCart(product.id, quantity, selectedVariantId);
       if (res.success) {
         toast.success("Added to cart successfully!");
       } else {
+        incrementCart(-quantity); // Revert on failure
         toast.error(res.error || "Failed to add to cart");
       }
     });
@@ -115,12 +122,13 @@ export function ProductDetailClient({
 
     try {
       const res = await toggleLike(product.id);
-      if (res.success && res.likes !== undefined) {
+      if (res.success) {
+        // res.isLiked is now narrowed to boolean (not boolean | undefined)
         setLikeCount(res.likes); // sync with server
         setIsLiked(res.isLiked);
       } else {
         toast.error(res.error || "Failed to register like.");
-        // Revert
+        // Revert optimistic update
         setIsLiked(!newIsLiked);
         setLikeCount((prev: number) => !newIsLiked ? prev + 1 : prev - 1);
       }
@@ -157,16 +165,7 @@ export function ProductDetailClient({
 
   // Dynamic live quote calculation
   const quoteCalculation = useMemo(() => {
-    // For now we map DB product back to the old mock format shape that calculateQuotePricing expects
-    // We will refactor calculateQuotePricing in Phase 4 (Pricing & Checkout Engine)
-    const legacyProductFormat = {
-      ...product,
-      moq: product.minimumOrderQuantity,
-      basePrice: Number(product.price),
-      startingPrice: Number(product.price),
-      priceTiers: product.bulkPricingTiers || [],
-    };
-    return calculateQuotePricing(legacyProductFormat, quantity, selectedCustomizations);
+    return calculateQuotePricing(product, quantity, selectedCustomizations);
   }, [product, quantity, selectedCustomizations]);
 
   const handleToggleCustomization = (id: string) => {
@@ -184,7 +183,7 @@ export function ProductDetailClient({
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background pb-24">
+    <div className="flex flex-col min-h-screen bg-background pb-24 pt-20">
       {/* Breadcrumb Navigation Strip */}
       <div className="border-b border-border/40 bg-secondary/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
@@ -229,6 +228,12 @@ export function ProductDetailClient({
               }}
               leadTime={`${product.leadTimeDays} business days`}
             />
+
+            {product.brandingAvailable !== false && (
+              <LogoMockupPreview 
+                productImageSrc={product.media?.find((m: any) => m.isPrimary)?.url || product.media?.[0]?.url || "/placeholder-product.jpg"} 
+              />
+            )}
           </div>
 
           <div className="lg:col-span-5 flex flex-col gap-6 lg:sticky lg:top-24">
@@ -407,11 +412,13 @@ export function ProductDetailClient({
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {relatedProducts.map((p) => (
-                <ProductCard key={p.id || p.slug} product={{ ...p, category: p.category?.name, moq: p.minimumOrderQuantity, price: p.price }} />
-              ))}
-            </div>
+              <div className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar gap-6 pb-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:overflow-visible sm:snap-none">
+                {relatedProducts.map((p) => (
+                  <div key={p.id || p.slug} className="min-w-[280px] w-[80vw] sm:w-auto sm:min-w-0 snap-center shrink-0">
+                    <ProductCard product={{ ...p, category: p.category?.name, moq: p.minimumOrderQuantity, price: p.price }} />
+                  </div>
+                ))}
+              </div>
           </section>
         )}
       </main>

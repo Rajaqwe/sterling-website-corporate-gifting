@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { requireAdmin } from "@/lib/auth/server";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 const productSchema = z.object({
   name: z.string().min(2, "Product name is required"),

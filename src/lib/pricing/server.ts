@@ -8,7 +8,9 @@ export async function calculateServerProductTotal(
   const product = await prisma.product.findUnique({
     where: { id: productId },
     include: {
-      bulkPricingTiers: true,
+      // Always fetch tiers in ascending minQuantity order so the loop below
+      // is deterministic regardless of DB insertion order or provider.
+      bulkPricingTiers: { orderBy: { minQuantity: 'asc' } },
       brandingOptions: {
         include: {
           brandingOption: true,
@@ -41,9 +43,12 @@ export async function calculateServerProductTotal(
     }
   }
 
-  // If quantity is higher than the max of all defined tiers, select highest bracket
+  // If quantity is higher than the max of all defined tiers, select highest bracket.
+  // Use a non-mutating copy so product.bulkPricingTiers is not reordered as a side effect.
   if (product.bulkPricingTiers.length > 0) {
-    const highestTier = product.bulkPricingTiers.sort((a, b) => b.minQuantity - a.minQuantity)[0];
+    const highestTier = [...product.bulkPricingTiers].sort(
+      (a: { minQuantity: number }, b: { minQuantity: number }) => b.minQuantity - a.minQuantity
+    )[0];
     if (quantity >= highestTier.minQuantity) {
       activeTier = highestTier;
     }

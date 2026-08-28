@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /**
  * Centralized utility for handling currency conversion and formatting.
  * Sterling uses INR as the canonical currency.

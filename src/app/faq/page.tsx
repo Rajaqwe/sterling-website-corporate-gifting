@@ -11,7 +11,7 @@ const faqCategories = [
     questions: [
       {
         q: "What is your Minimum Order Quantity (MOQ)?",
-        a: "Standard MOQs depend on the product and customization type. Generally, custom-branded items require a minimum of 25-50 units. Unbranded products can be ordered in smaller quantities. Contact us for product-specific MOQ details.",
+        a: "Standard MOQs depend on the product and customization type. Unbranded products can be ordered in smaller quantities. Generally, custom-branded items require a minimum of 25-50 units.Contact us for product-specific MOQ details.",
       },
       {
         q: "Can I order a sample before placing a bulk order?",
@@ -64,10 +64,29 @@ const faqCategories = [
 ];
 
 export default function FaqPage() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqCategories.flatMap(cat => 
+      cat.questions.map(q => ({
+        "@type": "Question",
+        "name": q.q,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": q.a
+        }
+      }))
+    )
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Hero */}
-      <section className="relative bg-primary text-white py-20 md:py-28 overflow-hidden">
+      <section className="relative bg-primary text-white py-20 md:py-15	 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
@@ -96,7 +115,7 @@ export default function FaqPage() {
                   </div>
                   <h2 className="text-2xl font-serif font-bold text-primary">{category.category}</h2>
                 </div>
-                <Accordion className="rounded-xl border bg-white shadow-sm overflow-hidden">
+                <Accordion multiple={false} className="rounded-xl border bg-white shadow-sm overflow-hidden">
                   {category.questions.map((item, qIdx) => (
                     <AccordionItem key={qIdx} className="px-6">
                       <AccordionTrigger className="py-5 text-base font-semibold text-primary hover:no-underline">

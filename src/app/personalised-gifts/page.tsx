@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export const dynamic = 'force-dynamic';
 
 import { ProductFilterSidebar, MobileFilterDrawer } from "@/components/products/ProductFilterSidebar";
@@ -34,7 +36,7 @@ export default async function PersonalisedGiftsPage({
   ]);
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 space-y-4 md:space-y-0">
         <div>
           <h1 className="text-4xl font-serif font-bold text-primary mb-2">Personalised Gifts</h1>

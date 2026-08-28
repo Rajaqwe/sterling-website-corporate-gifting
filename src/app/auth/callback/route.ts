@@ -4,7 +4,12 @@ import { NextResponse } from 'next/server'
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
-  const next = requestUrl.searchParams.get('next') || '/dashboard'
+  const rawNext = requestUrl.searchParams.get('next');
+  
+  // Validate next parameter to prevent open redirects (P1-5)
+  const next = rawNext && rawNext.startsWith('/') && !rawNext.startsWith('//') 
+    ? rawNext 
+    : '/dashboard';
 
   if (code) {
     const supabase = createClient()
@@ -28,7 +33,7 @@ export async function GET(request: Request) {
     
     if (user) {
       const { prisma } = await import('@/lib/prisma/client');
-      const existingUser = await prisma.user.findUnique({ where: { email: user.email! } });
+      const existingUser = await prisma.user.findUnique({ where: { id: user.id } });
       
       if (!existingUser) {
         await prisma.user.create({

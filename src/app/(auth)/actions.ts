@@ -3,8 +3,17 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { rateLimit } from '@/lib/security/rate-limit'
+import { headers } from 'next/headers'
 
 export async function login(formData: FormData) {
+  const ip = headers().get('x-forwarded-for') || 'anonymous';
+  const limitCheck = await rateLimit(`login_${ip}`, 5, 60000); // 5 attempts per minute
+  
+  if (!limitCheck.success) {
+    return redirect(`/login?message=${encodeURIComponent('Too many login attempts. Please try again later.')}`)
+  }
+
   const supabase = createClient()
   
   const email = formData.get('email') as string
@@ -19,7 +28,7 @@ export async function login(formData: FormData) {
     return redirect(`/login?message=${encodeURIComponent(error.message)}`)
   }
 
-  const role = data?.user?.user_metadata?.role;
+  const role = data?.user?.app_metadata?.role;
   const isAdmin = role === 'ADMIN' || role === 'SUPER_ADMIN';
 
   revalidatePath('/', 'layout')
@@ -70,11 +79,20 @@ export async function signInAnonymously() {
 }
 
 export async function signup(formData: FormData) {
+  const ip = headers().get('x-forwarded-for') || 'anonymous';
+  const limitCheck = await rateLimit(`signup_${ip}`, 3, 60000); // 3 attempts per minute
+  
+  if (!limitCheck.success) {
+    return redirect(`/register?message=${encodeURIComponent('Too many signup attempts. Please try again later.')}`)
+  }
+
   const supabase = createClient()
   
   const email = formData.get('email') as string
   const password = formData.get('password') as string
-  const fullName = formData.get('fullName') as string | null
+  const firstName = formData.get('firstName') as string
+  const lastName = formData.get('lastName') as string
+  const companyName = formData.get('companyName') as string | null
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -88,16 +106,40 @@ export async function signup(formData: FormData) {
   // Provision Prisma User
   if (data?.user) {
     const { prisma } = await import('@/lib/prisma/client');
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const existingUser = await prisma.user.findUnique({ where: { id: data.user.id } });
     if (!existingUser) {
-      await prisma.user.create({
+      const fullName = [firstName, lastName].filter(Boolean).join(' ') || null;
+      
+      const newUser = await prisma.user.create({
         data: {
           id: data.user.id,
           email,
-          fullName: fullName || null,
+          fullName,
           role: 'CUSTOMER',
         }
       });
+
+      if (companyName) {
+        // Simple slugify for the company
+        const slug = companyName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        const company = await prisma.company.upsert({
+          where: { slug },
+          update: {},
+          create: {
+            name: companyName,
+            slug,
+            industry: 'Other',
+          }
+        });
+
+        await prisma.companyMember.create({
+          data: {
+            userId: newUser.id,
+            companyId: company.id,
+            role: 'COMPANY_ADMIN',
+          }
+        });
+      }
     }
   }
 

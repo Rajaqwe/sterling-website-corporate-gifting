@@ -1,192 +1,87 @@
-import { PRODUCTS, CATEGORIES } from "@/lib/constants/products";
-import {
-  CustomizationOption,
-  FilterState,
-  PriceTier,
-  Product,
-  QuoteCalculation,
-} from "@/types/product";
+import { QuoteCalculation, PriceTier } from "@/types/product";
 
-/**
- * Filter, search, and sort products in a pure immutable pipeline.
- */
-export function queryProducts(
-  products: Product[] = PRODUCTS,
-  filters: Partial<FilterState> = {}
-): Product[] {
-  const {
-    category = null,
-    categories = [],
-    minPrice = null,
-    maxPrice = null,
-    maxMoq = null,
-    searchQuery = "",
-    tags = [],
-    sortBy = "featured",
-  } = filters;
-
-  const normalizedQuery = searchQuery ? searchQuery.trim().toLowerCase() : "";
-
-  // Combine category and categories
-  const targetCategories = new Set<string>();
-  if (category && category !== "all") {
-    targetCategories.add(category.toLowerCase());
-  }
-  if (categories && categories.length > 0) {
-    categories.forEach((cat) => {
-      if (cat && cat !== "all") targetCategories.add(cat.toLowerCase());
-    });
-  }
-
-  const filtered = products.filter((product) => {
-    // 1. Category filter
-    if (targetCategories.size > 0) {
-      const prodCatSlug = (product.categorySlug || "").toLowerCase();
-      const prodCatId = (product.categoryId || "").toLowerCase();
-      const prodCatName = (product.category || "").toLowerCase();
-
-      const matches =
-        targetCategories.has(prodCatSlug) ||
-        targetCategories.has(prodCatId) ||
-        targetCategories.has(prodCatName);
-
-      if (!matches) return false;
-    }
-
-    // 2. MOQ filter (products with product.moq <= maxMoq match)
-    if (maxMoq !== null && maxMoq !== undefined && maxMoq > 0) {
-      if (product.moq > maxMoq) return false;
-    }
-
-    // 3. Price bounds filter (evaluated against startingPrice / basePrice)
-    if (minPrice !== null && minPrice !== undefined && minPrice > 0) {
-      const checkPrice = product.startingPrice ?? product.basePrice;
-      if (checkPrice < minPrice && (product.basePrice ?? 0) < minPrice) {
-        return false;
-      }
-    }
-
-    if (maxPrice !== null && maxPrice !== undefined && maxPrice > 0) {
-      const checkPrice = product.startingPrice ?? product.basePrice;
-      if (checkPrice > maxPrice) {
-        return false;
-      }
-    }
-
-    // 4. Tags filter
-    if (tags && tags.length > 0) {
-      const prodTags = (product.tags || []).map((t) => t.toLowerCase());
-      const matchesTag = tags.some((t) => prodTags.includes(t.toLowerCase()));
-      if (!matchesTag) return false;
-    }
-
-    // 5. Search query matching
-    if (normalizedQuery.length > 0) {
-      const inTitle = (product.title || product.name || "").toLowerCase().includes(normalizedQuery);
-      const inTagline = (product.tagline || product.subtitle || "").toLowerCase().includes(normalizedQuery);
-      const inDesc = (product.description || "").toLowerCase().includes(normalizedQuery);
-      const inCategory = (product.category || "").toLowerCase().includes(normalizedQuery);
-      const inTags = (product.tags || []).some((t) => t.toLowerCase().includes(normalizedQuery));
-
-      const inMaterial =
-        (product.specifications?.material || "").toLowerCase().includes(normalizedQuery) ||
-        (product.specifications?.materials || []).some((m) => m.toLowerCase().includes(normalizedQuery));
-
-      const inBranding = (product.specifications?.brandingMethods || []).some((b) =>
-        b.toLowerCase().includes(normalizedQuery)
-      );
-
-      if (!inTitle && !inTagline && !inDesc && !inCategory && !inTags && !inMaterial && !inBranding) {
-        return false;
-      }
-    }
-
-    return true;
-  });
-
-  // 6. Sorting
-  return filtered.sort((a, b) => {
-    const titleA = a.title || a.name || "";
-    const titleB = b.title || b.name || "";
-    const priceA = a.startingPrice ?? a.basePrice ?? 0;
-    const priceB = b.startingPrice ?? b.basePrice ?? 0;
-
-    switch (sortBy) {
-      case "price-asc":
-        return priceA - priceB;
-      case "price-desc":
-        return priceB - priceA;
-      case "moq-asc":
-        return a.moq - b.moq;
-      case "moq-desc":
-        return b.moq - a.moq;
-      case "name-asc":
-      case "title":
-        return titleA.localeCompare(titleB);
-      case "rating-desc":
-        return (b.rating ?? 0) - (a.rating ?? 0);
-      case "featured":
-      default: {
-        const featA = a.isFeatured || a.featured ? 1 : 0;
-        const featB = b.isFeatured || b.featured ? 1 : 0;
-        if (featA !== featB) return featB - featA;
-        return titleA.localeCompare(titleB);
-      }
-    }
-  });
+export interface PricingProduct {
+  price?: number | string | null;
+  minimumOrderQuantity?: number | null;
+  bulkPricingTiers?: {
+    minQuantity: number;
+    maxQuantity: number | null;
+    price: number | string;
+  }[];
+  brandingOptions?: any[];
 }
 
+export type PricingCustomization = string | {
+  id?: string;
+  setupFee?: number | string | null;
+  additionalCost?: number | string | null;
+  unitCost?: number | string | null;
+};
+
 /**
- * Calculates real-time tiered volume pricing and customization costs.
+ * Calculates real-time tiered volume pricing and customization costs
+ * using the Prisma Product shape.
  */
 export function calculateQuotePricing(
-  product: Product,
+  product: PricingProduct,
   quantity: number,
-  selectedCustomizations: string[] | CustomizationOption[] = []
+  selectedCustomizations: PricingCustomization[] = []
 ): QuoteCalculation {
-  const isMoqSatisfied = quantity >= product.moq;
+  const moq = product.minimumOrderQuantity || 1;
+  const isMoqSatisfied = quantity >= moq;
   const isBelowMoq = !isMoqSatisfied;
 
+  const basePrice = Number(product.price || 0);
+
   // Resolve matching price tier
-  const tiers = product.priceTiers || [];
-  let activeTier: PriceTier = tiers[0] || {
-    minQuantity: product.moq,
+  const tiers = product.bulkPricingTiers || [];
+  let activeTier: PriceTier = tiers.length > 0 ? {
+    minQuantity: tiers[0].minQuantity,
+    maxQuantity: tiers[0].maxQuantity,
+    unitPrice: Number(tiers[0].price),
+    savingsPercent: 0,
+  } : {
+    minQuantity: moq,
     maxQuantity: null,
-    unitPrice: product.basePrice || product.startingPrice || 0,
+    unitPrice: basePrice,
     savingsPercent: 0,
   };
 
   for (const tier of tiers) {
     if (quantity >= tier.minQuantity) {
       if (tier.maxQuantity === null || quantity <= tier.maxQuantity) {
-        activeTier = tier;
-        break;
+        activeTier = {
+          minQuantity: tier.minQuantity,
+          maxQuantity: tier.maxQuantity,
+          unitPrice: Number(tier.price),
+          savingsPercent: 0
+        };
+        // We do NOT break here because tiers might be out of order, 
+        // though typically they are ordered. We want the highest matching tier.
+        // Actually since we rely on order, let's keep the highest minQuantity that matches
       }
     }
   }
 
-  // If quantity is higher than the max of all defined tiers, select highest bracket
-  if (tiers.length > 0) {
-    const highestTier = tiers[tiers.length - 1];
-    if (quantity >= highestTier.minQuantity) {
-      activeTier = highestTier;
-    }
-  }
-
-  const baseUnitPrice = product.basePrice || tiers[0]?.unitPrice || product.startingPrice || 0;
+  const baseUnitPrice = basePrice;
   const tierUnitPrice = activeTier.unitPrice;
   const productSubtotal = tierUnitPrice * quantity;
 
   // Resolve selected customizations
-  const availableCustomizations = product.customizations || product.customizationOptions || [];
-  const resolvedCustomizations: CustomizationOption[] = [];
+  const availableCustomizations = product.brandingOptions || [];
+  const resolvedCustomizations: PricingCustomization[] = [];
 
   for (const item of selectedCustomizations) {
-    if (typeof item === "string") {
-      const match = availableCustomizations.find((c) => c.id === item);
-      if (match) resolvedCustomizations.push(match);
-    } else if (item && typeof item === "object" && "setupFee" in item) {
-      resolvedCustomizations.push(item);
+    const itemId = typeof item === "string" ? item : item.id;
+    const match = availableCustomizations.find((c: PricingCustomization & { brandingOptionId?: string, brandingOption?: any }) => {
+       const cid = typeof c === "string" ? c : c.id;
+       return cid === itemId || (typeof c === "object" && c !== null && ('brandingOptionId' in c ? c.brandingOptionId === itemId : false)) || (typeof c === "object" && c !== null && ('brandingOption' in c && c.brandingOption ? c.brandingOption.id === itemId : false));
+    });
+    if (match) {
+      // Handle joined table structure (ProductBrandingOption) vs Direct BrandingOption
+      resolvedCustomizations.push(match.brandingOption || match);
+    } else if (typeof item === "object") {
+      resolvedCustomizations.push(item as any);
     }
   }
 
@@ -194,8 +89,10 @@ export function calculateQuotePricing(
   let customizationUnitTotal = 0;
 
   for (const opt of resolvedCustomizations) {
-    customizationSetupTotal += opt.setupFee || 0;
-    customizationUnitTotal += (opt.unitCost || 0) * quantity;
+    if (typeof opt === "object" && opt !== null) {
+      customizationSetupTotal += Number(opt.setupFee || 0);
+      customizationUnitTotal += Number(opt.additionalCost || opt.unitCost || 0) * quantity;
+    }
   }
 
   const customizationSubtotal = customizationSetupTotal + customizationUnitTotal;
@@ -205,9 +102,9 @@ export function calculateQuotePricing(
   // Calculate savings vs base price
   const baseSubtotal = baseUnitPrice * quantity;
   const savingsTotal = Math.max(0, baseSubtotal - productSubtotal);
-  const savingsPercent =
-    activeTier.savingsPercent ??
-    (baseUnitPrice > 0 ? Math.round(((baseUnitPrice - tierUnitPrice) / baseUnitPrice) * 100) : 0);
+  const savingsPercent = baseUnitPrice > 0 ? Math.round(((baseUnitPrice - tierUnitPrice) / baseUnitPrice) * 100) : 0;
+  
+  activeTier.savingsPercent = savingsPercent;
 
   return {
     quantity,
@@ -227,41 +124,4 @@ export function calculateQuotePricing(
     isBelowMoq,
     activeTier,
   };
-}
-
-/**
- * Retrieve a single product by its slug or ID.
- */
-export function getProductBySlug(slug: string): Product | undefined {
-  if (!slug) return undefined;
-  const normalized = slug.trim().toLowerCase();
-  return PRODUCTS.find(
-    (p) => p.slug.toLowerCase() === normalized || p.id.toLowerCase() === normalized
-  );
-}
-
-/**
- * Get all categories with dynamic product counts.
- */
-export function getAllCategories(): {
-  id: string;
-  name: string;
-  slug: string;
-  count: number;
-  description?: string;
-  featuredImage?: string;
-}[] {
-  return CATEGORIES.map((cat) => {
-    const count = PRODUCTS.filter(
-      (p) => p.categorySlug === cat.slug || p.categoryId === cat.id
-    ).length;
-    return {
-      id: cat.id,
-      name: cat.name,
-      slug: cat.slug,
-      count,
-      description: cat.description,
-      featuredImage: cat.featuredImage,
-    };
-  });
 }

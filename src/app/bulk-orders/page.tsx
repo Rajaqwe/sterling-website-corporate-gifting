@@ -13,7 +13,7 @@ export default function BulkOrdersPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero */}
-      <section className="relative bg-primary text-white py-20 md:py-28 overflow-hidden">
+      <section className="relative bg-primary text-white py-20 md:py-15	 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
         <div className="absolute top-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
@@ -42,7 +42,7 @@ export default function BulkOrdersPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { icon: BadgePercent, title: "Bulk Pricing Tiers", desc: "Enjoy significant volume discounts as your order quantity increases. The more you order, the better the per-unit pricing." },
-              { icon: UserCheck, title: "Dedicated Account Manager", desc: "A single point of contact to assist you from product curation to final delivery — no runaround." },
+              { icon: UserCheck, title: "Dedicated Account Manager", desc: "A single point of contact to assist you from product curation to final delivery — no run around." },
               { icon: FileText, title: "Procurement Support", desc: "We provide detailed quotations, valid GST invoices, proforma invoices, and compliance documentation." },
               { icon: Truck, title: "Multi-Location Delivery", desc: "Seamless dispatch and tracking for large shipments across multiple corporate offices or individual addresses." },
               { icon: ShieldCheck, title: "Quality Assurance", desc: "Every unit is individually quality-checked before dispatch. Damaged items are replaced at no extra cost." },

@@ -1,9 +1,12 @@
+export const revalidate = 3600;
+
 import React from "react";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma/client";
 import { ProductDetailClient } from "@/components/products/ProductDetailClient";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Layers } from "lucide-react";
+import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Metadata } from "next";
 
@@ -36,6 +39,17 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
+export async function generateStaticParams() {
+  const products = await prisma.product.findMany({
+    select: { slug: true },
+    where: { status: 'ACTIVE' }
+  });
+  
+  return products.map((product) => ({
+    slug: product.slug,
+  }));
+}
+
 export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
   const slug = params.slug;
 
@@ -57,26 +71,7 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
   });
 
   if (!product) {
-    return (
-      <div className="container mx-auto px-4 py-24 min-h-[60vh] flex flex-col items-center justify-center text-center">
-        <div className="h-16 w-16 rounded-full bg-secondary flex items-center justify-center mb-4 text-muted-foreground">
-          <Layers className="h-8 w-8 text-primary" />
-        </div>
-        <h1 className="text-3xl font-serif font-bold text-primary mb-3">
-          Corporate Gift Not Found
-        </h1>
-        <p className="text-muted-foreground max-w-md mb-8">
-          The corporate gift item you requested could not be located in our active catalog.
-          It may have been discontinued or updated.
-        </p>
-        <Link href="/corporate-gifts">
-          <Button className="bg-accent text-primary hover:bg-accent/90 gap-2 font-semibold px-6">
-            <ArrowLeft className="h-4 w-4" />
-            Return to Corporate Catalog
-          </Button>
-        </Link>
-      </div>
-    );
+    notFound();
   }
 
   const relatedProducts = await prisma.product.findMany({
@@ -126,13 +121,34 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
     brandingOptions: product.brandingOptions.map(bo => bo.brandingOption)
   };
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    image: product.media.find(m => m.isPrimary)?.url || product.media[0]?.url,
+    description: product.seoDescription || product.shortDescription,
+    sku: product.sku,
+    offers: {
+      '@type': 'Offer',
+      price: product.price,
+      priceCurrency: 'INR',
+      availability: product.stockQuantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+    },
+  };
+
   return (
-    <ProductDetailClient 
-      product={mappedProduct} 
-      relatedProducts={relatedProducts} 
-      initialIsWishlisted={isInWishlist}
-      initialIsLiked={isLiked}
-      isLoggedIn={!!user}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <ProductDetailClient 
+        product={mappedProduct} 
+        relatedProducts={relatedProducts} 
+        initialIsWishlisted={isInWishlist}
+        initialIsLiked={isLiked}
+        isLoggedIn={!!user}
+      />
+    </>
   );
 }

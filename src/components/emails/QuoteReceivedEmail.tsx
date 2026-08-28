@@ -33,7 +33,7 @@ export function QuoteReceivedEmail({
             A dedicated account executive will be in touch within 24 hours with a personalized proposal.
           </Text>
           <Text style={{ color: '#94a3b8', fontSize: '14px', marginTop: '40px' }}>
-            © {new Date().getFullYear()} Sterling Corporate Gifting. All rights reserved.
+            &copy; {new Date().getFullYear()} Sterling Corporate Gifting. All rights reserved.
           </Text>
         </Container>
       </Body>

@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/prisma/client';
-import { User } from '@prisma/client';
+import { User } from '@/generated/prisma';
 import { redirect } from 'next/navigation';
 
 export type AuthContext = {
@@ -54,9 +54,11 @@ export async function requireUser(): Promise<AuthContext> {
 }
 
 /**
- * Requires the user to have an ADMIN or SUPER_ADMIN role.
+ * [DEPRECATED — use requireAdmin() from @/lib/auth/require-admin instead]
+ * Requires the user to have an ADMIN or SUPER_ADMIN role, checked against the DB.
+ * NOTE: Keep this renamed to avoid silent import of the wrong guard.
  */
-export async function requireAdmin(): Promise<AuthContext> {
+export async function requireAdminDB(): Promise<AuthContext> {
   const context = await requireUser();
   
   if (context.user.role !== 'ADMIN' && context.user.role !== 'SUPER_ADMIN') {
@@ -67,9 +69,11 @@ export async function requireAdmin(): Promise<AuthContext> {
 }
 
 /**
- * Requires the user to have a SUPER_ADMIN role.
+ * [DEPRECATED — use a server-action check against DB directly]
+ * Requires the user to have a SUPER_ADMIN role (checks DB role).
+ * NOTE: Keep this renamed to avoid silent import of the wrong guard.
  */
-export async function requireSuperAdmin(): Promise<AuthContext> {
+export async function requireSuperAdminDB(): Promise<AuthContext> {
   const context = await requireUser();
   
   if (context.user.role !== 'SUPER_ADMIN') {

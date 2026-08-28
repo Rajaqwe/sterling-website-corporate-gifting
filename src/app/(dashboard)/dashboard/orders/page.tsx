@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma/client";
 import { redirect } from "next/navigation";
-import { Package } from "lucide-react";
+import { Package, Download } from "lucide-react";
 import Link from "next/link";
 
 export default async function DashboardOrders() {
@@ -36,6 +36,7 @@ export default async function DashboardOrders() {
               <TableHead>Date</TableHead>
               <TableHead>Total</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -58,9 +59,14 @@ export default async function DashboardOrders() {
                   <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
                   <TableCell>{formatINR(order.total)}</TableCell>
                   <TableCell>
-                    <Badge variant={order.status === "DELIVERED" ? "outline" : "default"}>
+                    <Badge variant={order.status === 'DELIVERED' ? 'default' : order.status === 'PENDING' ? 'secondary' : 'outline'}>
                       {order.status}
                     </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <a href={`/api/orders/${order.id}/pdf`} target="_blank" className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" title="Download Invoice">
+                      <Download className="h-4 w-4" /> PDF
+                    </a>
                   </TableCell>
                 </TableRow>
               ))

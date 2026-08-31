@@ -1,4 +1,5 @@
 import { QuoteCalculation, PriceTier } from "@/types/product";
+import { Money } from "@/lib/money";
 
 export interface PricingProduct {
   price?: number | string | null;
@@ -31,21 +32,23 @@ export function calculateQuotePricing(
   const isMoqSatisfied = quantity >= moq;
   const isBelowMoq = !isMoqSatisfied;
 
-  const basePrice = Number(product.price || 0);
+  const basePriceMoney = Money.fromDecimal(product.price || 0);
 
   // Resolve matching price tier
   const tiers = product.bulkPricingTiers || [];
   let activeTier: PriceTier = tiers.length > 0 ? {
     minQuantity: tiers[0].minQuantity,
     maxQuantity: tiers[0].maxQuantity,
-    unitPrice: Number(tiers[0].price),
+    unitPrice: Money.fromDecimal(tiers[0].price).toPaise() / 100, // Kept as number for output schema compatibility
     savingsPercent: 0,
   } : {
     minQuantity: moq,
     maxQuantity: null,
-    unitPrice: basePrice,
+    unitPrice: basePriceMoney.toPaise() / 100,
     savingsPercent: 0,
   };
+
+  let activeTierMoney = Money.fromDecimal(activeTier.unitPrice);
 
   for (const tier of tiers) {
     if (quantity >= tier.minQuantity) {
@@ -53,19 +56,17 @@ export function calculateQuotePricing(
         activeTier = {
           minQuantity: tier.minQuantity,
           maxQuantity: tier.maxQuantity,
-          unitPrice: Number(tier.price),
+          unitPrice: Money.fromDecimal(tier.price).toPaise() / 100,
           savingsPercent: 0
         };
-        // We do NOT break here because tiers might be out of order, 
-        // though typically they are ordered. We want the highest matching tier.
-        // Actually since we rely on order, let's keep the highest minQuantity that matches
+        activeTierMoney = Money.fromDecimal(tier.price);
       }
     }
   }
 
-  const baseUnitPrice = basePrice;
-  const tierUnitPrice = activeTier.unitPrice;
-  const productSubtotal = tierUnitPrice * quantity;
+  const baseUnitPrice = basePriceMoney.toPaise() / 100;
+  const tierUnitPrice = activeTierMoney.toPaise() / 100;
+  const productSubtotalMoney = activeTierMoney.multiply(quantity);
 
   // Resolve selected customizations
   const availableCustomizations = product.brandingOptions || [];
@@ -78,31 +79,38 @@ export function calculateQuotePricing(
        return cid === itemId || (typeof c === "object" && c !== null && ('brandingOptionId' in c ? c.brandingOptionId === itemId : false)) || (typeof c === "object" && c !== null && ('brandingOption' in c && c.brandingOption ? c.brandingOption.id === itemId : false));
     });
     if (match) {
-      // Handle joined table structure (ProductBrandingOption) vs Direct BrandingOption
       resolvedCustomizations.push(match.brandingOption || match);
     } else if (typeof item === "object") {
       resolvedCustomizations.push(item as any);
     }
   }
 
-  let customizationSetupTotal = 0;
-  let customizationUnitTotal = 0;
+  let customizationSetupTotalMoney = Money.fromInteger(0);
+  let customizationUnitTotalMoney = Money.fromInteger(0);
 
   for (const opt of resolvedCustomizations) {
     if (typeof opt === "object" && opt !== null) {
-      customizationSetupTotal += Number(opt.setupFee || 0);
-      customizationUnitTotal += Number(opt.additionalCost || opt.unitCost || 0) * quantity;
+      customizationSetupTotalMoney = customizationSetupTotalMoney.add(Money.fromDecimal(opt.setupFee || 0));
+      const unitCost = Money.fromDecimal(opt.additionalCost || opt.unitCost || 0);
+      customizationUnitTotalMoney = customizationUnitTotalMoney.add(unitCost.multiply(quantity));
     }
   }
 
-  const customizationSubtotal = customizationSetupTotal + customizationUnitTotal;
-  const estimatedTotal = productSubtotal + customizationSubtotal;
-  const effectiveUnitCost = quantity > 0 ? Number((estimatedTotal / quantity).toFixed(2)) : 0;
+  const customizationSubtotalMoney = customizationSetupTotalMoney.add(customizationUnitTotalMoney);
+  const estimatedTotalMoney = productSubtotalMoney.add(customizationSubtotalMoney);
+  
+  const effectiveUnitCostMoney = quantity > 0 
+    ? estimatedTotalMoney.divide(quantity) 
+    : Money.fromInteger(0);
 
   // Calculate savings vs base price
-  const baseSubtotal = baseUnitPrice * quantity;
-  const savingsTotal = Math.max(0, baseSubtotal - productSubtotal);
-  const savingsPercent = baseUnitPrice > 0 ? Math.round(((baseUnitPrice - tierUnitPrice) / baseUnitPrice) * 100) : 0;
+  const baseSubtotalMoney = basePriceMoney.multiply(quantity);
+  const savingsTotalMoney = baseSubtotalMoney.subtract(productSubtotalMoney);
+  
+  // Percent math is fine with floats
+  const savingsPercent = baseUnitPrice > 0 
+    ? Math.round(((baseUnitPrice - tierUnitPrice) / baseUnitPrice) * 100) 
+    : 0;
   
   activeTier.savingsPercent = savingsPercent;
 
@@ -111,15 +119,15 @@ export function calculateQuotePricing(
     baseUnitPrice,
     tierUnitPrice,
     unitPrice: tierUnitPrice,
-    productSubtotal,
-    customizationSetupTotal,
-    customizationUnitTotal,
-    customizationSubtotal,
-    setupFeesTotal: customizationSetupTotal,
-    estimatedTotal,
-    effectiveUnitCost,
+    productSubtotal: productSubtotalMoney.toPaise() / 100,
+    customizationSetupTotal: customizationSetupTotalMoney.toPaise() / 100,
+    customizationUnitTotal: customizationUnitTotalMoney.toPaise() / 100,
+    customizationSubtotal: customizationSubtotalMoney.toPaise() / 100,
+    setupFeesTotal: customizationSetupTotalMoney.toPaise() / 100,
+    estimatedTotal: estimatedTotalMoney.toPaise() / 100,
+    effectiveUnitCost: effectiveUnitCostMoney.toPaise() / 100,
     savingsPercent,
-    savingsTotal,
+    savingsTotal: Math.max(0, savingsTotalMoney.toPaise() / 100),
     isMoqSatisfied,
     isBelowMoq,
     activeTier,

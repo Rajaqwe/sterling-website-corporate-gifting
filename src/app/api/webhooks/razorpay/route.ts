@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { prisma } from "@/lib/prisma/client";
 import { Prisma } from "@/generated/prisma";
 import { assertEnv } from "@/lib/env";
+import { Money } from "@/lib/money";
 
 export async function POST(req: NextRequest) {
   try {
@@ -76,10 +77,11 @@ export async function POST(req: NextRequest) {
             throw new Error(`Order ${orderId} is cancelled`);
           }
 
-          // Verify amount matches closely (allowing minor float differences, but Razorpay deals in integers/paisa so exact matching is better)
-          const expectedTotal = Number(order.total);
-          if (Math.abs(expectedTotal - receivedAmount) > 0.01) {
-             throw new Error(`Amount mismatch. Expected ${expectedTotal}, got ${receivedAmount}`);
+          // Verify amount matches closely
+          const expectedTotalMoney = Money.fromDecimal(order.total);
+          const receivedAmountMoney = Money.fromDecimal(receivedAmount);
+          if (expectedTotalMoney.toPaise() !== receivedAmountMoney.toPaise()) {
+             throw new Error(`Amount mismatch. Expected ${expectedTotalMoney.toDecimal()}, got ${receivedAmountMoney.toDecimal()}`);
           }
           
           if (receivedCurrency !== 'INR') { // Assuming INR base, adjust if needed

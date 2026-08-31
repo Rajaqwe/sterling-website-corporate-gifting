@@ -6,9 +6,7 @@ const withBundleAnalyzer = createBundleAnalyzer({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+  turbopack: {},
   images: {
     remotePatterns: [
       {
@@ -20,12 +18,6 @@ const nextConfig = {
         hostname: '*.supabase.co', // Required for Supabase Storage images (P2-2)
       },
     ],
-  },
-  webpack: (config) => {
-    config.infrastructureLogging = {
-      level: 'error',
-    };
-    return config;
   },
   async headers() {
     return [

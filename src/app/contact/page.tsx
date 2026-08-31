@@ -80,7 +80,7 @@ export default function ContactPage() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Contact Information */}
           <div className="lg:col-span-1 space-y-6">
-            <Card className="shadow-sm border-0 bg-white">
+            <Card className="shadow-sm border-0 bg-background">
               <CardContent className="p-6 md:p-8 space-y-8">
                 <div>
                   <h2 className="text-2xl font-bold text-primary mb-6">Contact Information</h2>
@@ -138,7 +138,7 @@ export default function ContactPage() {
 
           {/* Contact Form */}
           <div className="lg:col-span-2">
-            <Card className="shadow-lg border-0 bg-white">
+            <Card className="shadow-lg border-0 bg-background">
               <CardContent className="p-6 md:p-10">
                 <h2 className="text-2xl font-bold text-primary mb-6">Send us a Message</h2>
 

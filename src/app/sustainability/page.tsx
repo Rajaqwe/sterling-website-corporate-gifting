@@ -70,15 +70,15 @@ export default function SustainabilityPage() {
             <h2 className="text-3xl font-serif font-bold text-primary mb-4">Our Impact</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-            <div className="p-6 rounded-xl bg-white shadow-sm">
+            <div className="p-6 rounded-xl bg-background shadow-sm">
               <div className="text-2xl font-serif font-bold text-green-600 mb-1">40%</div>
               <div className="text-sm text-muted-foreground">Of Our Catalog is Eco-Friendly</div>
             </div>
-            <div className="p-6 rounded-xl bg-white shadow-sm">
+            <div className="p-6 rounded-xl bg-background shadow-sm">
               <div className="text-2xl font-serif font-bold text-green-600 mb-1">Zero</div>
               <div className="text-sm text-muted-foreground">Single-Use Plastic in Packaging</div>
             </div>
-            <div className="p-6 rounded-xl bg-white shadow-sm">
+            <div className="p-6 rounded-xl bg-background shadow-sm">
               <div className="text-2xl font-serif font-bold text-green-600 mb-1">100%</div>
               <div className="text-sm text-muted-foreground">Ethically Vetted Suppliers</div>
             </div>

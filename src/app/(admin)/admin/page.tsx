@@ -6,6 +6,10 @@ import { prisma } from "@/lib/prisma/client";
 import { RevenueChart } from "@/components/admin/RevenueChart";
 
 export default async function AdminOverview() {
+  const currentYear = new Date().getFullYear();
+  const yearStart = new Date(`${currentYear}-01-01T00:00:00.000Z`);
+  const yearEnd = new Date(`${currentYear + 1}-01-01T00:00:00.000Z`);
+
   // Fetch real aggregated data
   const [
     pendingQuotesCount,
@@ -14,7 +18,9 @@ export default async function AdminOverview() {
     productionOrdersCount,
     totalRevenueAgg,
     corporateClientsCount,
-    recentQuotes
+    recentQuotes,
+    monthlyOrders,
+    monthlyQuotes
   ] = await Promise.all([
     prisma.quoteRequest.count({ where: { status: 'NEW' } }),
     prisma.quoteRequest.count({ where: { status: 'REVIEWING' } }),
@@ -26,18 +32,42 @@ export default async function AdminOverview() {
       take: 3,
       orderBy: { createdAt: 'desc' },
       include: { items: true }
-    })
+    }),
+    prisma.order.findMany({
+      where: {
+        status: 'DELIVERED',
+        createdAt: { gte: yearStart, lt: yearEnd },
+      },
+      select: { createdAt: true, total: true },
+    }),
+    prisma.quoteRequest.findMany({
+      where: { createdAt: { gte: yearStart, lt: yearEnd } },
+      select: { createdAt: true },
+    }),
   ]);
 
   const totalRevenue = totalRevenueAgg._sum.total || 0;
 
-  // Mock data for the chart, in a real app we'd group by month using raw SQL or JS grouping
-  const chartData = [
-    { month: "Jan", revenue: 45000, quotes: 12 },
-    { month: "Feb", revenue: 52000, quotes: 15 },
-    { month: "Mar", revenue: Number(totalRevenue) > 0 ? Number(totalRevenue) * 0.8 : 38000, quotes: 10 },
-    { month: "Apr", revenue: Number(totalRevenue) > 0 ? Number(totalRevenue) : 85000, quotes: 24 },
-  ];
+  // Build 12-element array of monthly metrics (Jan=0 -> Dec=11)
+  const monthlyMetrics = Array.from({ length: 12 }, (_, i) => ({
+    month: new Date(2000, i, 1).toLocaleString('default', { month: 'short' }),
+    revenue: 0,
+    quotes: 0
+  }));
+
+  for (const order of monthlyOrders) {
+    const month = new Date(order.createdAt).getMonth();
+    monthlyMetrics[month].revenue += Number(order.total ?? 0);
+  }
+
+  for (const quote of monthlyQuotes) {
+    const month = new Date(quote.createdAt).getMonth();
+    monthlyMetrics[month].quotes += 1;
+  }
+
+  // Filter to show from Jan up to current month for cleaner chart
+  const currentMonth = new Date().getMonth();
+  const chartData = monthlyMetrics.slice(0, currentMonth + 1);
 
   return (
     <div className="space-y-8">
@@ -116,7 +146,7 @@ export default async function AdminOverview() {
                 recentQuotes.map((quote) => {
                   const itemsCount = quote.items.reduce((acc, item) => acc + item.quantity, 0);
                   return (
-                    <div key={quote.id} className="flex items-center justify-between p-4 border rounded-lg bg-white">
+                    <div key={quote.id} className="flex items-center justify-between p-4 border rounded-lg bg-background">
                       <div>
                         <Link href={`/admin/quotes/${quote.id}`} className="font-medium text-sm text-blue-600 hover:underline">
                           QR-{quote.id.substring(0, 8)}
@@ -133,7 +163,7 @@ export default async function AdminOverview() {
             </div>
             <Link 
               href="/admin/quotes" 
-              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium border border-slate-200 bg-white hover:bg-slate-100 hover:text-slate-900 h-10 px-4 py-2 w-full mt-6"
+              className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium border border-slate-200 bg-background hover:bg-slate-100 hover:text-slate-900 h-10 px-4 py-2 w-full mt-6"
             >
               View All Quotes
             </Link>
@@ -145,14 +175,14 @@ export default async function AdminOverview() {
             <CardTitle className="text-slate-900">Quick Links</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Link href="/admin/products/new" className="flex items-center p-4 border rounded-lg hover:bg-slate-50 transition-colors bg-white">
+            <Link href="/admin/products/new" className="flex items-center p-4 border rounded-lg hover:bg-slate-50 transition-colors bg-background">
               <Package className="h-8 w-8 text-blue-600 p-1.5 bg-blue-50 rounded mr-4" />
               <div>
                 <p className="font-medium text-slate-900">Add New Product</p>
                 <p className="text-sm text-slate-500">Create a new corporate gift listing</p>
               </div>
             </Link>
-            <Link href="/admin/customers" className="flex items-center p-4 border rounded-lg hover:bg-slate-50 transition-colors bg-white">
+            <Link href="/admin/customers" className="flex items-center p-4 border rounded-lg hover:bg-slate-50 transition-colors bg-background">
               <Users className="h-8 w-8 text-indigo-600 p-1.5 bg-indigo-50 rounded mr-4" />
               <div>
                 <p className="font-medium text-slate-900">Manage Clients</p>

@@ -1,66 +1,63 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { requireUser } from "@/lib/auth/server";
 import { prisma } from "@/lib/prisma/client";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { Suspense } from "react";
+import { SavedBanner } from "@/components/dashboard/SavedBanner";
+import { SettingsForm } from "@/components/dashboard/SettingsForm";
 
 export default async function SettingsPage() {
   const auth = await requireUser();
-  
+
   const user = await prisma.user.findUnique({
-    where: { id: auth.user.id }
+    where: { id: auth.user.id },
+    select: { email: true, fullName: true, phone: true },
   });
 
-  async function updateProfile(formData: FormData) {
-    'use server';
+  async function updateProfile(prevState: unknown, formData: FormData) {
+    "use server";
     const auth = await requireUser();
-    
+
+    const fullName = (formData.get("fullName") as string)?.trim();
+    const phone = (formData.get("phone") as string)?.trim();
+
     await prisma.user.update({
       where: { id: auth.user.id },
-      data: {
-        fullName: formData.get('fullName') as string,
-        phone: formData.get('phone') as string,
-      }
+      data: { fullName: fullName || null, phone: phone || null },
     });
 
-    revalidatePath('/dashboard/settings');
+    revalidatePath("/dashboard/settings");
+    redirect("/dashboard/settings?saved=1");
   }
 
   return (
     <div className="space-y-6">
       <div>
         <h3 className="text-2xl font-serif font-medium">Account Settings</h3>
-        <p className="text-sm text-muted-foreground">
-          Manage your personal account preferences and password.
+        <p className="text-sm text-muted-foreground mt-1">
+          Manage your personal account preferences.
         </p>
       </div>
 
-      <Card>
+      <Suspense>
+        <SavedBanner message="Profile updated successfully!" />
+      </Suspense>
+
+      <Card className="max-w-lg">
         <CardHeader>
           <CardTitle>Profile Details</CardTitle>
           <CardDescription>
-            Update your personal information.
+            Update your name and mobile number — changes are saved to your account immediately.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form action={updateProfile} className="space-y-4 max-w-md">
-            <div className="space-y-2">
-              <Label>Email</Label>
-              <Input disabled defaultValue={user?.email} className="bg-muted" />
-              <p className="text-xs text-muted-foreground">Email changes must be done via Support.</p>
-            </div>
-            <div className="space-y-2">
-              <Label>Full Name</Label>
-              <Input name="fullName" defaultValue={user?.fullName || ""} />
-            </div>
-            <div className="space-y-2">
-              <Label>Phone Number</Label>
-              <Input name="phone" defaultValue={user?.phone || ""} />
-            </div>
-            <Button type="submit">Update Profile</Button>
-          </form>
+          <SettingsForm
+            email={user?.email ?? ""}
+            fullName={user?.fullName ?? ""}
+            phone={user?.phone ?? ""}
+            updateProfile={updateProfile}
+          />
         </CardContent>
       </Card>
     </div>

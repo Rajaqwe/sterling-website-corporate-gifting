@@ -24,7 +24,7 @@ export default function Home() {
           <StaggerContainer staggerDelay={120}>
             <Reveal>
               <span className="inline-block mb-4 text-sm font-bold tracking-widest text-accent uppercase">
-                Premium B2B Gifting
+                Premium Corporate Gifting
               </span>
             </Reveal>
             <Reveal>
@@ -45,6 +45,11 @@ export default function Home() {
                     Explore Corporate Gifts
                   </Button>
                 </Link>
+                <Link href="/request-a-quote">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-white bg-transparent hover:bg-white/10 h-12 px-8 text-base font-semibold shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    Request a Quote
+                  </Button>
+                </Link>
               </div>
             </Reveal>
           </StaggerContainer>
@@ -62,16 +67,14 @@ export default function Home() {
               { number: "98%", label: "Client Satisfaction" },
             ].map((stat, i) => (
               <Reveal key={i}>
-                <Card className="border-none shadow-lg bg-white text-center hover:-translate-y-1 hover:shadow-xl transition-all duration-400 ease-out">
-                  <CardContent className="py-5 px-4">
-                    <div className="text-2xl md:text-3xl font-serif font-bold text-primary mb-0.5">
-                      {stat.number}
-                    </div>
-                    <div className="text-xs text-muted-foreground font-medium">
-                      {stat.label}
-                    </div>
-                  </CardContent>
-                </Card>
+                <div className={`text-center py-5 px-4 ${i !== 0 ? 'md:border-l border-border/20' : ''}`}>
+                  <div className="text-3xl md:text-4xl font-serif font-bold text-primary mb-1">
+                    {stat.number}
+                  </div>
+                  <div className="text-sm text-muted-foreground font-medium uppercase tracking-wide">
+                    {stat.label}
+                  </div>
+                </div>
               </Reveal>
             ))}
           </StaggerContainer>
@@ -97,10 +100,10 @@ export default function Home() {
               { icon: Gift, title: "Dedicated Support", desc: "Your dedicated account manager handles the end-to-end gifting process." },
             ].map((feature, i) => (
               <Reveal key={i}>
-                <Card className="group border-none shadow-none bg-secondary/50 text-center p-6 hover:shadow-lg hover:bg-white hover:-translate-y-2 transition-all duration-500 ease-out">
+                <Card className="group border-none shadow-none bg-secondary/50 text-center p-6 hover:shadow-md hover:bg-background hover:-translate-y-1 transition-ui">
                   <CardContent className="pt-6">
-                    <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/5 text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-colors duration-500">
-                      <feature.icon className="h-8 w-8 transition-transform duration-500 group-hover:scale-110" />
+                    <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/5 text-primary mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-[var(--motion-ui)]">
+                      <feature.icon className="h-8 w-8 transition-transform duration-[var(--motion-ui)] group-hover:scale-110" />
                     </div>
                     <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
                     <p className="text-muted-foreground leading-relaxed">{feature.desc}</p>
@@ -128,7 +131,7 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Category 1 */}
             <Link href="/corporate-gifts" className="group block relative h-[400px] rounded-2xl overflow-hidden">
-              <div className="absolute inset-0 bg-[url('/videos/posters/demo-1.jpg')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-[url('/videos/posters/demo-1.jpg')] bg-cover bg-center transition-transform duration-[var(--motion-soft)] ease-[var(--ease-standard)] group-hover:scale-[1.03]" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent" />
               <div className="absolute bottom-0 left-0 p-8">
                 <h3 className="text-2xl font-serif font-bold text-white mb-2">Executive Gifts</h3>
@@ -138,7 +141,7 @@ export default function Home() {
 
             {/* Category 2 */}
             <Link href="/employee-gifting" className="group block relative h-[400px] rounded-2xl overflow-hidden">
-              <div className="absolute inset-0 bg-[url('/videos/posters/demo-2.jpg')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-[url('/videos/posters/demo-2.jpg')] bg-cover bg-center transition-transform duration-[var(--motion-soft)] ease-[var(--ease-standard)] group-hover:scale-[1.03]" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent" />
               <div className="absolute bottom-0 left-0 p-8">
                 <h3 className="text-2xl font-serif font-bold text-white mb-2">Employee Appreciation</h3>
@@ -148,7 +151,7 @@ export default function Home() {
 
             {/* Category 3 */}
             <Link href="/employee-gifting" className="group block relative h-[400px] rounded-2xl overflow-hidden">
-              <div className="absolute inset-0 bg-[url('/videos/posters/demo-3.jpg')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-[url('/videos/posters/demo-3.jpg')] bg-cover bg-center transition-transform duration-[var(--motion-soft)] ease-[var(--ease-standard)] group-hover:scale-[1.03]" />
               <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/20 to-transparent" />
               <div className="absolute bottom-0 left-0 p-8">
                 <h3 className="text-2xl font-serif font-bold text-white mb-2">Welcome Kits</h3>
@@ -192,7 +195,7 @@ export default function Home() {
                 rating: 5,
               },
             ].map((testimonial, i) => (
-              <Card key={i} className="border-none shadow-sm bg-secondary/30 overflow-hidden hover:shadow-md transition-all duration-300">
+              <Card key={i} className="border-none shadow-sm bg-secondary/30 overflow-hidden hover:shadow-md hover:-translate-y-[1px] transition-ui">
                 <CardContent className="p-8">
                   <Quote className="h-8 w-8 text-accent/40 mb-4" />
                   <p className="text-foreground leading-relaxed mb-6 italic">
@@ -252,10 +255,15 @@ export default function Home() {
           <p className="text-lg text-white/80 mb-10">
             Our corporate gifting specialists are ready to help you curate the perfect selection for your team or clients.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
             <Link href="/request-a-quote">
-              <Button size="lg" className="w-full sm:w-auto bg-accent text-primary hover:bg-accent/90 h-12 px-8 text-base font-semibold">
-                Start a Corporate Enquiry
+              <Button size="lg" className="w-full sm:w-auto bg-accent text-primary hover:bg-gold-hover h-12 px-8 text-base font-semibold transition-colors">
+                Request a Quote
+              </Button>
+            </Link>
+            <Link href="/corporate-gifts">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-white hover:bg-white/10 hover:text-white h-12 px-8 text-base font-semibold transition-colors">
+                Explore Corporate Gifts
               </Button>
             </Link>
           </div>

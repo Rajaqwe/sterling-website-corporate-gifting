@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, startTransition } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { User, Briefcase, Menu, LogOut, LayoutDashboard, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetClose } from "@/components/ui/sheet";
 import { SearchBar } from "./SearchBar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+
 import { CartDrawer } from "@/components/cart/CartDrawer";
 
 const navLinks = [
@@ -57,20 +57,25 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
 
   return (
     <header 
-      className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ease-out ${
-        isScrolled 
-          ? "bg-background/80 backdrop-blur-xl border-b border-border/40 shadow-sm py-3 text-foreground" 
-          : "bg-transparent border-transparent py-5"
+      className={`fixed top-0 left-0 right-0 z-50 w-full transition-[padding] duration-500 ease-in-out ${
+        isScrolled ? "py-3" : "py-5"
       }`}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between transition-all duration-300">
+      {/* Background with opacity transition for smoothness */}
+      <div 
+        className={`absolute inset-0 bg-background/90 backdrop-blur-xl border-b border-border/40 shadow-sm transition-opacity duration-500 ease-in-out ${
+          isScrolled ? "opacity-100" : "opacity-0"
+        }`} 
+      />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="flex items-center justify-between">
+
           
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2 group">
               <span 
-                className={`font-serif font-bold tracking-widest uppercase transition-all duration-300 ${
+                className={`font-serif font-bold tracking-widest uppercase inline-block transition-all duration-500 ease-in-out group-hover:scale-[1.05] group-hover:text-accent ${
                   isScrolled ? "text-xl text-primary" : `text-3xl ${isLightText ? "text-white" : "text-primary"}`
                 }`}
               >
@@ -81,77 +86,63 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link 
-                key={link.name} 
-                href={link.href}
-                className={`text-sm font-medium transition-colors ${
-                  isScrolled 
-                    ? "text-foreground hover:text-primary" 
-                    : `${isLightText ? "text-white/90 hover:text-white" : "text-foreground hover:text-primary/70"}`
-                }`}
-              >
-                {link.name}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = pathname.startsWith(link.href);
+              return (
+                <Link 
+                  key={link.name} 
+                  href={link.href}
+                  className={`text-sm font-medium transition-colors duration-500 relative py-1 ${
+                    isActive ? "text-accent font-semibold" : ""
+                  } ${
+                    isScrolled 
+                      ? isActive ? "" : "text-foreground hover:text-primary" 
+                      : isActive ? "" : `${isLightText ? "text-white/90 hover:text-white" : "text-foreground hover:text-primary/70"}`
+                  }`}
+                >
+                  {link.name}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-full animate-breath-enter" />
+                  )}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Icons & Actions */}
           <div className="hidden md:flex items-center gap-4">
-            <SearchBar isLightText={isLightText} />
+            <SearchBar isLightText={isLightText && !isScrolled} />
             
             {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger className={`inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent text-sm font-medium transition-all outline-none select-none size-8 ${isScrolled ? "hover:bg-muted text-foreground" : `hover:bg-primary/10 ${isLightText ? "text-white" : "text-primary"}`}`} aria-label="Account">
+              <Link href={(user.app_metadata?.role === 'ADMIN' || user.app_metadata?.role === 'SUPER_ADMIN') ? "/admin" : "/dashboard"}>
+                <Button variant="ghost" size="icon" aria-label="Account" className={`transition-colors duration-500 ${!isScrolled ? (isLightText ? "text-white hover:bg-background/20 hover:text-white" : "text-primary hover:bg-primary/10 hover:text-primary") : ""}`}>
                   <User className="h-5 w-5" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {(user.app_metadata?.role === 'ADMIN' || user.app_metadata?.role === 'SUPER_ADMIN') && (
-                    <DropdownMenuItem className="cursor-pointer p-0">
-                      <Link href="/admin" className="flex items-center w-full px-3 py-2 font-medium text-amber-600">
-                        <Briefcase className="mr-2 h-4 w-4" />
-                        <span>Admin Portal</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem className="cursor-pointer p-0">
-                    <Link href="/dashboard" className="flex items-center w-full px-3 py-2">
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      <span>My Account</span>
-                    </Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer p-0" onSelect={() => onSignOut()}>
-                    <div className="flex w-full items-center text-destructive px-3 py-2">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </div>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </Button>
+              </Link>
             ) : (
               <Link href="/login">
-                <Button variant="ghost" size="icon" aria-label="Account" className={!isScrolled ? `${isLightText ? "text-white hover:bg-white/20 hover:text-white" : "text-primary hover:bg-primary/10 hover:text-primary"}` : ""}>
+                <Button variant="ghost" size="icon" aria-label="Account" className={`transition-colors duration-500 ${!isScrolled ? (isLightText ? "text-white hover:bg-background/20 hover:text-white" : "text-primary hover:bg-primary/10 hover:text-primary") : ""}`}>
                   <User className="h-5 w-5" />
                 </Button>
               </Link>
             )}
 
-            <CartDrawer isLightText={isLightText} />
+            <CartDrawer isLightText={isLightText && !isScrolled} />
 
             <Link href="/request-a-quote">
-              <Button variant={isScrolled ? "default" : "outline"} className={`gap-2 hidden lg:flex ${!isScrolled && (isLightText ? "bg-transparent border-white text-white hover:bg-white/20 hover:text-white" : "border-primary text-primary hover:bg-primary/5")}`}>
+              <Button variant={isScrolled ? "default" : "outline"} className={`gap-2 hidden lg:flex transition-all duration-500 ${!isScrolled && (isLightText ? "bg-transparent border-white text-white hover:bg-background/20 hover:text-white" : "border-primary text-primary hover:bg-primary/5")}`}>
                 <Briefcase className="h-4 w-4" />
-                <span>Quote</span>
+                <span>Request a Quote</span>
               </Button>
             </Link>
           </div>
 
           {/* Mobile Menu */}
           <div className="md:hidden flex items-center gap-2">
-            <SearchBar isLightText={isLightText} />
-            <CartDrawer isLightText={isLightText} />
+            <SearchBar isLightText={isLightText && !isScrolled} />
+            <CartDrawer isLightText={isLightText && !isScrolled} />
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-              <SheetTrigger className={`inline-flex items-center justify-center rounded-md p-2 hover:bg-secondary transition-colors ${!isScrolled && (isLightText ? "text-white hover:bg-white/20" : "text-primary")}`}>
+              <SheetTrigger className={`inline-flex items-center justify-center rounded-md p-2 transition-colors duration-500 hover:bg-secondary ${!isScrolled && (isLightText ? "text-white hover:bg-background/20" : "text-primary")}`}>
                 <Menu className="h-6 w-6" />
                 <span className="sr-only">Menu</span>
               </SheetTrigger>
@@ -175,7 +166,9 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                           key={link.name} 
                           href={link.href}
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className="text-lg font-medium text-foreground hover:text-primary py-3 transition-colors motion-safe:animate-fade-in-up"
+                          className={`text-lg font-medium py-3 transition-colors motion-safe:animate-fade-in ${
+                            pathname.startsWith(link.href) ? "text-accent font-semibold" : "text-foreground hover:text-primary"
+                          }`}
                           style={{ animationDelay: `${idx * 100}ms`, animationFillMode: 'both' }}
                         >
                           {link.name}
@@ -209,7 +202,12 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                   </nav>
                 </div>
                 
-                <div className="p-4 bg-secondary/20 border-t border-border/40 pb-safe">
+                <div className="p-4 bg-secondary/20 border-t border-border/40 pb-safe flex flex-col gap-3">
+                  <Link href="/request-a-quote" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-center gap-2 w-full bg-accent hover:bg-gold-hover text-accent-foreground py-3 rounded-xl font-medium transition-colors shadow-sm">
+                    <Briefcase className="h-5 w-5" />
+                    Request a Quote
+                  </Link>
+
                   {user ? (
                     <div className="flex flex-col gap-3">
                       <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between bg-background p-3 rounded-xl border border-border/60 hover:border-primary/50 transition-colors">
@@ -220,13 +218,18 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                           <span className="font-medium">My Dashboard</span>
                         </div>
                       </Link>
-                      <button onClick={() => { onSignOut(); setIsMobileMenuOpen(false); }} className="flex items-center gap-3 text-destructive p-3 hover:bg-destructive/10 rounded-xl transition-colors text-left">
+                      <button onClick={() => { 
+                        startTransition(() => {
+                          onSignOut(); 
+                        });
+                        setIsMobileMenuOpen(false); 
+                      }} className="flex items-center gap-3 text-destructive p-3 hover:bg-destructive/10 rounded-xl transition-colors text-left">
                         <LogOut className="h-5 w-5" />
                         <span className="font-medium">Log out</span>
                       </button>
                     </div>
                   ) : (
-                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-center gap-2 w-full bg-primary text-primary-foreground py-3 rounded-xl font-medium">
+                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-xl font-medium transition-colors">
                       <User className="h-5 w-5" />
                       Sign In / Register
                     </Link>

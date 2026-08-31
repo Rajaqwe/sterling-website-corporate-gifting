@@ -185,7 +185,7 @@ export function DemoVideoCarousel() {
       {/* Navigation Controls - Desktop (hidden on mobile, shown on hover) */}
       <button
         onClick={(e) => { e.preventDefault(); goToPrev(); }}
-        className="absolute left-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-white backdrop-blur-md opacity-0 md:group-hover:opacity-100 transition-opacity z-20 focus:opacity-100 outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="absolute left-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-background/10 hover:bg-background/20 border border-white/20 flex items-center justify-center text-white backdrop-blur-md opacity-0 md:group-hover:opacity-100 transition-opacity z-20 focus:opacity-100 outline-none focus-visible:ring-2 focus-visible:ring-accent"
         aria-label="Previous video"
       >
         <ChevronLeft className="h-6 w-6" />
@@ -193,7 +193,7 @@ export function DemoVideoCarousel() {
 
       <button
         onClick={(e) => { e.preventDefault(); goToNext(); }}
-        className="absolute right-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 flex items-center justify-center text-white backdrop-blur-md opacity-0 md:group-hover:opacity-100 transition-opacity z-20 focus:opacity-100 outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="absolute right-4 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-background/10 hover:bg-background/20 border border-white/20 flex items-center justify-center text-white backdrop-blur-md opacity-0 md:group-hover:opacity-100 transition-opacity z-20 focus:opacity-100 outline-none focus-visible:ring-2 focus-visible:ring-accent"
         aria-label="Next video"
       >
         <ChevronRight className="h-6 w-6" />
@@ -208,7 +208,7 @@ export function DemoVideoCarousel() {
             className={`h-2 transition-all duration-300 rounded-full ${
               currentIndex === index 
                 ? "w-8 bg-accent" 
-                : "w-2 bg-white/50 hover:bg-white/80"
+                : "w-2 bg-background/50 hover:bg-background/80"
             }`}
             aria-label={`Go to demo video ${index + 1}`}
             aria-selected={currentIndex === index}

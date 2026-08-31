@@ -7,7 +7,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   return (
-    <div key={pathname} className="motion-safe:animate-fade-in-up">
+    <div key={pathname} className="motion-safe:animate-soft-reveal">
       {children}
     </div>
   );

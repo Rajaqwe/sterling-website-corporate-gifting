@@ -115,7 +115,7 @@ export default function FaqPage() {
                   </div>
                   <h2 className="text-2xl font-serif font-bold text-primary">{category.category}</h2>
                 </div>
-                <Accordion multiple={false} className="rounded-xl border bg-white shadow-sm overflow-hidden">
+                <Accordion multiple={false} className="rounded-xl border bg-background shadow-sm overflow-hidden">
                   {category.questions.map((item, qIdx) => (
                     <AccordionItem key={qIdx} className="px-6">
                       <AccordionTrigger className="py-5 text-base font-semibold text-primary hover:no-underline">
@@ -151,7 +151,7 @@ export default function FaqPage() {
               </Button>
             </Link>
             <Link href="/request-a-quote">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-primary hover:bg-white h-12 px-8 text-base">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-primary hover:bg-background h-12 px-8 text-base">
                 Request a Quote
               </Button>
             </Link>

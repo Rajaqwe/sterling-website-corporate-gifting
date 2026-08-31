@@ -11,11 +11,12 @@ import { Suspense } from "react";
 import { prisma } from "@/lib/prisma/client";
 import { parseSearchParams, buildPrismaWhereClause, buildPrismaOrderBy, getAvailableFilters } from "@/lib/products/filter-utils";
 
-export default async function PersonalisedGiftsPage({
-  searchParams,
-}: {
-  searchParams: Record<string, string | string[] | undefined>;
-}) {
+export default async function PersonalisedGiftsPage(
+  props: {
+    searchParams: Promise<Record<string, string | string[] | undefined>>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const filters = parseSearchParams(searchParams);
   const where = buildPrismaWhereClause(filters);
   const orderBy = buildPrismaOrderBy(filters.sort);

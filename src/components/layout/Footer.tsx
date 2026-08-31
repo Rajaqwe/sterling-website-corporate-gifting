@@ -43,8 +43,8 @@ export function Footer() {
           
           {/* Brand Column */}
           <div className="lg:col-span-2">
-            <Link href="/" className="inline-block mb-6">
-              <span className="font-serif text-2xl font-bold tracking-widest uppercase">
+            <Link href="/" className="inline-block mb-6 group">
+              <span className="font-serif text-2xl font-bold tracking-widest uppercase inline-block transition-ui group-hover:scale-[1.05] group-hover:text-accent">
                 Sterling
               </span>
             </Link>

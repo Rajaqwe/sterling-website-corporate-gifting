@@ -60,13 +60,13 @@ export function SearchBar({ isLightText = false }: { isLightText?: boolean }) {
   };
 
   return (
-    <>
+    <div className="relative inline-block">
       <Button 
         variant="ghost" 
         size="icon" 
         aria-label="Search"
         onClick={() => setIsOpen(!isOpen)}
-        className={isOpen ? "bg-accent text-accent-foreground relative rounded-full" : `relative rounded-full ${isLightText ? "text-white hover:bg-white/20 hover:text-white" : "text-primary hover:bg-primary/10 hover:text-primary"}`}
+        className={isOpen ? "bg-accent text-accent-foreground relative rounded-full" : `relative rounded-full ${isLightText ? "text-white hover:bg-background/20 hover:text-white" : "text-primary hover:bg-primary/10 hover:text-primary"}`}
       >
         {isOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
       </Button>
@@ -74,10 +74,10 @@ export function SearchBar({ isLightText = false }: { isLightText?: boolean }) {
       {isOpen && (
         <>
           <div 
-            className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm animate-in fade-in" 
+            className="fixed inset-0 z-40 bg-transparent animate-in fade-in" 
             onClick={() => setIsOpen(false)}
           />
-          <div className="fixed left-[50%] top-[15vh] z-50 w-[95vw] sm:w-[500px] translate-x-[-50%] bg-background border border-border/40 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+          <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[95vw] sm:w-[350px] origin-top-right bg-background border border-border/40 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
             <Command 
             className="w-full flex flex-col" 
             shouldFilter={false} // We filter on the server
@@ -96,7 +96,7 @@ export function SearchBar({ isLightText = false }: { isLightText?: boolean }) {
                 placeholder="Search products, categories..." 
                 value={query}
                 onValueChange={setQuery}
-                className="flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none focus-visible:outline-none focus-visible:ring-0 placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
               />
               {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
             </div>
@@ -142,6 +142,6 @@ export function SearchBar({ isLightText = false }: { isLightText?: boolean }) {
           </div>
         </>
       )}
-    </>
+    </div>
   );
 }

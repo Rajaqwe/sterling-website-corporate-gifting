@@ -7,14 +7,14 @@ import { rateLimit } from '@/lib/security/rate-limit'
 import { headers } from 'next/headers'
 
 export async function login(formData: FormData) {
-  const ip = headers().get('x-forwarded-for') || 'anonymous';
+  const ip = (await headers()).get('x-forwarded-for') || 'anonymous';
   const limitCheck = await rateLimit(`login_${ip}`, 5, 60000); // 5 attempts per minute
   
   if (!limitCheck.success) {
     return redirect(`/login?message=${encodeURIComponent('Too many login attempts. Please try again later.')}`)
   }
 
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const email = formData.get('email') as string
   const password = formData.get('password') as string
@@ -41,7 +41,7 @@ export async function login(formData: FormData) {
 }
 
 export async function signOut() {
-  const supabase = createClient()
+  const supabase = await createClient()
   await supabase.auth.signOut()
   
   revalidatePath('/', 'layout')
@@ -49,7 +49,7 @@ export async function signOut() {
 }
 
 export async function signInWithOAuth(provider: 'google' | 'apple') {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
@@ -67,7 +67,7 @@ export async function signInWithOAuth(provider: 'google' | 'apple') {
 }
 
 export async function signInAnonymously() {
-  const supabase = createClient()
+  const supabase = await createClient()
   const { error } = await supabase.auth.signInAnonymously()
 
   if (error) {
@@ -79,14 +79,14 @@ export async function signInAnonymously() {
 }
 
 export async function signup(formData: FormData) {
-  const ip = headers().get('x-forwarded-for') || 'anonymous';
+  const ip = (await headers()).get('x-forwarded-for') || 'anonymous';
   const limitCheck = await rateLimit(`signup_${ip}`, 3, 60000); // 3 attempts per minute
   
   if (!limitCheck.success) {
     return redirect(`/register?message=${encodeURIComponent('Too many signup attempts. Please try again later.')}`)
   }
 
-  const supabase = createClient()
+  const supabase = await createClient()
   
   const email = formData.get('email') as string
   const password = formData.get('password') as string
@@ -108,24 +108,41 @@ export async function signup(formData: FormData) {
     const { prisma } = await import('@/lib/prisma/client');
     const existingUser = await prisma.user.findUnique({ where: { id: data.user.id } });
     if (!existingUser) {
-      const fullName = [firstName, lastName].filter(Boolean).join(' ') || null;
-      
-      const newUser = await prisma.user.create({
-        data: {
-          id: data.user.id,
-          email,
-          fullName,
-          role: 'CUSTOMER',
-        }
-      });
+      const userByEmail = await prisma.user.findUnique({ where: { email } });
+      let finalUserId = data.user.id;
 
-      if (companyName) {
-        // Simple slugify for the company
-        const slug = companyName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-        const company = await prisma.company.upsert({
-          where: { slug },
-          update: {},
-          create: {
+      if (userByEmail) {
+        try {
+          await prisma.user.update({
+            where: { email },
+            data: { id: data.user.id }
+          });
+        } catch (e) {
+          console.error("Could not reconnect orphaned Prisma user on signup", e);
+          finalUserId = userByEmail.id; // Fallback
+        }
+      } else {
+        const fullName = [firstName, lastName].filter(Boolean).join(' ') || null;
+        
+        await prisma.user.create({
+          data: {
+            id: data.user.id,
+            email,
+            fullName,
+            role: 'CUSTOMER',
+          }
+        });
+      }
+
+      if (companyName && !userByEmail) {
+        let slug = companyName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        const existingCompany = await prisma.company.findUnique({ where: { slug } });
+        if (existingCompany) {
+          slug = `${slug}-${Date.now()}`;
+        }
+
+        const company = await prisma.company.create({
+          data: {
             name: companyName,
             slug,
             industry: 'Other',
@@ -134,7 +151,7 @@ export async function signup(formData: FormData) {
 
         await prisma.companyMember.create({
           data: {
-            userId: newUser.id,
+            userId: data.user.id,
             companyId: company.id,
             role: 'COMPANY_ADMIN',
           }
@@ -148,7 +165,7 @@ export async function signup(formData: FormData) {
 }
 
 export async function resetPassword(formData: FormData) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const email = formData.get('email') as string
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -163,7 +180,7 @@ export async function resetPassword(formData: FormData) {
 }
 
 export async function updatePassword(formData: FormData) {
-  const supabase = createClient()
+  const supabase = await createClient()
   const password = formData.get('password') as string
 
   const { error } = await supabase.auth.updateUser({

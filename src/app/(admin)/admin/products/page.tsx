@@ -8,7 +8,8 @@ import { AdminSearchInput } from "@/components/admin/AdminSearchInput";
 import { AdminPagination } from "@/components/admin/AdminPagination";
 import { BulkProductImport } from "@/components/admin/BulkProductImport";
 
-export default async function AdminProducts({ searchParams }: { searchParams: { page?: string, q?: string } }) {
+export default async function AdminProducts(props: { searchParams: Promise<{ page?: string, q?: string }> }) {
+  const searchParams = await props.searchParams;
   const page = Number(searchParams.page) || 1;
   const q = searchParams.q || "";
   const take = 10;
@@ -55,11 +56,11 @@ export default async function AdminProducts({ searchParams }: { searchParams: { 
         </div>
       </div>
 
-      <div className="flex items-center gap-4 bg-white p-4 border rounded-md shadow-sm">
+      <div className="flex items-center gap-4 bg-background p-4 border rounded-md shadow-sm">
         <AdminSearchInput placeholder="Search products by name, SKU, or category..." />
       </div>
 
-      <div className="border border-slate-200 rounded-md bg-white overflow-x-auto">
+      <div className="border border-slate-200 rounded-md bg-background overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
@@ -69,13 +70,14 @@ export default async function AdminProducts({ searchParams }: { searchParams: { 
               <TableHead>Base Price</TableHead>
               <TableHead>Stock</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Merchandising</TableHead>
               <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {products.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-64 text-center">
+                <TableCell colSpan={8} className="h-64 text-center">
                   <div className="flex flex-col items-center justify-center space-y-3">
                     <Package className="h-12 w-12 text-slate-300" />
                     <h3 className="text-lg font-medium text-slate-900">No products found</h3>
@@ -110,6 +112,24 @@ export default async function AdminProducts({ searchParams }: { searchParams: { 
                     <Badge variant={product.status === "ACTIVE" ? "default" : product.status === "DRAFT" ? "secondary" : "destructive"}>
                       {product.status}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <form action={async () => {
+                      'use server';
+                      const { prisma } = await import('@/lib/prisma/client');
+                      const { requireAdmin } = await import('@/lib/auth/require-admin');
+                      await requireAdmin();
+                      await prisma.product.update({
+                        where: { id: product.id },
+                        data: { isFeatured: !product.isFeatured }
+                      });
+                      const { revalidatePath } = await import('next/cache');
+                      revalidatePath('/admin/products');
+                    }}>
+                      <button type="submit" className={`text-xs px-2 py-1 rounded border ${product.isFeatured ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'}`}>
+                        {product.isFeatured ? 'Featured ★' : 'Feature'}
+                      </button>
+                    </form>
                   </TableCell>
                   <TableCell>
                     <Link href={`/admin/products/${product.id}`} className="text-blue-600 hover:underline text-sm font-medium">

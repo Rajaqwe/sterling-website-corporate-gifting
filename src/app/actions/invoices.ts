@@ -8,7 +8,7 @@ import crypto from 'crypto'
 
 export async function generateInvoiceForOrder(orderId: string) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     
     if (!user) return { success: false, error: "Unauthorized" }
@@ -57,6 +57,14 @@ export async function generateInvoiceForOrder(orderId: string) {
     revalidatePath('/admin/orders');
     return { success: true, invoiceId: invoice.id };
   } catch (error: any) {
+    if (error?.code === 'P2002') {
+      const existingInvoice = await prisma.invoice.findUnique({
+        where: { orderId: orderId }
+      });
+      if (existingInvoice) {
+        return { success: true, invoiceId: existingInvoice.id, message: "Invoice already exists for this order." };
+      }
+    }
     console.error("Failed to generate invoice:", error);
     return { success: false, error: "Failed to generate invoice." };
   }

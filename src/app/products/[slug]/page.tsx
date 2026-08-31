@@ -9,8 +9,10 @@ import { ArrowLeft, Layers } from "lucide-react";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Metadata } from "next";
+import { serializeData } from "@/lib/utils/serialize";
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const product = await prisma.product.findUnique({
     where: { slug: params.slug },
     include: { category: true, media: true }
@@ -50,7 +52,8 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
+export default async function ProductDetailPage(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const slug = params.slug;
 
   const product = await prisma.product.findUnique({
@@ -64,7 +67,14 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
         include: { brandingOption: true }
       },
       reviews: {
-        include: { user: true },
+        include: {
+          user: {
+            select: {
+              fullName: true,
+              avatarUrl: true
+            }
+          }
+        },
         orderBy: { createdAt: 'desc' }
       }
     }
@@ -88,7 +98,7 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
   });
 
   // Get user session to pass wishlist/cart state
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   let isInWishlist = false;
@@ -143,8 +153,8 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <ProductDetailClient 
-        product={mappedProduct} 
-        relatedProducts={relatedProducts} 
+        product={serializeData(mappedProduct)} 
+        relatedProducts={serializeData(relatedProducts)} 
         initialIsWishlisted={isInWishlist}
         initialIsLiked={isLiked}
         isLoggedIn={!!user}

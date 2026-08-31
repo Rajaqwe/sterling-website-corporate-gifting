@@ -15,8 +15,17 @@ import { signOut } from "@/app/(auth)/actions";
 import { NavbarClient } from "./NavbarClient";
 
 export async function Navbar() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+
+  if (user) {
+    const { prisma } = await import("@/lib/prisma/client");
+    const dbUser = await prisma.user.findUnique({ where: { id: user.id }, select: { role: true } });
+    if (dbUser) {
+      if (!user.app_metadata) user.app_metadata = {};
+      user.app_metadata.role = dbUser.role; // Override with true DB role
+    }
+  }
 
   return <NavbarClient user={user} onSignOut={signOut} />;
 }

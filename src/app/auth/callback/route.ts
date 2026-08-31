@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     : '/dashboard';
 
   if (code) {
-    const supabase = createClient()
+    const supabase = await createClient()
     
     // Attempt to exchange the code for a session
     const { error } = await supabase.auth.exchangeCodeForSession(code)
@@ -33,18 +33,47 @@ export async function GET(request: Request) {
     
     if (user) {
       const { prisma } = await import('@/lib/prisma/client');
-      const existingUser = await prisma.user.findUnique({ where: { id: user.id } });
+      let existingUser = await prisma.user.findUnique({ where: { id: user.id } });
       
       if (!existingUser) {
-        await prisma.user.create({
-          data: {
-            id: user.id,
-            email: user.email!,
-            fullName: user.user_metadata?.full_name || null,
-            avatarUrl: user.user_metadata?.avatar_url || null,
-            role: 'CUSTOMER',
+        const userByEmail = await prisma.user.findUnique({ where: { email: user.email! } });
+        if (userByEmail) {
+          // Orphaned Prisma user: a user exists with this email but a different Supabase ID.
+          // This happens if a user deletes their Supabase account but not their Prisma account,
+          // or during OAuth linking quirks. We'll try to reconnect them by updating their ID.
+          try {
+            await prisma.user.update({
+              where: { email: user.email! },
+              data: { id: user.id }
+            });
+            console.log(`Reconnected orphaned Prisma user ${user.email} to new Supabase ID ${user.id}`);
+            existingUser = await prisma.user.findUnique({ where: { id: user.id } });
+          } catch (e) {
+            console.error(`Could not reconnect orphaned Prisma user ${user.email}. Foreign keys may prevent ID update.`, e);
           }
-        });
+        } else {
+          existingUser = await prisma.user.create({
+            data: {
+              id: user.id,
+              email: user.email!,
+              fullName: user.user_metadata?.full_name || null,
+              avatarUrl: user.user_metadata?.avatar_url || null,
+              role: 'CUSTOMER',
+            }
+          });
+        }
+      }
+
+      // Sync the role from Prisma to Supabase app_metadata (OAuth logins sometimes wipe custom claims)
+      if (existingUser && existingUser.role !== user.app_metadata?.role) {
+        try {
+          const { getSupabaseAdmin } = await import('@/lib/supabase/admin');
+          await getSupabaseAdmin().auth.admin.updateUserById(user.id, { 
+            app_metadata: { role: existingUser.role } 
+          });
+        } catch (e) {
+          console.error("Failed to sync role to Supabase app_metadata", e);
+        }
       }
     }
     

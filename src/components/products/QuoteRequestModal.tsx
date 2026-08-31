@@ -14,6 +14,7 @@ import {
   Phone,
   Calendar,
   UploadCloud,
+  ShoppingCart,
   X,
 } from "lucide-react";
 import { submitQuoteRequest } from "@/app/products/actions";
@@ -42,6 +43,8 @@ interface QuoteRequestModalProps {
   selectedVariant?: ProductVariant;
   selectedCustomizations: CustomizationOption[];
   quoteCalculation: QuoteCalculation;
+  onAddToCart?: () => void;
+  isAddingToCart?: boolean;
 }
 
 export function QuoteRequestModal({
@@ -51,6 +54,8 @@ export function QuoteRequestModal({
   selectedVariant,
   selectedCustomizations,
   quoteCalculation,
+  onAddToCart,
+  isAddingToCart
 }: QuoteRequestModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -273,21 +278,34 @@ export function QuoteRequestModal({
 
       {/* Primary Request Quote CTA Button */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur-md border-t border-border/60 z-40 sm:relative sm:bottom-auto sm:left-auto sm:right-auto sm:p-0 sm:bg-transparent sm:border-0 sm:backdrop-blur-none sm:z-auto shadow-[0_-10px_40px_rgba(0,0,0,0.1)] sm:shadow-none">
-        <Button
-          data-testid="request-quote-button"
-          size="lg"
-          onClick={() => setIsOpen(true)}
-          className="w-full bg-accent text-primary hover:bg-gold-hover h-14 font-bold shadow-md transition-colors text-[15px]"
-        >
-          <Send className="mr-2 h-4 w-4" />
-          Request Corporate Quote
-        </Button>
+        <div className="flex flex-col gap-3">
+          {onAddToCart && (
+            <Button
+              size="lg"
+              onClick={onAddToCart}
+              disabled={isAddingToCart}
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-14 font-bold shadow-md transition-colors text-[15px]"
+            >
+              <ShoppingCart className="mr-2 h-5 w-5" />
+              Add to Cart
+            </Button>
+          )}
+          <Button
+            data-testid="request-quote-button"
+            size="lg"
+            onClick={() => setIsOpen(true)}
+            className="w-full bg-accent text-primary hover:bg-gold-hover h-14 font-bold shadow-md transition-colors text-[15px]"
+          >
+            <Send className="mr-2 h-4 w-4" />
+            Request Corporate Quote
+          </Button>
+        </div>
       </div>
 
       {/* Interactive Modal Dialog */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto animate-in fade-in">
-          <div className="relative w-full max-w-xl bg-card rounded-2xl border border-border shadow-2xl p-6 my-8 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-[var(--motion-ui)] ease-[var(--ease-standard)]">
+          <div className="relative w-full max-w-xl bg-card rounded-2xl border border-border shadow-2xl p-6 my-8 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-[var(--motion-ui)] ease-[var(--ease-standard)]">
             {/* Close Button */}
             <button
               type="button"

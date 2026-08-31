@@ -1,25 +1,30 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatINR } from "@/lib/currency";
 import { Badge } from "@/components/ui/badge";
-import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma/client";
-import { redirect } from "next/navigation";
+import { requireUser } from "@/lib/auth/server";
 import { Package, Download } from "lucide-react";
 import Link from "next/link";
+import { AdminPagination } from "@/components/admin/AdminPagination";
 
-export default async function DashboardOrders() {
-  const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+export default async function DashboardOrders(props: { searchParams?: Promise<{ page?: string }> }) {
+  const searchParams = await props.searchParams;
+  const page = Number(searchParams?.page) || 1;
+  const pageSize = 10;
+  const auth = await requireUser();
+  const user = auth.user;
 
-  if (!user) {
-    redirect("/login");
-  }
-
-  // Fetch real orders from database for the logged in user
-  const orders = await prisma.order.findMany({
-    where: { userId: user.id },
-    orderBy: { createdAt: 'desc' }
-  });
+  // Fetch real orders from database for the logged in user with pagination
+  const [orders, totalOrders] = await Promise.all([
+    prisma.order.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.order.count({ where: { userId: user.id } })
+  ]);
+  const totalPages = Math.ceil(totalOrders / pageSize);
 
   return (
     <div className="space-y-6">
@@ -28,7 +33,7 @@ export default async function DashboardOrders() {
         <p className="mt-2 text-muted-foreground">Track your past corporate orders and shipments.</p>
       </div>
 
-      <div className="border rounded-md bg-white">
+      <div className="border rounded-md bg-background">
         <Table>
           <TableHeader>
             <TableRow>
@@ -42,7 +47,7 @@ export default async function DashboardOrders() {
           <TableBody>
             {orders.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="h-48 text-center">
+                <TableCell colSpan={5} className="h-48 text-center">
                   <div className="flex flex-col items-center justify-center space-y-3">
                     <Package className="h-8 w-8 text-muted-foreground" />
                     <p className="text-muted-foreground">You haven&apos;t placed any orders yet.</p>
@@ -64,7 +69,7 @@ export default async function DashboardOrders() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    <a href={`/api/orders/${order.id}/pdf`} target="_blank" className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" title="Download Invoice">
+                    <a href={`/api/orders/${order.id}/pdf`} target="_blank" className="text-muted-foreground hover:text-primary transition-all duration-[var(--motion-fast)] ease-[var(--ease-standard)] opacity-70 group-hover:opacity-100 flex items-center justify-end gap-1 text-sm font-medium">
                       <Download className="h-4 w-4" /> PDF
                     </a>
                   </TableCell>
@@ -73,6 +78,7 @@ export default async function DashboardOrders() {
             )}
           </TableBody>
         </Table>
+        {totalPages > 1 && <AdminPagination currentPage={page} totalPages={totalPages} />}
       </div>
     </div>
   );

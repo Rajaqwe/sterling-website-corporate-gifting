@@ -13,7 +13,7 @@ export type AuthContext = {
  * If no user is authenticated, returns null.
  */
 export async function getAuthUser(): Promise<AuthContext | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user: supabaseUser }, error } = await supabase.auth.getUser();
 
   if (error || !supabaseUser) {
@@ -21,7 +21,7 @@ export async function getAuthUser(): Promise<AuthContext | null> {
   }
 
   const user = await prisma.user.findUnique({
-    where: { email: supabaseUser.email },
+    where: { id: supabaseUser.id },
     include: {
       companyMembers: {
         where: { isActive: true },

@@ -4,18 +4,11 @@ import { prisma } from '@/lib/prisma/client'
 import { createClient as createServerClient } from '@/lib/supabase/server'
 import { rateLimit } from '@/lib/security/rate-limit'
 
+import { getSupabaseAdmin } from '@/lib/supabase/admin'
+
 // Allowed roles for promotion
 const ALLOWED_ROLES = ['ADMIN', 'SUPER_ADMIN', 'CUSTOMER'] as const
 type AllowedRole = typeof ALLOWED_ROLES[number]
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !key) {
-    throw new Error('Supabase admin keys are missing in environment variables')
-  }
-  return createClient(url, key)
-}
 
 export async function POST(request: Request) {
   try {
@@ -32,7 +25,7 @@ export async function POST(request: Request) {
     }
 
     // --- Gate: require a valid SUPER_ADMIN session ---
-    const supabase = createServerClient()
+    const supabase = await createServerClient()
     const {
       data: { user: callerSupabaseUser },
       error: authError,

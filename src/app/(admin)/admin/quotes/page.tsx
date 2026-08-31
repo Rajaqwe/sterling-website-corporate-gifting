@@ -9,7 +9,8 @@ import { formatINR } from "@/lib/currency";
 import { AdminSearchInput } from "@/components/admin/AdminSearchInput";
 import { AdminPagination } from "@/components/admin/AdminPagination";
 
-export default async function AdminQuotes({ searchParams }: { searchParams: { page?: string, q?: string } }) {
+export default async function AdminQuotes(props: { searchParams: Promise<{ page?: string, q?: string }> }) {
+  const searchParams = await props.searchParams;
   const page = Number(searchParams.page) || 1;
   const q = searchParams.q || "";
   const take = 10;
@@ -46,7 +47,7 @@ export default async function AdminQuotes({ searchParams }: { searchParams: { pa
         <p className="mt-2 text-slate-500">Review and respond to incoming corporate quotation requests.</p>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4 bg-white p-4 border rounded-md shadow-sm">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 bg-background p-4 border rounded-md shadow-sm">
         <AdminSearchInput placeholder="Search quotes by reference, company, name, or email..." />
       </div>
 
@@ -59,7 +60,7 @@ export default async function AdminQuotes({ searchParams }: { searchParams: { pa
           actionHref={q ? "/admin/quotes" : ""}
         />
       ) : (
-        <div className="border border-slate-200 rounded-md bg-white">
+        <div className="border border-slate-200 rounded-md bg-background">
           {/* Desktop Table (Hidden on Mobile) */}
           <div className="hidden md:block overflow-x-auto">
             <Table>

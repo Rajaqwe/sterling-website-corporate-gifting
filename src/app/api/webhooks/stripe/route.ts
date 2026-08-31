@@ -4,6 +4,7 @@ import Stripe from 'stripe';
 import { prisma } from '@/lib/prisma/client';
 import { Prisma } from '@/generated/prisma';
 import { assertEnv } from '@/lib/env';
+import { Money } from '@/lib/money';
 
 // Secrets are fetched lazily at runtime so Next.js build doesn't crash
 function getStripeClient() {
@@ -16,7 +17,7 @@ function getStripeClient() {
 export async function POST(req: Request) {
   try {
     const body = await req.text();
-    const signature = headers().get('stripe-signature') as string;
+    const signature = (await headers()).get('stripe-signature') as string;
 
     let event: Stripe.Event;
 
@@ -69,10 +70,11 @@ export async function POST(req: Request) {
           }
 
           const receivedAmount = (session.amount_total ?? 0) / 100;
-          const expectedTotal = Number(order.total);
+          const receivedAmountMoney = Money.fromDecimal(receivedAmount);
+          const expectedTotalMoney = Money.fromDecimal(order.total);
           
-          if (Math.abs(expectedTotal - receivedAmount) > 0.01) {
-             throw new Error(`Amount mismatch. Expected ${expectedTotal}, got ${receivedAmount}`);
+          if (expectedTotalMoney.toPaise() !== receivedAmountMoney.toPaise()) {
+             throw new Error(`Amount mismatch. Expected ${expectedTotalMoney.toDecimal()}, got ${receivedAmountMoney.toDecimal()}`);
           }
 
           // Update Order and Payment status in the database

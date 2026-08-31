@@ -1,27 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --font-sans: 'Inter', sans-serif;
+    --font-serif: 'Playfair Display', serif;
+    /* Premium Cream Background */
+    --background: 42 50% 93%;
     --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
+    --card: 42 50% 93%;
     --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
+    --popover: 42 50% 93%;
     --popover-foreground: 222.2 84% 4.9%;
     
     /* Sterling Deep Navy Primary */
     --primary: 222 47% 11%;
     --primary-foreground: 210 40% 98%;
     
-    /* Elegant soft gray for secondary */
-    --secondary: 210 40% 96.1%;
+    /* Elegant soft warm gray for secondary */
+    --secondary: 42 20% 88%;
     --secondary-foreground: 222.2 47.4% 11.2%;
     
     /* Muted tones for subtle backgrounds */
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 42 20% 88%;
+    --muted-foreground: 30 10% 40%;
     
     /* Sterling Gold / Champagne Accent */
     --accent: 33 40% 59%;
@@ -34,10 +39,20 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --border: 42 15% 82%;
+    --input: 42 15% 82%;
     --ring: 222 47% 11%;
     --radius: 0.5rem;
+
+    /* Semantic Status Tokens (Light Mode) */
+    --status-success: 142.1 76.2% 36.3%; /* Green 600 */
+    --status-success-bg: 149.3 80.4% 90%; /* Green 100 */
+    --status-pending: 37.7 92.1% 50.2%; /* Yellow 500 */
+    --status-pending-bg: 54.5 91.7% 81.2%; /* Yellow 200 */
+    --status-danger: 0 84.2% 60.2%; /* Red 500 */
+    --status-danger-bg: 0 93.3% 94.1%; /* Red 100 */
+    --status-info: 217.2 91.2% 59.8%; /* Blue 500 */
+    --status-info-bg: 214.3 94.6% 93.3%; /* Blue 100 */
   }
 
   .dark {
@@ -51,28 +66,50 @@
     --primary: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
     
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 40 20% 15%;
     --secondary-foreground: 210 40% 98%;
     
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 40 20% 15%;
+    --muted-foreground: 40 10% 65%;
     
     --accent: 33 40% 59%;
     --accent-foreground: 222.2 47.4% 11.2%;
     --gold-hover: 33 40% 49%;
 
-    --surface-elevated: 222 47% 13%;
+    --surface-elevated: 40 20% 12%;
     
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
+    --border: 40 20% 18%;
+    --input: 40 20% 18%;
     --ring: 212.7 26.8% 83.9%;
+
+    /* Semantic Status Tokens (Dark Mode) */
+    --status-success: 142.1 70.6% 45.3%; /* Green 500 */
+    --status-success-bg: 142.1 76.2% 16.3%; /* Green 900 */
+    --status-pending: 47.9 95.8% 53.1%; /* Yellow 400 */
+    --status-pending-bg: 24.6 95% 15%; /* Amber 950 */
+    --status-danger: 0 84.2% 60.2%; /* Red 500 */
+    --status-danger-bg: 0 74% 22%; /* Red 900 */
+    --status-info: 217.2 91.2% 59.8%; /* Blue 500 */
+    --status-info-bg: 222.2 84% 14.9%; /* Blue 950 */
   }
 }
 
 @layer base {
+  :root {
+    /* Motion Tokens */
+    --motion-fast: 180ms;
+    --motion-ui: 280ms;
+    --motion-standard: 420ms;
+    --motion-soft: 650ms;
+    --motion-reveal: 800ms;
+    
+    --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  
   * {
     @apply border-border;
   }
@@ -84,21 +121,38 @@
   h1, h2, h3, h4, h5, h6 {
     @apply tracking-tight font-serif;
   }
+  
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
 }
 
 /* ========================== */
-/* Entrance Animations        */
+/* Motion Language            */
 /* ========================== */
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/* Breathing Entrance: rest -> subtle expansion (max 1.02) -> settle */
+@keyframes breathEnter {
+  0% { 
+    opacity: 0.96; 
+    transform: scale(0.985); 
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.015);
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1); 
+  }
 }
 
-@keyframes fadeInUp {
+/* Soft Reveal for general UI elements */
+@keyframes softReveal {
   from { 
     opacity: 0; 
-    transform: translateY(24px); 
+    transform: translateY(8px); 
   }
   to { 
     opacity: 1; 
@@ -106,50 +160,52 @@
   }
 }
 
-@keyframes slideInRight {
-  from { 
-    opacity: 0; 
-    transform: translateX(24px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateX(0); 
-  }
+.animate-breath-enter {
+  animation: breathEnter var(--motion-reveal) var(--ease-standard) both;
 }
 
-@keyframes scaleIn {
-  from { 
-    opacity: 0; 
-    transform: scale(0.95); 
-  }
-  to { 
-    opacity: 1; 
-    transform: scale(1); 
-  }
+.animate-breath-enter-delay {
+  animation: breathEnter var(--motion-reveal) var(--ease-standard) 150ms both;
 }
 
+.animate-breath-enter-delay-2 {
+  animation: breathEnter var(--motion-reveal) var(--ease-standard) 300ms both;
+}
+
+.animate-soft-reveal {
+  animation: softReveal var(--motion-standard) var(--ease-soft) both;
+}
+
+/* Base fade in, replacing old robotic animations */
 .animate-fade-in {
-  animation: fadeIn 0.6s ease-out both;
+  animation: softReveal var(--motion-soft) var(--ease-soft) both;
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.7s ease-out both;
+  animation: softReveal var(--motion-soft) var(--ease-soft) both;
 }
 
 .animate-fade-in-up-delay {
-  animation: fadeInUp 0.7s ease-out 0.15s both;
+  animation: softReveal var(--motion-soft) var(--ease-soft) 150ms both;
 }
 
 .animate-fade-in-up-delay-2 {
-  animation: fadeInUp 0.7s ease-out 0.3s both;
+  animation: softReveal var(--motion-soft) var(--ease-soft) 300ms both;
 }
 
 .animate-slide-in-right {
-  animation: slideInRight 0.6s ease-out both;
+  animation: softReveal var(--motion-soft) var(--ease-soft) both;
 }
 
 .animate-scale-in {
-  animation: scaleIn 0.5s ease-out both;
+  animation: breathEnter var(--motion-reveal) var(--ease-standard) both;
+}
+
+/* Shared transition utility */
+.transition-ui {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-duration: var(--motion-ui);
+  transition-timing-function: var(--ease-standard);
 }
 
 /* ========================== */
@@ -165,10 +221,26 @@ html {
 /* ========================== */
 
 @keyframes whatsappPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); }
-  50% { box-shadow: 0 0 0 12px rgba(37, 211, 102, 0); }
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); }
+  50% { transform: scale(1.02); box-shadow: 0 0 0 8px rgba(37, 211, 102, 0.15); }
 }
 
 .whatsapp-pulse {
-  animation: whatsappPulse 2s ease-in-out infinite;
+  animation: whatsappPulse 3s var(--ease-standard) infinite;
+}
+
+/* ========================== */
+/* Accessibility              */
+/* ========================== */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

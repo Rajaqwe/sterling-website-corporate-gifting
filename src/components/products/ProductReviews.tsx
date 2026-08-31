@@ -14,6 +14,7 @@ export function ProductReviews({ productId, reviews, isLoggedIn }: { productId: 
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +27,7 @@ export function ProductReviews({ productId, reviews, isLoggedIn }: { productId: 
       const res = await submitReview(productId, rating, content, title);
       if (res.success) {
         toast.success("Review submitted successfully!");
-        setShowForm(false);
+        setIsSubmitted(true);
         setContent("");
         setTitle("");
         setRating(5);
@@ -41,11 +42,16 @@ export function ProductReviews({ productId, reviews, isLoggedIn }: { productId: 
       <div className="w-full bg-card rounded-2xl border border-border/60 p-6 shadow-xs mt-10">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-serif font-bold text-primary">Customer Reviews</h3>
-          <Button variant="outline" size="sm" onClick={() => setShowForm(!showForm)}>
-            Write a Review
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setShowForm(!showForm)}
+            disabled={isSubmitted}
+          >
+            {isSubmitted ? "Review Submitted" : "Write a Review"}
           </Button>
         </div>
-        {showForm && (
+        {showForm && !isSubmitted && (
           <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4 border-t border-border/40 pt-4">
              <div className="flex items-center gap-2">
                <span className="text-sm font-semibold">Rating:</span>
@@ -75,7 +81,13 @@ export function ProductReviews({ productId, reviews, isLoggedIn }: { productId: 
              </Button>
           </form>
         )}
-        {!showForm && (
+        {showForm && isSubmitted && (
+          <div className="mt-4 p-6 rounded-xl bg-emerald-50 border border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900/50 flex flex-col items-center justify-center text-center gap-2">
+            <h4 className="font-serif font-bold text-emerald-800 dark:text-emerald-400">Thank You for Your Review!</h4>
+            <p className="text-sm text-emerald-600 dark:text-emerald-500">Your feedback has been successfully submitted and is highly appreciated.</p>
+          </div>
+        )}
+        {!showForm && !isSubmitted && (
           <p className="text-sm text-muted-foreground mt-4">No reviews yet. Be the first to review this product!</p>
         )}
       </div>
@@ -86,12 +98,17 @@ export function ProductReviews({ productId, reviews, isLoggedIn }: { productId: 
     <div className="w-full bg-card rounded-2xl border border-border/60 p-6 shadow-xs mt-10">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-serif font-bold text-primary">Customer Reviews ({reviews.length})</h3>
-        <Button variant="outline" size="sm" onClick={() => setShowForm(!showForm)}>
-          Write a Review
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={() => setShowForm(!showForm)}
+          disabled={isSubmitted}
+        >
+          {isSubmitted ? "Review Submitted" : "Write a Review"}
         </Button>
       </div>
       
-      {showForm && (
+      {showForm && !isSubmitted && (
           <form onSubmit={handleSubmit} className="mb-6 flex flex-col gap-4 border-b border-border/40 pb-6">
              <div className="flex items-center gap-2">
                <span className="text-sm font-semibold">Rating:</span>
@@ -120,6 +137,13 @@ export function ProductReviews({ productId, reviews, isLoggedIn }: { productId: 
                {isPending ? "Submitting..." : "Submit Review"}
              </Button>
           </form>
+      )}
+      
+      {showForm && isSubmitted && (
+          <div className="mb-6 p-6 rounded-xl bg-emerald-50 border border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900/50 flex flex-col items-center justify-center text-center gap-2">
+            <h4 className="font-serif font-bold text-emerald-800 dark:text-emerald-400">Thank You for Your Review!</h4>
+            <p className="text-sm text-emerald-600 dark:text-emerald-500">Your feedback has been successfully submitted and is highly appreciated.</p>
+          </div>
       )}
 
       <div className="flex flex-col gap-6">

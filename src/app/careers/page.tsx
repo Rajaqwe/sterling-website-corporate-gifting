@@ -89,7 +89,7 @@ export default function CareersPage() {
           </div>
           <div className="space-y-4">
             {openings.map((job, i) => (
-              <Card key={i} className="border-none shadow-sm bg-white overflow-hidden hover:shadow-md transition-all duration-300 group">
+              <Card key={i} className="border-none shadow-sm bg-background overflow-hidden hover:shadow-md transition-all duration-300 group">
                 <CardContent className="p-6 md:p-8">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex-1">

@@ -63,7 +63,7 @@ export function CartDrawer({ isLightText = false }: { isLightText?: boolean }) {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger 
         render={
-          <Button variant="ghost" size="icon" className={`relative ${isLightText ? "text-white hover:bg-white/20 hover:text-white" : "hover:bg-primary/10 text-foreground hover:text-primary"}`} />
+          <Button variant="ghost" size="icon" className={`relative ${isLightText ? "text-white hover:bg-background/20 hover:text-white" : "hover:bg-primary/10 text-foreground hover:text-primary"}`} />
         }
       >
         <ShoppingCart className="h-5 w-5" />

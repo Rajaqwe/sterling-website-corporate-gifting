@@ -34,7 +34,7 @@ export function ProductGallery({ images, title, badge, moq }: ProductGalleryProp
             fill
             priority
             sizes="(max-width: 1024px) 100vw, 55vw"
-            className="object-cover object-center transition-all duration-300"
+            className="object-cover object-center transition-ui"
             onError={() => {
               setHasError((prev) => ({ ...prev, [activeIndex]: true }));
             }}
@@ -77,10 +77,10 @@ export function ProductGallery({ images, title, badge, moq }: ProductGalleryProp
               aria-selected={activeIndex === idx}
               aria-label={`View image ${idx + 1}`}
               onClick={() => setActiveIndex(idx)}
-              className={`relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
+              className={`relative h-20 w-20 sm:h-24 sm:w-24 shrink-0 rounded-xl overflow-hidden border-2 transition-ui cursor-pointer ${
                 activeIndex === idx
-                  ? "border-accent ring-2 ring-accent/30 scale-95 shadow-md"
-                  : "border-border/60 hover:border-accent/60 opacity-80 hover:opacity-100"
+                  ? "border-accent ring-2 ring-accent/30 scale-[0.98] shadow-sm"
+                  : "border-border/60 hover:border-accent/60 opacity-80 hover:opacity-100 hover:-translate-y-[1px]"
               }`}
             >
               <Image

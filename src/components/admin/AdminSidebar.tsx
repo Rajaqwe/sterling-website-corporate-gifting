@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { startTransition } from "react";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, 
@@ -63,7 +64,15 @@ export function AdminSidebar() {
         </nav>
       </div>
       <div className="flex flex-shrink-0 border-t border-slate-800 p-4">
-        <button className="group block w-full flex-shrink-0 text-left">
+        <button 
+          onClick={() => {
+            startTransition(async () => {
+              const { signOut } = await import("@/app/(auth)/actions");
+              await signOut();
+            });
+          }} 
+          className="group block w-full flex-shrink-0 text-left"
+        >
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <div className="h-9 w-9 rounded-full bg-slate-700 flex items-center justify-center text-white font-medium">
@@ -73,7 +82,7 @@ export function AdminSidebar() {
             <div className="ml-3">
               <p className="text-sm font-medium text-white">Admin User</p>
               <p className="text-xs font-medium text-slate-400 hover:text-white flex items-center mt-1">
-                <LogOut className="mr-1 h-3 w-3" /> Sign Out
+                <LogOut className="mr-1 h-3 w-3" /> Log out
               </p>
             </div>
           </div>

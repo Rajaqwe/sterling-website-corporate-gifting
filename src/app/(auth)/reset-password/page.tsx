@@ -9,13 +9,14 @@ import { Lock } from "lucide-react";
 import { updatePassword } from "../actions";
 import { AutoDismissAlert } from "@/components/ui/auto-dismiss-alert";
 import { createBrowserClient } from "@supabase/ssr";
-import { useEffect } from "react";
+import { useEffect, use } from "react";
 
-export default function ResetPasswordPage({
-  searchParams,
-}: {
-  searchParams: { message: string; type?: 'error' | 'success' };
-}) {
+export default function ResetPasswordPage(
+  props: {
+    searchParams: Promise<{ message: string; type?: 'error' | 'success' }>;
+  }
+) {
+  const searchParams = use(props.searchParams);
   useEffect(() => {
     // This automatically parses any #access_token fragments in the URL from the email link
     // and sets the secure session cookies so the Server Action can read them!

@@ -115,18 +115,19 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  companyMembers CompanyMember[]
-  addresses      Address[]
-  orders         Order[]
-  quotes         QuoteRequest[]
-  wishlist       Wishlist?
-  invoices       Invoice[]
-  notifications  Notification[]
-  auditLogs      AuditLog[]
-  quoteMessages  QuoteMessage[]
-  cart           Cart?
-  reviews        Review[]
-  productLikes   ProductLike[]
+  companyMembers     CompanyMember[]
+  addresses          Address[]
+  orders             Order[]
+  quotes             QuoteRequest[]
+  wishlist           Wishlist?
+  invoices           Invoice[]
+  notifications      Notification[]
+  auditLogs          AuditLog[]
+  quoteMessages      QuoteMessage[]
+  cart               Cart?
+  reviews            Review[]
+  productLikes       ProductLike[]
+  companyInvitations CompanyInvitation[]
 }
 
 model Company {
@@ -146,9 +147,10 @@ model Company {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  members  CompanyMember[]
-  orders   Order[]
-  invoices Invoice[]
+  members            CompanyMember[]
+  orders             Order[]
+  invoices           Invoice[]
+  companyInvitations CompanyInvitation[]
 }
 
 model CompanyMember {
@@ -241,6 +243,8 @@ model Product {
   reviewCount          Int           @default(0)
   isDiscounted         Boolean       @default(false)
   likes                Int           @default(0)
+  technicalSpecifications Json?
+  packageLogistics     Json?
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
 
@@ -270,6 +274,7 @@ model ProductMedia {
   caption      String?
   sortOrder    Int       @default(0)
   isPrimary    Boolean   @default(false)
+  isLiveProofing Boolean @default(false)
   isActive     Boolean   @default(true)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -379,6 +384,7 @@ model QuoteRequest {
   deliveryLocation       String?
   requiredDeliveryDate   DateTime?
   eventType              String?
+  expiresAt              DateTime?
   additionalRequirements String?     @db.Text
   fileUrl                String?
   fileName               String?
@@ -433,7 +439,7 @@ model Order {
   orderNumber         String      @unique
   userId              String
   companyId           String?
-  quoteId             String?    @unique
+  quoteId             String?     @unique
   status              OrderStatus @default(PENDING)
   subtotal            Decimal     @db.Decimal(10, 2)
   tax                 Decimal     @db.Decimal(10, 2)
@@ -468,6 +474,7 @@ model OrderItem {
   totalPrice           Decimal  @db.Decimal(10, 2)
   brandingOption       String?
   customizationDetails String?  @db.Text
+  variantSnapshot      Json?
   createdAt            DateTime @default(now())
 
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
@@ -495,7 +502,7 @@ model Payment {
 model Invoice {
   id            String        @id @default(uuid())
   invoiceNumber String        @unique
-  orderId       String
+  orderId       String        @unique
   userId        String
   companyId     String?
   subtotal      Decimal       @db.Decimal(10, 2)
@@ -626,6 +633,24 @@ model ProductLike {
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([userId, productId])
+}
+
+model CompanyInvitation {
+  id        String      @id @default(uuid())
+  companyId String
+  email     String
+  role      CompanyRole @default(MEMBER)
+  token     String      @unique
+  expiresAt DateTime
+  status    String      @default("PENDING") // PENDING, ACCEPTED, EXPIRED, CANCELLED
+  invitedBy String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  inviter User    @relation(fields: [invitedBy], references: [id])
+
+  @@unique([companyId, email])
 }
 
 // ------------------------------------------------------

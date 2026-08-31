@@ -7,11 +7,12 @@ import { Mail } from "lucide-react";
 import { resetPassword } from "../actions";
 import { AutoDismissAlert } from "@/components/ui/auto-dismiss-alert";
 
-export default function ForgotPasswordPage({
-  searchParams,
-}: {
-  searchParams: { message: string; type?: 'error' | 'success' };
-}) {
+export default async function ForgotPasswordPage(
+  props: {
+    searchParams: Promise<{ message: string; type?: 'error' | 'success' }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   return (
     <Card className="border shadow-sm rounded-xl">
       <CardHeader className="space-y-1 px-8 pt-8 pb-0">

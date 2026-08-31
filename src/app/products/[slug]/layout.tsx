@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 
-export async function generateMetadata(
-  { params }: { params: { slug: string } }
-): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const params = await props.params;
   const slug = params.slug;
   const title = slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 

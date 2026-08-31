@@ -3,10 +3,8 @@ import { prisma } from "@/lib/prisma/client";
 import { requireUser } from "@/lib/auth/server";
 import { generateInvoicePdfStream } from "@/lib/pdf/generateInvoicePdf";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const auth = await requireUser();
     

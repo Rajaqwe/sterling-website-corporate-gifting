@@ -37,13 +37,13 @@ export function ProductCard({ product, className = "", priority = false }: Produ
   return (
     <Card
       data-testid="product-card"
-      className={cn("group flex flex-col h-full bg-white rounded-xl border border-border/40 overflow-hidden hover:-translate-y-1.5 hover:shadow-xl transition-all duration-500 ease-out", className)}
+      className={cn("group group/card flex flex-col h-full bg-background rounded-xl border border-border/40 overflow-hidden hover:-translate-y-1 hover:shadow-md transition-ui", className)}
     >
       {/* Product Image Stage */}
       <div className="relative aspect-[4/5] w-full overflow-hidden bg-secondary/30">
         <Link
           href={`/products/${product.slug}`}
-          className="block w-full h-full"
+          className="block w-full h-full relative"
           aria-label={`View ${title}`}
         >
           {imageError ? (
@@ -58,7 +58,7 @@ export function ProductCard({ product, className = "", priority = false }: Produ
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               priority={priority}
-              className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+              className="object-cover object-center transition-transform duration-[var(--motion-soft)] ease-[var(--ease-standard)] group-hover/card:scale-[1.03]"
               onError={() => {
                 setImageError(true);
                 setImageSrc("/placeholder-product.jpg");
@@ -90,15 +90,7 @@ export function ProductCard({ product, className = "", priority = false }: Produ
           </span>
         </div>
 
-        {/* Hover / Mobile CTA */}
-        <div className="absolute bottom-3 inset-x-3 flex justify-center pointer-events-none">
-          <Link 
-            href={`/request-a-quote?product=${product.slug}`}
-            className="pointer-events-auto w-full md:opacity-0 md:translate-y-2 md:group-hover/card:opacity-100 md:group-hover/card:translate-y-0 transition-all duration-300 flex items-center justify-center gap-1.5 text-sm font-semibold bg-accent hover:bg-gold-hover text-primary py-2.5 px-4 rounded-lg shadow-md [@media(hover:none)]:opacity-100 [@media(hover:none)]:translate-y-0"
-          >
-            Request Quote <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
+        {/* Removed Hover CTA to keep image clean and ensure actions are always visible */}
       </div>
 
       {/* Content Area */}
@@ -176,6 +168,20 @@ export function ProductCard({ product, className = "", priority = false }: Produ
               </span>
             </div>
           )}
+        </div>
+        
+        {/* Actions */}
+        <div className="flex gap-2 pt-3 mt-1">
+          <Link href={`/products/${product.slug}`} className="flex-1">
+            <button className="w-full h-9 rounded-md border border-border/60 hover:bg-secondary/50 text-xs font-semibold text-foreground transition-colors">
+              View Details
+            </button>
+          </Link>
+          <Link href={`/request-a-quote?product=${product.slug}`} className="flex-1">
+            <button className="w-full h-9 rounded-md bg-accent hover:bg-gold-hover text-primary text-xs font-semibold shadow-sm transition-colors">
+              Request Quote
+            </button>
+          </Link>
         </div>
       </CardContent>
     </Card>

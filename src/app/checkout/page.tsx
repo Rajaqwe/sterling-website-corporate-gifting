@@ -8,22 +8,48 @@ import { prisma } from "@/lib/prisma/client";
 import { requireUser } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
 import { CheckoutForm } from "./CheckoutForm";
+import { CartCheckoutForm } from "./CartCheckoutForm";
 
-export default async function CheckoutPage({
-  searchParams,
-}: {
-  searchParams: { quoteId: string };
-}) {
+export default async function CheckoutPage(
+  props: {
+    searchParams: Promise<{ quoteId?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const quoteId = searchParams.quoteId;
   const auth = await requireUser();
 
   if (!quoteId) {
-    redirect("/dashboard/quotes");
+    // Standard Cart Checkout Flow
+    const cart = await prisma.cart.findUnique({
+      where: { userId: auth.user.id },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: { media: true, variants: true }
+            }
+          }
+        }
+      }
+    });
+
+    if (!cart || cart.items.length === 0) {
+      redirect("/corporate-gifts");
+    }
+
+    return (
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-12 max-w-5xl">
+        <h1 className="text-3xl font-serif font-bold text-primary mb-8">Secure Direct Checkout</h1>
+        <CartCheckoutForm cart={JSON.parse(JSON.stringify(cart))} />
+      </div>
+    );
   }
 
+  // Quote Checkout Flow
   const quote = await prisma.quoteRequest.findUnique({
     where: { id: quoteId },
-    include: { items: true }
+    include: { items: { include: { product: true } } }
   });
 
   if (!quote) {
@@ -39,13 +65,10 @@ export default async function CheckoutPage({
     redirect(`/dashboard/quotes/${quote.id}`);
   }
 
-  const itemsTotal = quote.items.reduce((acc, item) => acc + Number(item.totalPrice), 0);
-  const totalQuantity = quote.items.reduce((acc, item) => acc + item.quantity, 0);
-
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-5xl">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-12 max-w-5xl">
       <h1 className="text-3xl font-serif font-bold text-primary mb-8">Secure B2B Checkout</h1>
-      <CheckoutForm quote={quote as any} />
+      <CheckoutForm quote={JSON.parse(JSON.stringify(quote))} />
     </div>
   );
 }

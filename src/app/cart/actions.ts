@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma/client";
 import { revalidatePath } from "next/cache";
 
 async function getUser() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   return user;
 }
@@ -32,17 +32,34 @@ export async function getCartItems() {
 
     if (!cart) return { success: true, items: [] };
 
-    // Need to parse media json
-    const items = cart.items.map((item: any) => {
-      if (item.product.media && typeof item.product.media === 'string') {
+    // Need to parse media json and serialize Decimal fields
+    const serializedItems = cart.items.map((item: any) => {
+      let media = item.product.media;
+      if (media && typeof media === 'string') {
         try {
-          item.product.media = JSON.parse(item.product.media);
+          media = JSON.parse(media);
         } catch(e) {}
       }
-      return item;
+
+      return {
+        ...item,
+        product: {
+          ...item.product,
+          media,
+          price: item.product.price?.toString() || "0",
+          compareAtPrice: item.product.compareAtPrice?.toString() || null,
+          weight: item.product.weight?.toString() || null,
+          rating: item.product.rating?.toString() || null,
+          variants: item.product.variants?.map((v: any) => ({
+            ...v,
+            price: v.price?.toString() || null,
+            weight: v.weight?.toString() || null,
+          })) || []
+        }
+      };
     });
 
-    return { success: true, items };
+    return { success: true, items: serializedItems };
   } catch (error: any) {
     return { success: false, error: error.message };
   }

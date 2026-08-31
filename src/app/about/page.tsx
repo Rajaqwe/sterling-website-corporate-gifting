@@ -42,7 +42,7 @@ export default function AboutPage() {
               { number: "50+", label: "Product Categories" },
               { number: "98%", label: "Client Satisfaction" },
             ].map((stat, i) => (
-              <Card key={i} className="border-none shadow-lg bg-white text-center">
+              <Card key={i} className="border-none shadow-lg bg-background text-center">
                 <CardContent className="py-6 px-4">
                   <div className="text-2xl md:text-3xl font-serif font-bold text-primary mb-1">
                     {stat.number}
@@ -109,7 +109,7 @@ export default function AboutPage() {
               { icon: Target, title: "Corporate-First Approach", desc: "Built specifically for B2B needs: GST invoices, procurement support, tiered pricing, and compliance documentation." },
               { icon: Sparkles, title: "Trend-Forward Curation", desc: "Our sourcing team constantly identifies the latest premium products to keep your gifting fresh and impressive." },
             ].map((item, i) => (
-              <Card key={i} className="border-none shadow-none bg-white/60 text-center p-6 hover:shadow-md transition-shadow duration-300">
+              <Card key={i} className="border-none shadow-none bg-background/60 text-center p-6 hover:shadow-md transition-shadow duration-300">
                 <CardContent className="pt-6">
                   <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary/5 text-primary mb-5">
                     <item.icon className="h-7 w-7" />
@@ -139,7 +139,7 @@ export default function AboutPage() {
               </Button>
             </Link>
             <Link href="/contact">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-primary hover:bg-white h-12 px-8 text-base">
+              <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-primary hover:bg-background h-12 px-8 text-base">
                 Contact Us
               </Button>
             </Link>

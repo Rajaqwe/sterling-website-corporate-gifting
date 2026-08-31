@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma/client'
 import { revalidatePath } from 'next/cache'
 import { OrderStatus } from '@/generated/prisma'
 import { createClient } from '@/lib/supabase/server'
+import { TaxService } from '@/lib/pricing/TaxService'
+import { Money } from '@/lib/money'
 import crypto from 'crypto'
 
 export async function createOrderFromQuote(
@@ -72,10 +74,10 @@ export async function createOrderFromQuote(
       });
 
       // Calculate totals from quote items (server-authoritative)
-      const subtotal = quote.items.reduce((acc: number, item: any) => acc + Number(item.totalPrice), 0);
-      const tax = subtotal * 0.18; // 18% GST
-      const shippingCost = 0;
-      const total = subtotal + tax + shippingCost;
+      const subtotalMoney = quote.items.reduce((acc: Money, item: any) => acc.add(Money.fromDecimal(item.totalPrice)), Money.fromInteger(0));
+      const taxCalc = TaxService.calculateGST(subtotalMoney);
+      const shippingCost = Money.fromInteger(0);
+      const total = taxCalc.total.add(shippingCost);
 
       // Create the order
       const newOrder = await tx.order.create({
@@ -84,10 +86,10 @@ export async function createOrderFromQuote(
           userId: user.id,
           quoteId: quote.id,
           status: OrderStatus.PENDING,
-          subtotal,
-          tax,
-          shippingCost,
-          total,
+          subtotal: taxCalc.subtotal.toDecimal(),
+          tax: taxCalc.taxAmount.toDecimal(),
+          shippingCost: shippingCost.toDecimal(),
+          total: total.toDecimal(),
           shippingAddressId: shippingAddress.id,
           billingAddressId: billingAddress.id,
         }

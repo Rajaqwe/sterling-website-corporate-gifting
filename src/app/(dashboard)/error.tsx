@@ -12,7 +12,7 @@ export default function ErrorBoundary({
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error("Admin area error:", error);
+    console.error("Dashboard error:", error);
   }, [error]);
 
   return (
@@ -21,7 +21,11 @@ export default function ErrorBoundary({
         <AlertCircle className="h-6 w-6" />
         <h2 className="text-xl font-semibold">Something went wrong!</h2>
       </div>
-      <p className="text-muted-foreground">{error.message || "An unexpected error occurred in the admin area."}</p>
+      <p className="text-muted-foreground">
+        {process.env.NODE_ENV === "development"
+          ? error.message
+          : "An unexpected error occurred while loading your dashboard. Please try again."}
+      </p>
       <Button onClick={() => reset()} variant="outline">
         Try again
       </Button>

@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 
 interface RevealProps {
   children: React.ReactNode;
-  animation?: "fade-in-up" | "fade-in" | "scale-in";
+  animationType?: "breath" | "soft-reveal" | "none";
   delay?: number;
   duration?: number;
   className?: string;
@@ -13,7 +13,7 @@ interface RevealProps {
 
 export function Reveal({
   children,
-  animation = "fade-in-up",
+  animationType = "soft-reveal",
   delay = 0,
   duration,
   className = "",
@@ -56,13 +56,21 @@ export function Reveal({
     };
   }, [threshold]);
 
-  // Map the animation prop to the tailwind animate-* class
-  const animationClass = isVisible ? `motion-safe:animate-${animation}` : "opacity-0";
+  const getAnimationClass = () => {
+    if (!isVisible) {
+      if (animationType === "breath") return "opacity-0 scale-[0.985]";
+      if (animationType === "soft-reveal") return "opacity-0 translate-y-2";
+      return "opacity-0";
+    }
+    if (animationType === "breath") return "animate-breath-enter";
+    if (animationType === "soft-reveal") return "animate-soft-reveal";
+    return "";
+  };
 
   return (
     <div
       ref={ref}
-      className={`${animationClass} ${className}`}
+      className={`${getAnimationClass()} ${className}`}
       style={{
         animationDelay: `${delay}ms`,
         ...(duration && { animationDuration: `${duration}ms` }),

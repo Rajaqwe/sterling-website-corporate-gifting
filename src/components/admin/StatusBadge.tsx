@@ -1,24 +1,17 @@
 import { Badge } from "@/components/ui/badge";
 
-type StatusType = "NEW" | "REVIEWING" | "CONTACTED" | "PROPOSAL_SENT" | "NEGOTIATION" | "APPROVED" | "REJECTED" | "COMPLETED" | "CANCELLED" | "PENDING" | "CONFIRMED" | "PROCESSING" | "BRANDING" | "PACKED" | "SHIPPED" | "DELIVERED" | "REFUNDED";
+export type StatusType = "NEW" | "REVIEWING" | "CONTACTED" | "PROPOSAL_SENT" | "NEGOTIATION" | "APPROVED" | "REJECTED" | "COMPLETED" | "CANCELLED" | "PENDING" | "CONFIRMED" | "PROCESSING" | "BRANDING" | "PACKED" | "SHIPPED" | "DELIVERED" | "REFUNDED";
 
-export function StatusBadge({ status }: { status: string }) {
+export function getStatusStyles(status: string): string {
   const normalized = status.toUpperCase() as StatusType;
   
-  let variant: "default" | "secondary" | "destructive" | "outline" = "secondary";
-  let customClass = "";
-
   switch (normalized) {
-    // Amber / Pending States
     case "NEW":
     case "PENDING":
     case "REVIEWING":
     case "PROCESSING":
-      customClass = "bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-200";
-      variant = "outline";
-      break;
+      return "bg-[hsl(var(--status-pending-bg))] text-[hsl(var(--status-pending))] border-[hsl(var(--status-pending))] hover:bg-[hsl(var(--status-pending-bg))]";
     
-    // Blue / In Progress States
     case "CONTACTED":
     case "PROPOSAL_SENT":
     case "NEGOTIATION":
@@ -26,31 +19,28 @@ export function StatusBadge({ status }: { status: string }) {
     case "BRANDING":
     case "PACKED":
     case "SHIPPED":
-      customClass = "bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200";
-      variant = "outline";
-      break;
+      return "bg-[hsl(var(--status-info-bg))] text-[hsl(var(--status-info))] border-[hsl(var(--status-info))] hover:bg-[hsl(var(--status-info-bg))]";
       
-    // Green / Success States
     case "APPROVED":
     case "COMPLETED":
     case "DELIVERED":
-      customClass = "bg-emerald-100 text-emerald-800 border-emerald-200 hover:bg-emerald-200";
-      variant = "outline";
-      break;
+      return "bg-[hsl(var(--status-success-bg))] text-[hsl(var(--status-success))] border-[hsl(var(--status-success))] hover:bg-[hsl(var(--status-success-bg))]";
       
-    // Red / Failed States
     case "REJECTED":
     case "CANCELLED":
     case "REFUNDED":
-      variant = "destructive";
-      break;
+      return "bg-[hsl(var(--status-danger-bg))] text-[hsl(var(--status-danger))] border-[hsl(var(--status-danger))] hover:bg-[hsl(var(--status-danger-bg))]";
       
     default:
-      variant = "secondary";
+      return "bg-secondary text-secondary-foreground border-border";
   }
+}
+
+export function StatusBadge({ status }: { status: string }) {
+  const customClass = getStatusStyles(status);
 
   return (
-    <Badge variant={variant} className={customClass}>
+    <Badge variant="outline" className={customClass}>
       {status.replace(/_/g, " ")}
     </Badge>
   );

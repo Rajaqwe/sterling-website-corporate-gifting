@@ -8,7 +8,11 @@ export async function GET(request: Request) {
   try {
     // Check for authorization header if you want to secure it, Vercel sends a CRON_SECRET
     const authHeader = request.headers.get("authorization");
-    if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    if (!process.env.CRON_SECRET) {
+      console.error("CRON_SECRET is missing from environment variables");
+      return NextResponse.json({ error: "Configuration Error" }, { status: 500 });
+    }
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

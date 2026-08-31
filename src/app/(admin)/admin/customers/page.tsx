@@ -5,7 +5,8 @@ import { prisma } from "@/lib/prisma/client";
 import { AdminSearchInput } from "@/components/admin/AdminSearchInput";
 import { AdminPagination } from "@/components/admin/AdminPagination";
 
-export default async function AdminCustomers({ searchParams }: { searchParams: { page?: string, q?: string } }) {
+export default async function AdminCustomers(props: { searchParams: Promise<{ page?: string, q?: string }> }) {
+  const searchParams = await props.searchParams;
   const page = Number(searchParams.page) || 1;
   const q = searchParams.q || "";
   const take = 10;
@@ -45,11 +46,11 @@ export default async function AdminCustomers({ searchParams }: { searchParams: {
         </div>
       </div>
 
-      <div className="flex items-center gap-4 bg-white p-4 border rounded-md shadow-sm">
+      <div className="flex items-center gap-4 bg-background p-4 border rounded-md shadow-sm">
         <AdminSearchInput placeholder="Search customers by name, email, or company..." />
       </div>
 
-      <div className="border border-slate-200 rounded-md bg-white overflow-x-auto">
+      <div className="border border-slate-200 rounded-md bg-background overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>

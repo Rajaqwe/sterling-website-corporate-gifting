@@ -66,15 +66,15 @@ export default function EventGiftsPage() {
       <section className="py-16 bg-secondary/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-            <div className="p-6 rounded-xl bg-white shadow-sm">
+            <div className="p-6 rounded-xl bg-background shadow-sm">
               <div className="text-2xl font-serif font-bold text-primary mb-1">24 - 48 Hours</div>
               <div className="text-sm text-muted-foreground">Express Production Available</div>
             </div>
-            <div className="p-6 rounded-xl bg-white shadow-sm">
+            <div className="p-6 rounded-xl bg-background shadow-sm">
               <div className="text-2xl font-serif font-bold text-primary mb-1">5,000+</div>
               <div className="text-sm text-muted-foreground">Events Serviced</div>
             </div>
-            <div className="p-6 rounded-xl bg-white shadow-sm">
+            <div className="p-6 rounded-xl bg-background shadow-sm">
               <div className="text-2xl font-serif font-bold text-primary mb-1">Pan-India</div>
               <div className="text-sm text-muted-foreground">Venue Delivery Coverage</div>
             </div>

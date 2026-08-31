@@ -7,16 +7,18 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { ActiveFilters, SortDropdown } from "@/components/products/ProductCatalogFilters";
 import { Package } from "lucide-react";
 import { Suspense } from "react";
+import { serializeData } from "@/lib/utils/serialize";
 import { Reveal, StaggerContainer } from "@/components/ui/reveal";
 
 import { prisma } from "@/lib/prisma/client";
 import { parseSearchParams, buildPrismaWhereClause, buildPrismaOrderBy, getAvailableFilters } from "@/lib/products/filter-utils";
 
-export default async function CorporateGiftsPage({
-  searchParams,
-}: {
-  searchParams: Record<string, string | string[] | undefined>;
-}) {
+export default async function CorporateGiftsPage(
+  props: {
+    searchParams: Promise<Record<string, string | string[] | undefined>>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const filters = parseSearchParams(searchParams);
   const where = buildPrismaWhereClause(filters);
   const orderBy = buildPrismaOrderBy(filters.sort);
@@ -87,7 +89,7 @@ export default async function CorporateGiftsPage({
             </div>
           ) : (
             <StaggerContainer staggerDelay={100} className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {products.map((product) => (
+              {serializeData(products).map((product: any) => (
                 <Reveal key={product.id}>
                   <ProductCard product={product as any} />
                 </Reveal>

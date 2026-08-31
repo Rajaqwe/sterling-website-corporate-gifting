@@ -15,7 +15,7 @@ import { QuoteRequestModal } from "@/components/products/QuoteRequestModal";
 import { ProductReviews } from "@/components/products/ProductReviews";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Star, Heart, ShoppingCart, Share2, MessageCircle, Ghost, Link2 } from "lucide-react";
+import { ChevronRight, Star, Heart, Share2, MessageCircle, Ghost, Link2 } from "lucide-react";
 import { addToCart, toggleWishlist, toggleLike } from "@/app/products/actions";
 import { toast } from "sonner";
 import { useTransition } from "react";
@@ -217,26 +217,9 @@ export function ProductDetailClient({
               badge={product.isFeatured ? "Featured" : ""}
               moq={product.minimumOrderQuantity}
             />
-
-            <ProductSpecifications
-              specifications={{
-                materials: [product.material || "Premium Grade"],
-                dimensions: product.dimensions,
-                weight: product.weight ? `${product.weight} kg` : undefined,
-                imprintArea: "Standard Logo Sizing",
-                countryOfOrigin: "Imported"
-              }}
-              leadTime={`${product.leadTimeDays} business days`}
-            />
-
-            {product.brandingAvailable !== false && (
-              <LogoMockupPreview 
-                productImageSrc={product.media?.find((m: any) => m.isPrimary)?.url || product.media?.[0]?.url || "/placeholder-product.jpg"} 
-              />
-            )}
           </div>
 
-          <div className="lg:col-span-5 flex flex-col gap-6 lg:sticky lg:top-24">
+          <div className="lg:col-span-5 flex flex-col gap-6">
             <div className="flex flex-col gap-2">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -278,9 +261,9 @@ export function ProductDetailClient({
                         key={variant.id}
                         type="button"
                         onClick={() => setSelectedVariantId(variant.id)}
-                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${isSelected
-                            ? "border-primary bg-primary text-primary-foreground shadow-xs"
-                            : "border-border/60 bg-background text-foreground hover:bg-secondary/60"
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-ui ${isSelected
+                            ? "border-primary bg-primary text-primary-foreground shadow-sm scale-[0.98]"
+                            : "border-border/60 bg-background text-foreground hover:bg-secondary/60 hover:-translate-y-[1px]"
                           }`}
                       >
                         {variant.colorHex && (
@@ -302,65 +285,92 @@ export function ProductDetailClient({
               <div><span className="font-semibold text-foreground">Availability:</span> {product.stockStatus === 'IN_STOCK' ? <span className="text-emerald-600 font-semibold">In Stock</span> : <span className="text-amber-600 font-semibold">{product.stockStatus}</span>}</div>
             </div>
 
-            <div className="pt-2 border-t border-border/50 flex flex-col sm:flex-row gap-3">
+            {/* Like + Share actions — compact row */}
+            <div className="pt-2 border-t border-border/50 flex items-center gap-2">
               <Button
-                onClick={handleAddToCart}
-                disabled={isPending}
-                className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 h-12 shadow-sm font-semibold"
+                variant="outline"
+                className={`h-10 flex items-center justify-center gap-1.5 transition-all px-3 ${isLiked ? "border-red-200 bg-red-50/50 dark:bg-red-950/20" : ""}`}
+                onClick={handleLike}
+                disabled={isLiking}
+                aria-label="Like Product"
               >
-                <ShoppingCart className="mr-2 h-4 w-4" /> Add to Cart
+                <Heart className={`h-4 w-4 ${isLiking ? "scale-110" : ""} ${isLiked ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+                {likeCount > 0 && <span className={`text-xs font-semibold ${isLiked ? "text-red-600" : "text-foreground"}`}>{likeCount}</span>}
               </Button>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  className={`h-12 flex-1 sm:flex-none sm:w-16 flex items-center justify-center gap-1 transition-all ${isLiked ? "border-red-200 bg-red-50/50 dark:bg-red-950/20" : ""}`}
-                  onClick={handleLike}
-                  aria-label="Like Product"
-                >
-                  <Heart className={`h-5 w-5 ${isLiking ? "scale-110" : ""} ${isLiked ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
-                  {likeCount > 0 && <span className={`text-xs font-semibold ${isLiked ? "text-red-600" : "text-foreground"}`}>{likeCount}</span>}
-                </Button>
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="h-12 w-12 flex items-center justify-center border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md shadow-sm" aria-label="Share">
-                    <Share2 className="h-5 w-5" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48 bg-card shadow-lg rounded-xl border border-border/60">
-                    <DropdownMenuItem className="cursor-pointer gap-2 py-2.5" onClick={() => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`, '_blank')}>
-                      <MessageCircle className="h-4 w-4 text-green-500" /> WhatsApp
+              <DropdownMenu>
+                <DropdownMenuTrigger className="h-10 w-10 flex items-center justify-center border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md" aria-label="Share">
+                  <Share2 className="h-4 w-4" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48 bg-card shadow-lg rounded-xl border border-border/60">
+                  <DropdownMenuItem className="cursor-pointer gap-2 py-2.5" onClick={() => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`, '_blank')}>
+                    <MessageCircle className="h-4 w-4 text-green-500" /> WhatsApp
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer gap-2 py-2.5" onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank')}>
+                    Facebook
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer gap-2 py-2.5" onClick={() => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, '_blank')}>
+                    Twitter (X)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer gap-2 py-2.5" onClick={() => {
+                    handleCopyLink();
+                    window.open('https://instagram.com', '_blank');
+                  }}>
+                    Instagram
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer gap-2 py-2.5" onClick={() => {
+                    handleCopyLink();
+                    window.open('https://snapchat.com', '_blank');
+                  }}>
+                    <Ghost className="h-4 w-4 text-yellow-500" /> Snapchat
+                  </DropdownMenuItem>
+                  {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
+                    <DropdownMenuItem className="cursor-pointer gap-2 py-2.5 border-t border-border/50" onClick={handleNativeShare}>
+                      <Share2 className="h-4 w-4" /> System Share
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer gap-2 py-2.5" onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank')}>
-                      Facebook
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer gap-2 py-2.5" onClick={() => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`, '_blank')}>
-                      Twitter (X)
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer gap-2 py-2.5" onClick={() => {
-                      handleCopyLink();
-                      window.open('https://instagram.com', '_blank');
-                    }}>
-                      Instagram
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer gap-2 py-2.5" onClick={() => {
-                      handleCopyLink();
-                      window.open('https://snapchat.com', '_blank');
-                    }}>
-                      <Ghost className="h-4 w-4 text-yellow-500" /> Snapchat
-                    </DropdownMenuItem>
-                    {typeof navigator !== 'undefined' && typeof navigator.share === 'function' && (
-                      <DropdownMenuItem className="cursor-pointer gap-2 py-2.5 border-t border-border/50" onClick={handleNativeShare}>
-                        <Share2 className="h-4 w-4" /> System Share
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem className="cursor-pointer gap-2 py-2.5" onClick={handleCopyLink}>
-                      <Link2 className="h-4 w-4" /> Copy Link
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+                  )}
+                  <DropdownMenuItem className="cursor-pointer gap-2 py-2.5" onClick={handleCopyLink}>
+                    <Link2 className="h-4 w-4" /> Copy Link
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <p className="text-xs text-muted-foreground ml-1">
+                Scroll down to configure &amp; add to cart
+              </p>
             </div>
 
-            <div className="pt-2 border-t border-border/50">
+            <ProductSpecifications
+              specifications={{
+                materials: [product.material || "Premium Grade"],
+                dimensions: product.dimensions,
+                weight: product.weight ? `${product.weight} kg` : undefined,
+                imprintArea: "Standard Logo Sizing",
+                countryOfOrigin: "Imported"
+              }}
+              leadTime={`${product.leadTimeDays} business days`}
+            />
+          </div>
+        </div>
+
+        {/* Below: Customization, Pricing, and Proofing */}
+        <div className="mt-16 grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+          <div className="lg:col-span-7 flex flex-col gap-10">
+            {product.brandingAvailable !== false && (
+              <LogoMockupPreview 
+                productImageSrc={product.media?.find((m: any) => m.isPrimary)?.url || product.media?.[0]?.url || "/placeholder-product.jpg"} 
+              />
+            )}
+            
+            <ProductReviews
+              productId={product.id}
+              reviews={product.reviews || []}
+              isLoggedIn={isLoggedIn}
+            />
+          </div>
+
+          <div className="lg:col-span-5 flex flex-col gap-6 lg:sticky lg:top-24">
+            <div className="p-6 rounded-2xl bg-surface-elevated border border-border/40 shadow-sm flex flex-col gap-6">
               <ProductCustomization
                 customizations={availableCustomizations}
                 selectedIds={selectedCustomizationIds}
@@ -368,32 +378,29 @@ export function ProductDetailClient({
                 selectedPlacements={selectedPlacements}
                 onPlacementChange={handlePlacementChange}
               />
+
+              <div className="pt-6 border-t border-border/50">
+                <TieredPricingTable
+                  priceTiers={product.bulkPricingTiers || []}
+                  selectedQuantity={quantity}
+                  basePrice={Number(product.price)}
+                  onSelectTierQuantity={handleSelectTierQuantity}
+                />
+              </div>
+
+              <div className="pt-6 border-t border-border/50">
+                <QuoteRequestModal
+                  product={{ ...product, moq: product.minimumOrderQuantity, price: displayPrice }}
+                  quantity={quantity}
+                  onQuantityChange={setQuantity}
+                  selectedVariant={selectedVariant}
+                  selectedCustomizations={selectedCustomizations}
+                  quoteCalculation={quoteCalculation}
+                  onAddToCart={handleAddToCart}
+                  isAddingToCart={isPending}
+                />
+              </div>
             </div>
-
-            <div className="pt-2 border-t border-border/50">
-              <TieredPricingTable
-                priceTiers={product.bulkPricingTiers || []}
-                selectedQuantity={quantity}
-                basePrice={Number(product.price)}
-                onSelectTierQuantity={handleSelectTierQuantity}
-              />
-            </div>
-
-            <QuoteRequestModal
-              product={{ ...product, moq: product.minimumOrderQuantity, price: displayPrice }}
-              quantity={quantity}
-              onQuantityChange={setQuantity}
-              selectedVariant={selectedVariant}
-              selectedCustomizations={selectedCustomizations}
-              quoteCalculation={quoteCalculation}
-            />
-
-            <ProductReviews
-              productId={product.id}
-              reviews={product.reviews || []}
-              isLoggedIn={isLoggedIn}
-            />
-
           </div>
         </div>
 

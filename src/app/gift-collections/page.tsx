@@ -11,11 +11,12 @@ import { Suspense } from "react";
 import { prisma } from "@/lib/prisma/client";
 import { parseSearchParams, buildPrismaWhereClause, buildPrismaOrderBy, getAvailableFilters } from "@/lib/products/filter-utils";
 
-export default async function CollectionsPage({
-  searchParams,
-}: {
-  searchParams: Record<string, string | string[] | undefined>;
-}) {
+export default async function CollectionsPage(
+  props: {
+    searchParams: Promise<Record<string, string | string[] | undefined>>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const filters = parseSearchParams(searchParams);
   const where = buildPrismaWhereClause(filters);
   const orderBy = buildPrismaOrderBy(filters.sort);
@@ -75,10 +76,18 @@ export default async function CollectionsPage({
               {products.map((product) => (
                 <Link key={product.id} href={`/products/${product.slug}`} className="group block">
                   <Card className="h-full flex flex-col overflow-hidden transition-all hover:shadow-md border-transparent hover:border-primary/20">
-                    <div className="aspect-square bg-secondary/20 relative flex items-center justify-center p-6">
-                      <Package className="h-16 w-16 text-primary/40 group-hover:scale-110 transition-transform duration-300" />
+                    <div className="aspect-square bg-secondary/20 relative flex items-center justify-center overflow-hidden">
+                      {(product as any).media?.[0]?.url ? (
+                        <img
+                          src={(product as any).media[0].url}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+                        />
+                      ) : (
+                        <Package className="h-16 w-16 text-primary/40 group-hover:scale-110 transition-transform duration-300" />
+                      )}
                       {product.isDiscounted && (
-                        <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">Sale</span>
+                        <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded shadow-sm">Sale</span>
                       )}
                     </div>
                     <CardContent className="p-5 flex-1 flex flex-col">

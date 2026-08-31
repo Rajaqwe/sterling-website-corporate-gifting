@@ -70,15 +70,115 @@ const COMPANIES = [
   },
 ];
 
-const notchRightStyle = {
-  WebkitMaskImage: "radial-gradient(circle at right center, transparent 24px, black 25px)",
-  maskImage: "radial-gradient(circle at right center, transparent 24px, black 25px)",
-};
+function CompanyCard({ 
+  company, 
+  isActive, 
+  onMouseEnter, 
+  onClick, 
+  animationType = "default" 
+}: { 
+  company: typeof COMPANIES[0], 
+  isActive: boolean, 
+  onMouseEnter: () => void, 
+  onClick: () => void, 
+  animationType?: "default" | "flip" 
+}) {
+  
+  if (animationType === "flip") {
+    return (
+      <div 
+        className={`relative flex items-center justify-center h-[380px] md:h-[420px] border-r border-b border-border/40 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary ${isActive ? 'z-50' : 'z-10'}`}
+        style={{ perspective: "1200px" }}
+        tabIndex={0}
+        onMouseEnter={onMouseEnter}
+        onClick={onClick}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onClick();
+          }
+        }}
+        role="button"
+        aria-expanded={isActive}
+      >
+        <div 
+          className="w-full h-full relative duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
+          style={{ 
+            transformStyle: "preserve-3d", 
+            transform: isActive ? "rotateY(180deg)" : "rotateY(0deg)",
+          }}
+        >
+          {/* Front Face */}
+          <div 
+            className="absolute inset-0 flex flex-col items-center justify-center gap-6 bg-background group"
+            style={{ backfaceVisibility: "hidden" }}
+          >
+            <img 
+              src={company.logoUrl} 
+              alt={`${company.name} logo`} 
+              className="w-20 h-20 md:w-28 md:h-28 object-contain drop-shadow-sm transition-transform duration-500 group-hover:scale-110"
+            />
+            <span className="text-2xl md:text-3xl font-bold tracking-wide text-foreground font-serif">
+              {company.name}
+            </span>
+          </div>
 
-const notchLeftStyle = {
-  WebkitMaskImage: "radial-gradient(circle at left center, transparent 24px, black 25px)",
-  maskImage: "radial-gradient(circle at left center, transparent 24px, black 25px)",
-};
+          {/* Back Face */}
+          <div 
+            className="absolute inset-1 md:inset-2 bg-[#0A192F] rounded-2xl md:rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col justify-between p-8 md:p-10"
+            style={{ 
+              backfaceVisibility: "hidden", 
+              transform: "rotateY(180deg)"
+            }}
+          >
+            {/* Header: Name and Category */}
+            <div>
+              <h3 className="text-3xl md:text-4xl font-sans font-bold text-white mb-3 tracking-tight">
+                {company.name}
+              </h3>
+              <p className="text-white/80 leading-relaxed text-sm md:text-base font-sans">
+                {company.description}
+              </p>
+            </div>
+
+            {/* Footer: Tags / Pills */}
+            <div className="flex flex-wrap gap-2 mt-8">
+              {company.tags.map((tag: string) => (
+                <span key={tag} className="px-3 py-1.5 text-[10px] md:text-xs font-bold tracking-wider text-white bg-white/10 rounded-md border border-white/20">
+                  {tag}
+                </span>
+              ))}
+              <span className="flex items-center gap-2 px-3 py-1.5 text-[10px] md:text-xs font-bold tracking-wider text-white bg-white/10 rounded-md border border-white/20">
+                <img src="/logos/india.svg" alt="India" className="w-4 h-3 object-cover rounded-sm shadow-sm" /> INDIA
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Default standard fallback animation
+  return (
+    <div 
+      className={`relative flex items-center justify-center h-[380px] md:h-[420px] border-r border-b border-border/40 bg-background cursor-pointer outline-none transition-colors duration-300 ${isActive ? 'z-50' : 'z-10'}`}
+      tabIndex={0}
+      onMouseEnter={onMouseEnter}
+      onClick={onClick}
+    >
+      <div className={`absolute inset-0 flex flex-col items-center justify-center gap-6 transition-opacity duration-700 ${isActive ? "opacity-0" : "opacity-100"}`}>
+        <img src={company.logoUrl} alt={`${company.name} logo`} className="w-20 h-20 md:w-28 md:h-28 object-contain" />
+        <span className="text-2xl md:text-3xl font-bold tracking-wide text-foreground font-serif">{company.name}</span>
+      </div>
+      <div className={`absolute inset-0 bg-background flex flex-col justify-between p-8 md:p-10 transition-opacity duration-700 ${isActive ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+        <div>
+          <h3 className="text-3xl md:text-4xl font-sans font-bold text-foreground mb-3">{company.name}</h3>
+          <p className="text-foreground/70 text-sm md:text-base">{company.description}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function InteractiveLogos() {
   const [activeCompanyId, setActiveCompanyId] = useState<string | null>(null);
@@ -105,84 +205,16 @@ export function InteractiveLogos() {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 border-l border-t border-border/40"
             onMouseLeave={() => setActiveCompanyId(null)}
           >
-            {COMPANIES.map((company, index) => {
-              const isActive = activeCompanyId === company.id;
-              
-              // Determine notch direction based on column
-              // Assuming 4 columns on desktop: col 0,1,2 -> right notch, col 3 -> left notch
-              const isRightColumn = index % 4 === 3;
-              const maskStyle = isRightColumn ? notchLeftStyle : notchRightStyle;
-
-              return (
-                <div 
-                  key={company.id}
-                  className="relative flex items-center justify-center h-[380px] md:h-[420px] border-r border-b border-border/40 bg-white cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
-                  tabIndex={0}
-                  onMouseEnter={() => setActiveCompanyId(company.id)}
-                  onClick={() => setActiveCompanyId(isActive ? null : company.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setActiveCompanyId(isActive ? null : company.id);
-                    }
-                  }}
-                  aria-label={`${company.name} details`}
-                  role="button"
-                  aria-expanded={isActive}
-                >
-                  
-                  {/* Default State: Grayscale Logo */}
-                  <div className={`absolute inset-0 flex flex-col items-center justify-center gap-6 transition-all duration-500 ${isActive ? "opacity-0 scale-95" : "opacity-100 scale-100"}`}>
-                    <img 
-                      src={company.logoUrl} 
-                      alt={`${company.name} logo`} 
-                      className="w-20 h-20 md:w-28 md:h-28 object-contain drop-shadow-sm"
-                    />
-                    <span className="text-2xl md:text-3xl font-bold tracking-wide text-foreground font-serif">
-                      {company.name}
-                    </span>
-                  </div>
-
-                  {/* Active Hover Card Layer */}
-                  <div 
-                    className={`absolute inset-[-1px] md:inset-[-12px] z-10 transition-all duration-500 cubic-bezier(0.22, 1, 0.36, 1) pointer-events-none ${
-                      isActive ? "opacity-100 scale-100" : "opacity-0 scale-90"
-                    }`}
-                  >
-                    {/* Inner wrapper for rounded corners */}
-                    <div className="w-full h-full rounded-2xl md:rounded-3xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.15)] bg-white">
-                      {/* Masked Navy Blue Background Container */}
-                      <div className="w-full h-full bg-primary flex flex-col justify-between p-8 md:p-10" style={maskStyle}>
-                        
-                        {/* Header: Name and Category */}
-                        <div className={isRightColumn ? "pl-4 md:pl-6" : "pr-4 md:pr-6"}>
-                          <h3 className="text-3xl md:text-4xl font-sans font-bold text-white mb-3 tracking-tight">
-                            {company.name}
-                          </h3>
-                          <p className="text-white/70 leading-relaxed text-sm md:text-base font-sans">
-                            {company.description}
-                          </p>
-                        </div>
-
-                        {/* Footer: Tags / Pills */}
-                        <div className={`flex flex-wrap gap-2 mt-8 ${isRightColumn ? "pl-4 md:pl-6" : "pr-4 md:pr-6"}`}>
-                          {company.tags.map(tag => (
-                            <span key={tag} className="px-3 py-1.5 text-[10px] md:text-xs font-bold tracking-wider text-white bg-white/10 rounded-md border border-white/5">
-                              {tag}
-                            </span>
-                          ))}
-                          <span className="flex items-center gap-2 px-3 py-1.5 text-[10px] md:text-xs font-bold tracking-wider text-white bg-white/10 rounded-md border border-white/5">
-                            <img src="/logos/india.svg" alt="India" className="w-4 h-3 object-cover rounded-sm shadow-sm" /> INDIA
-                          </span>
-                        </div>
-
-                      </div>
-                    </div>
-                  </div>
-                  
-                </div>
-              );
-            })}
+            {COMPANIES.map((company) => (
+              <CompanyCard 
+                key={company.id}
+                company={company}
+                isActive={activeCompanyId === company.id}
+                onMouseEnter={() => setActiveCompanyId(company.id)}
+                onClick={() => setActiveCompanyId(activeCompanyId === company.id ? null : company.id)}
+                animationType="flip" // Applying the new flip animation exclusively to these products as requested
+              />
+            ))}
           </div>
         </Reveal>
 
@@ -190,3 +222,4 @@ export function InteractiveLogos() {
     </section>
   );
 }
+

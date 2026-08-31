@@ -6,19 +6,29 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma/client";
 import { formatINR } from "@/lib/currency";
 import { requireUser } from "@/lib/auth/server";
+import { AdminPagination } from "@/components/admin/AdminPagination";
 
-export default async function DashboardQuotes() {
+export default async function DashboardQuotes(props: { searchParams?: Promise<{ page?: string }> }) {
+  const searchParams = await props.searchParams;
+  const page = Number(searchParams?.page) || 1;
+  const pageSize = 10;
   const auth = await requireUser();
   
   if (!auth?.user) {
     return null;
   }
 
-  const quotes = await prisma.quoteRequest.findMany({
-    where: { userId: auth.user.id },
-    include: { items: true },
-    orderBy: { createdAt: 'desc' }
-  });
+  const [quotes, totalQuotes] = await Promise.all([
+    prisma.quoteRequest.findMany({
+      where: { userId: auth.user.id },
+      include: { items: true },
+      orderBy: { createdAt: 'desc' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.quoteRequest.count({ where: { userId: auth.user.id } })
+  ]);
+  const totalPages = Math.ceil(totalQuotes / pageSize);
 
   return (
     <div className="space-y-6">
@@ -64,7 +74,7 @@ export default async function DashboardQuotes() {
                         <StatusBadge status={quote.status} />
                       </TableCell>
                       <TableCell className="text-right flex items-center justify-end gap-3">
-                        <a href={`/api/quotes/${quote.id}/pdf`} target="_blank" className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-1 text-sm font-medium" title="Download PDF Quote">
+                        <a href={`/api/quotes/${quote.id}/pdf`} target="_blank" className="text-muted-foreground hover:text-primary transition-all duration-[var(--motion-fast)] ease-[var(--ease-standard)] opacity-70 group-hover:opacity-100 flex items-center gap-1 text-sm font-medium" title="Download PDF Quote">
                           <Download className="h-4 w-4" /> PDF
                         </a>
                       </TableCell>
@@ -105,6 +115,7 @@ export default async function DashboardQuotes() {
               );
             })}
           </div>
+          {totalPages > 1 && <AdminPagination currentPage={page} totalPages={totalPages} />}
         </div>
       )}
     </div>

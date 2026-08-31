@@ -1,63 +1,68 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/layout/Navbar";
 import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
+import { HideOnDashboard } from "@/components/layout/HideOnDashboard";
 import { createClient } from "@/lib/supabase/server";
 import { FloatingButtons } from "@/components/layout/FloatingButtons";
 import { AuthProvider } from "@/components/layout/AuthProvider";
 import { CartProvider } from "@/components/cart/CartContext";
 import { prisma } from "@/lib/prisma/client";
+import NextTopLoader from 'nextjs-toploader';
 
-const fontSans = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
 
-const fontSerif = Playfair_Display({
-  subsets: ["latin"],
-  variable: "--font-serif",
-});
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   title: {
     template: "%s | Sterling Corporate",
     default: "Sterling | Premium B2B Corporate Gifting",
   },
   description: "Thoughtfully curated corporate gifts for enterprise clients, startups, and executive teams.",
-  keywords: ["corporate gifting", "B2B gifts", "executive gifts", "bulk corporate orders", "employee welcome kits", "branded company gifts"],
-  authors: [{ name: "Sterling Operations" }],
+  keywords: ["corporate gifting", "B2B gifts", "executive gifts", "bulk gifting", "employee gifts", "custom merchandise", "swag"],
+  authors: [{ name: "Sterling Team" }],
   openGraph: {
-    title: "Sterling | Premium B2B Corporate Gifting",
-    description: "Thoughtfully curated corporate gifts for enterprise clients, startups, and executive teams.",
-    url: "https://sterlinggifting.com",
-    siteName: "Sterling Corporate",
+    title: "Sterling Corporate Gifting",
+    description: "Premium B2B Corporate Gifting platform for enterprise clients.",
+    url: "/",
+    siteName: "Sterling",
     images: [
       {
-        url: "https://sterlinggifting.com/og-image.jpg",
+        url: "/og-image.jpg", // Placeholder
         width: 1200,
         height: 630,
-        alt: "Sterling Corporate Gifts",
-      },
+      }
     ],
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sterling | Corporate Gifting",
-    description: "Premium enterprise gifts.",
-    images: ["https://sterlinggifting.com/og-image.jpg"],
+    title: "Sterling Corporate",
+    description: "Premium B2B Corporate Gifting.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
+
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { session } } = await supabase.auth.getSession();
   const user = session?.user;
 
@@ -71,22 +76,25 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased flex flex-col",
-          fontSans.variable,
-          fontSerif.variable
+          "min-h-screen bg-background font-sans antialiased flex flex-col"
         )}
       >
+        <NextTopLoader color="#ca9d55" height={3} showSpinner={false} />
         <AuthProvider accessToken={session?.access_token || null}>
           <CartProvider initialCount={initialCartCount}>
-            <Navbar />
+            <HideOnDashboard>
+              <Navbar />
+            </HideOnDashboard>
             <main className="flex-1">
               {children}
             </main>
             <ConditionalFooter />
-            <FloatingButtons />
+            <HideOnDashboard>
+              <FloatingButtons />
+            </HideOnDashboard>
           </CartProvider>
         </AuthProvider>
       </body>

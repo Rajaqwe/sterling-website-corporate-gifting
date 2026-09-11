@@ -55,13 +55,15 @@ function AccordionContent({
     <AccordionPrimitive.Panel
       data-slot="accordion-content"
       className={cn(
-        "overflow-hidden text-sm h-(--accordion-panel-height) transition-[height] duration-[var(--motion-ui)] ease-[var(--ease-standard)] data-ending-style:h-0 data-starting-style:h-0",
+        "grid transition-[grid-template-rows] duration-[var(--motion-ui)] ease-[var(--ease-standard)] data-ending-style:grid-rows-[0fr] data-starting-style:grid-rows-[0fr] grid-rows-[1fr]",
         className
       )}
       {...props}
     >
-      <div className="pt-0 pb-2.5 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4">
-        {children}
+      <div className="overflow-hidden">
+        <div className="pt-0 pb-2.5 text-sm [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4">
+          {children}
+        </div>
       </div>
     </AccordionPrimitive.Panel>
   )

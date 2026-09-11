@@ -61,7 +61,13 @@ export function buildPrismaWhereClause(filters: ParsedProductFilters, baseCatego
 
   // Search query
   if (filters.q) {
-    AND.push({ name: { contains: filters.q, mode: 'insensitive' } });
+    AND.push({
+      OR: [
+        { name: { contains: filters.q, mode: 'insensitive' } },
+        { sku: { contains: filters.q, mode: 'insensitive' } },
+        { category: { name: { contains: filters.q, mode: 'insensitive' } } },
+      ]
+    });
   }
 
   // Price

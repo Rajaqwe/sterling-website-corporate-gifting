@@ -1,24 +1,19 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma/client";
+import { parseSearchParams, buildPrismaWhereClause } from "@/lib/products/filter-utils";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get("q");
 
   if (!q || q.length < 2) {
-    return NextResponse.json({ results: [] });
+    return NextResponse.json({ products: [], categories: [] });
   }
 
   try {
-    const products = await prisma.product.findMany({
-      where: {
-        status: "ACTIVE",
-        OR: [
-          { name: { contains: q, mode: "insensitive" } },
-          { sku: { contains: q, mode: "insensitive" } },
-          { category: { name: { contains: q, mode: "insensitive" } } },
-        ],
-      },
+    const [products, categories] = await Promise.all([
+      prisma.product.findMany({
+      where: buildPrismaWhereClause(parseSearchParams({ q })),
       select: {
         id: true,
         name: true,
@@ -28,8 +23,14 @@ export async function GET(request: Request) {
         media: true,
         category: { select: { name: true } },
       },
-      take: 5,
-    });
+        take: 5,
+      }),
+      prisma.category.findMany({
+        where: { isActive: true, name: { contains: q, mode: "insensitive" } },
+        select: { id: true, name: true, slug: true },
+        take: 4,
+      }),
+    ]);
 
     // Handle stringified media
     const formatted = products.map((p) => {
@@ -54,7 +55,7 @@ export async function GET(request: Request) {
       };
     });
 
-    return NextResponse.json({ results: formatted });
+    return NextResponse.json({ products: formatted, categories });
   } catch (error) {
     console.error("Search error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

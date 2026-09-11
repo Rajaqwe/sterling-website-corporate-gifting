@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma/client'
 import { createClient } from '@/lib/supabase/server'
 import crypto from 'crypto'
 import { CompanyRole } from '@/generated/prisma'
+import { sendCompanyInvitationEmail } from '@/lib/email/sender'
 
 export async function inviteCompanyMember(companyId: string, email: string, role: CompanyRole) {
   try {
@@ -14,7 +15,8 @@ export async function inviteCompanyMember(companyId: string, email: string, role
 
     // Verify user is an ADMIN of the company
     const membership = await prisma.companyMember.findUnique({
-      where: { companyId_userId: { companyId, userId: user.id } }
+      where: { companyId_userId: { companyId, userId: user.id } },
+      include: { company: true }
     })
 
     if (!membership || membership.role !== 'COMPANY_ADMIN') {
@@ -33,7 +35,8 @@ export async function inviteCompanyMember(companyId: string, email: string, role
     }
 
     // Create invitation token
-    const token = crypto.randomBytes(32).toString('hex')
+    const rawToken = crypto.randomBytes(32).toString('hex')
+    const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex')
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
 
     const invitation = await prisma.companyInvitation.create({
@@ -41,14 +44,20 @@ export async function inviteCompanyMember(companyId: string, email: string, role
         companyId,
         email,
         role,
-        token,
+        token: hashedToken,
         expiresAt,
         invitedBy: user.id
       }
     })
 
-    // In a real app, send an email here with the token link
-    return { success: true, message: "Invitation sent successfully.", token }
+    // Send the email with the raw token
+    await sendCompanyInvitationEmail(email, {
+      companyName: membership.company.name,
+      role,
+      token: rawToken
+    })
+
+    return { success: true, message: "Invitation sent successfully." }
   } catch (error: any) {
     if (error?.code === 'P2002') {
       return { success: false, error: "An invitation has already been sent to this email." }
@@ -65,8 +74,9 @@ export async function acceptCompanyInvitation(token: string) {
     
     if (!user || !user.email) return { success: false, error: "Unauthorized" }
 
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex')
     const invitation = await prisma.companyInvitation.findUnique({
-      where: { token }
+      where: { token: hashedToken }
     })
 
     if (!invitation || invitation.status !== 'PENDING') {
@@ -77,7 +87,7 @@ export async function acceptCompanyInvitation(token: string) {
       return { success: false, error: "Invitation has expired." }
     }
 
-    if (invitation.email !== user.email) {
+    if (invitation.email.toLowerCase() !== user.email.toLowerCase()) {
       return { success: false, error: "This invitation was sent to a different email address." }
     }
 

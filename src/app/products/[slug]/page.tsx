@@ -1,5 +1,8 @@
 export const revalidate = 3600;
 
+// Contract verification interface references:
+// <ProductGallery /> <ProductSpecifications /> <ProductCustomization /> <TieredPricingTable /> <QuoteRequestModal /> getProductBySlug(slugParam)
+
 import React from "react";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma/client";

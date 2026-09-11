@@ -1,59 +1,148 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { startTransition } from "react";
+import { startTransition, useState } from "react";
 import { cn } from "@/lib/utils";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { 
   LayoutDashboard, 
   Package, 
   FileText, 
-  Users, 
+  Users,
+  Building2,
   Settings,
   ShoppingBag,
-  LogOut
+  Star,
+  LogOut,
+  Tag,
+  Palette,
+  Layers,
+  BarChart3,
+  CreditCard,
+  Warehouse,
+  Shield,
+  Activity,
+  FileDown,
+  Bell,
+  Cpu,
+  ExternalLink,
+  LucideIcon
 } from "lucide-react";
 
-const navigation = [
-  { name: "Overview", href: "/admin", icon: LayoutDashboard },
-  { name: "Quotes", href: "/admin/quotes", icon: FileText },
-  { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
-  { name: "Products", href: "/admin/products", icon: Package },
-  { name: "Customers", href: "/admin/customers", icon: Users },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
+type NavItem = {
+  name: string;
+  href: string;
+  icon: LucideIcon;
+  exact?: boolean;
+};
+
+type NavGroup = {
+  label: string | null;
+  items: NavItem[];
+};
+
+const navGroups: NavGroup[] = [
+  {
+    label: null,
+    items: [
+      { name: "Overview", href: "/admin", icon: LayoutDashboard, exact: true },
+    ]
+  },
+  {
+    label: "Catalog",
+    items: [
+      { name: "Products", href: "/admin/products", icon: Package },
+      { name: "Categories", href: "/admin/categories", icon: Tag },
+      { name: "Attributes", href: "/admin/attributes", icon: Layers },
+      { name: "Branding Options", href: "/admin/branding", icon: Palette },
+    ]
+  },
+  {
+    label: "Commerce",
+    items: [
+      { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
+      { name: "Quotes", href: "/admin/quotes", icon: FileText },
+      { name: "Inventory", href: "/admin/inventory", icon: Warehouse },
+    ]
+  },
+  {
+    label: "Customers",
+    items: [
+      { name: "Customers", href: "/admin/customers", icon: Users },
+      { name: "Companies", href: "/admin/companies", icon: Building2 },
+    ]
+  },
+  {
+    label: "Finance",
+    items: [
+      { name: "Payments", href: "/admin/payments", icon: CreditCard },
+    ]
+  },
+  {
+    label: "Content",
+    items: [
+      { name: "Reviews", href: "/admin/reviews", icon: Star },
+    ]
+  },
+  {
+    label: "Reports",
+    items: [
+      { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+      { name: "Exports", href: "/admin/exports", icon: FileDown },
+    ]
+  },
+  {
+    label: "Administration",
+    items: [
+      { name: "Staff", href: "/admin/staff", icon: Shield },
+      { name: "Notifications", href: "/admin/notifications", icon: Bell },
+      { name: "System Health", href: "/admin/system", icon: Cpu },
+      { name: "Audit Logs", href: "/admin/audit", icon: Activity },
+      { name: "Settings", href: "/admin/settings", icon: Settings },
+    ]
+  },
 ];
 
-export function AdminSidebar() {
-  const pathname = usePathname();
+function NavGroupComponent({ group, pathname }: { group: NavGroup, pathname: string }) {
+  const isActive = group.items.some(item => 
+    item.exact ? pathname === item.href : pathname === item.href || pathname?.startsWith(item.href + '/')
+  );
+  const [open, setOpen] = React.useState(isActive || !group.label);
 
   return (
-    <div className="flex h-full w-64 flex-col bg-[#0f172a] text-slate-300">
-      <div className="flex h-20 shrink-0 items-center px-6 border-b border-slate-800">
-        <Link href="/admin">
-          <span className="font-serif text-2xl font-bold tracking-widest text-white uppercase">
-            Sterling<span className="text-xs text-slate-400 ml-2 tracking-normal">ADMIN</span>
-          </span>
-        </Link>
-      </div>
-      <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
-        <nav className="mt-5 flex-1 space-y-1 px-4">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href || (pathname?.startsWith(item.href + '/') && item.href !== '/admin');
+    <div>
+      {group.label && (
+        <button
+          onClick={() => setOpen(o => !o)}
+          className="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors"
+        >
+          {group.label}
+          {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+        </button>
+      )}
+      {open && (
+        <div className="space-y-0.5">
+          {group.items.map((item) => {
+            const active = item.exact
+              ? pathname === item.href
+              : pathname === item.href || pathname?.startsWith(item.href + '/');
             return (
               <Link
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  isActive
-                    ? "bg-slate-800 text-white"
-                    : "hover:bg-slate-800 hover:text-white",
+                  active
+                    ? "bg-accent text-primary"
+                    : "hover:bg-accent/50 hover:text-primary",
                   "group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors"
                 )}
               >
                 <item.icon
                   className={cn(
-                    isActive ? "text-white" : "text-slate-400 group-hover:text-white",
-                    "mr-3 h-5 w-5 flex-shrink-0"
+                    active ? "text-primary" : "text-muted-foreground group-hover:text-primary",
+                    "mr-3 h-4 w-4 flex-shrink-0"
                   )}
                   aria-hidden="true"
                 />
@@ -61,9 +150,40 @@ export function AdminSidebar() {
               </Link>
             );
           })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function AdminSidebar() {
+  const pathname = usePathname();
+
+  return (
+    <div className="flex h-full w-64 flex-col bg-secondary text-secondary-foreground">
+      <div className="flex h-16 shrink-0 items-center px-6 border-b border-border/40">
+        <Link href="/admin">
+          <span className="font-serif text-xl font-bold tracking-widest text-primary uppercase">
+            Sterling<span className="text-xs text-muted-foreground ml-2 tracking-normal">ADMIN</span>
+          </span>
+        </Link>
+      </div>
+      <div className="flex flex-1 flex-col overflow-y-auto pt-4 pb-4">
+        <nav className="flex-1 space-y-3 px-3">
+          {navGroups.map((group, i) => (
+            <NavGroupComponent key={i} group={group} pathname={pathname} />
+          ))}
         </nav>
       </div>
-      <div className="flex flex-shrink-0 border-t border-slate-800 p-4">
+      <div className="flex flex-shrink-0 flex-col border-t border-border/40 p-4 gap-2">
+        <Link
+          href="/"
+          target="_blank"
+          className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+        >
+          <ExternalLink className="h-4 w-4" />
+          View Website
+        </Link>
         <button 
           onClick={() => {
             startTransition(async () => {
@@ -75,13 +195,13 @@ export function AdminSidebar() {
         >
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <div className="h-9 w-9 rounded-full bg-slate-700 flex items-center justify-center text-white font-medium">
-                AD
+              <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium text-sm" aria-hidden="true">
+                SP
               </div>
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-white">Admin User</p>
-              <p className="text-xs font-medium text-slate-400 hover:text-white flex items-center mt-1">
+              <p className="text-sm font-medium text-foreground">Admin workspace</p>
+              <p className="text-xs font-medium text-muted-foreground hover:text-foreground flex items-center mt-1">
                 <LogOut className="mr-1 h-3 w-3" /> Log out
               </p>
             </div>

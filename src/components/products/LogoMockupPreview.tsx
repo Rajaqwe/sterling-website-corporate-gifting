@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useRef, DragEvent } from "react";
+import React, { useState, useRef, DragEvent, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { UploadCloud, Image as ImageIcon, X, Maximize2, Check } from "lucide-react";
+import { UploadCloud, Image as ImageIcon, X, Maximize2, Check, RotateCw, Undo, Redo, Trash2, AlignCenter, AlignHorizontalSpaceBetween, AlignVerticalSpaceBetween } from "lucide-react";
 import Image from "next/image";
 
 interface LogoMockupPreviewProps {
@@ -16,6 +16,7 @@ interface LogoItem {
   position: { x: number; y: number };
   width: number;
   height: number;
+  rotation: number;
   isConfirmed: boolean;
 }
 
@@ -26,6 +27,31 @@ export function LogoMockupPreview({ productImageSrc }: LogoMockupPreviewProps) {
   const [isResizing, setIsResizing] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Undo / Redo History
+  const [history, setHistory] = useState<LogoItem[][]>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+
+  const saveHistory = (newLogos: LogoItem[]) => {
+    const nextHistory = history.slice(0, historyIndex + 1);
+    nextHistory.push(newLogos);
+    setHistory(nextHistory);
+    setHistoryIndex(nextHistory.length - 1);
+  };
+
+  const undo = () => {
+    if (historyIndex > 0) {
+      setHistoryIndex(historyIndex - 1);
+      setLogos(history[historyIndex - 1]);
+    }
+  };
+
+  const redo = () => {
+    if (historyIndex < history.length - 1) {
+      setHistoryIndex(historyIndex + 1);
+      setLogos(history[historyIndex + 1]);
+    }
+  };
 
   const dragRef = useRef<{ 
     startX: number; 
@@ -44,11 +70,14 @@ export function LogoMockupPreview({ productImageSrc }: LogoMockupPreviewProps) {
       position: { x: 50, y: 50 },
       width: 30,
       height: 30,
+      rotation: 0,
       isConfirmed: false
     }));
     
     if (newLogos.length > 0) {
-      setLogos((prev) => [...prev, ...newLogos]);
+      const updatedLogos = [...logos, ...newLogos];
+      setLogos(updatedLogos);
+      saveHistory(updatedLogos);
       setActiveId(newLogos[newLogos.length - 1].id);
     }
   };
@@ -113,14 +142,9 @@ export function LogoMockupPreview({ productImageSrc }: LogoMockupPreviewProps) {
 
       setLogos(prev => prev.map(l => l.id === activeId ? {
         ...l,
-        position: {
-          x: newX,
-          y: newY
-        }
+        position: { x: newX, y: newY }
       } : l));
     } else if (dragRef.current.type === 'resize') {
-      // Independent vertical and horizontal stretching
-      // Multiply by 2 because the element is centered (-translate-x-1/2), so growing width by 2px pushes the corner by 1px
       const dx = ((e.clientX - dragRef.current.startX) / containerRect.width) * 200;
       const dy = ((e.clientY - dragRef.current.startY) / containerRect.height) * 200;
       
@@ -128,14 +152,15 @@ export function LogoMockupPreview({ productImageSrc }: LogoMockupPreviewProps) {
       const newHeight = Math.max(5, Math.min(200, dragRef.current.initHeight + dy));
       
       setLogos(prev => prev.map(l => l.id === activeId ? {
-        ...l,
-        width: newWidth,
-        height: newHeight
+        ...l, width: newWidth, height: newHeight
       } : l));
     }
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
+    if (isDragging || isResizing) {
+      saveHistory(logos); // save history at end of drag/resize
+    }
     setIsDragging(false);
     setIsResizing(false);
     dragRef.current = null;
@@ -144,43 +169,131 @@ export function LogoMockupPreview({ productImageSrc }: LogoMockupPreviewProps) {
     } catch (err) {}
   };
 
+  const updateActiveLogo = (updates: Partial<LogoItem>) => {
+    if (!activeId) return;
+    const nextLogos = logos.map(l => l.id === activeId ? { ...l, ...updates } : l);
+    setLogos(nextLogos);
+    saveHistory(nextLogos);
+  };
+
+  const rotateActiveLogo = () => {
+    const logo = logos.find(l => l.id === activeId);
+    if (logo) {
+      updateActiveLogo({ rotation: (logo.rotation || 0) + 15 });
+    }
+  };
+
+  const deleteActiveLogo = () => {
+    if (!activeId) return;
+    const nextLogos = logos.filter(l => l.id !== activeId);
+    setLogos(nextLogos);
+    saveHistory(nextLogos);
+    setActiveId(null);
+  };
+
+  const snapTo = (x: number, y: number) => {
+    updateActiveLogo({ position: { x, y } });
+  };
+
   const confirmLogo = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    setLogos(prev => prev.map(l => l.id === id ? { ...l, isConfirmed: true } : l));
+    const nextLogos = logos.map(l => l.id === id ? { ...l, isConfirmed: true } : l);
+    setLogos(nextLogos);
+    saveHistory(nextLogos);
     setActiveId(null);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!activeId) return;
+    const logo = logos.find(l => l.id === activeId);
+    if (!logo) return;
+
+    let handled = false;
+    const step = e.shiftKey ? 5 : 1;
+
+    if (e.key === 'ArrowUp') {
+      updateActiveLogo({ position: { ...logo.position, y: Math.max(0, logo.position.y - step) } });
+      handled = true;
+    } else if (e.key === 'ArrowDown') {
+      updateActiveLogo({ position: { ...logo.position, y: Math.min(100, logo.position.y + step) } });
+      handled = true;
+    } else if (e.key === 'ArrowLeft') {
+      updateActiveLogo({ position: { ...logo.position, x: Math.max(0, logo.position.x - step) } });
+      handled = true;
+    } else if (e.key === 'ArrowRight') {
+      updateActiveLogo({ position: { ...logo.position, x: Math.min(100, logo.position.x + step) } });
+      handled = true;
+    } else if (e.key === 'Delete' || e.key === 'Backspace') {
+      deleteActiveLogo();
+      handled = true;
+    }
+
+    if (handled) e.preventDefault();
   };
 
   const activeLogo = logos.find(l => l.id === activeId);
 
   return (
     <div className="flex flex-col gap-4 border border-border/60 rounded-xl p-4 bg-surface-elevated">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="font-semibold text-primary text-sm flex items-center gap-2">
           <ImageIcon className="h-4 w-4" /> Live Proofing Engine
         </h3>
-        <div className="flex gap-2">
-          {logos.length > 0 && (
-            <Button variant="ghost" size="sm" onClick={() => setLogos([])} className="h-7 px-2 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30">
-              <X className="h-3 w-3 mr-1" /> Clear All
+        
+        {/* Toolbar */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1 bg-secondary/50 p-1 rounded-md">
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={undo} disabled={historyIndex <= 0} title="Undo">
+              <Undo className="h-3.5 w-3.5" />
             </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={redo} disabled={historyIndex >= history.length - 1} title="Redo">
+              <Redo className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+
+          {activeLogo && (
+            <div className="flex items-center gap-1 bg-secondary/50 p-1 rounded-md">
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => snapTo(50, 50)} title="Center">
+                <AlignCenter className="h-3.5 w-3.5" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => snapTo(20, 20)} title="Top Left">
+                <AlignHorizontalSpaceBetween className="h-3.5 w-3.5" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={rotateActiveLogo} title="Rotate 15°">
+                <RotateCw className="h-3.5 w-3.5" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-red-500 hover:text-red-600 hover:bg-red-50" onClick={deleteActiveLogo} title="Delete">
+                <Trash2 className="h-3.5 w-3.5" />
+              </Button>
+            </div>
           )}
-          <label className="cursor-pointer h-7 px-3 text-xs flex items-center justify-center bg-accent text-primary rounded-md font-medium hover:bg-gold-hover transition-colors shadow-sm">
-             <UploadCloud className="h-3 w-3 mr-1.5" /> Add Logo
-             <input type="file" accept="image/*" multiple className="hidden" onChange={handleFileUpload} />
-          </label>
+
+          <div className="flex items-center gap-2">
+            {logos.length > 0 && (
+              <Button variant="ghost" size="sm" onClick={() => { setLogos([]); setHistory([]); setHistoryIndex(-1); }} className="h-7 px-2 text-xs text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30">
+                <X className="h-3 w-3 mr-1" /> Clear All
+              </Button>
+            )}
+            <label className="cursor-pointer h-7 px-3 text-xs flex items-center justify-center bg-accent text-primary rounded-md font-medium hover:bg-gold-hover transition-colors shadow-sm">
+               <UploadCloud className="h-3 w-3 mr-1.5" /> Add Logo
+               <input type="file" accept="image/*" multiple className="hidden" onChange={handleFileUpload} />
+            </label>
+          </div>
         </div>
       </div>
 
       <div 
         ref={containerRef}
-        className={`relative aspect-square w-full max-w-sm mx-auto overflow-hidden bg-secondary/30 rounded-lg border-2 transition-colors ${isDragOver ? 'border-accent border-dashed bg-accent/5' : 'border-border/50'}`}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        className={`relative aspect-square w-full max-w-sm mx-auto overflow-hidden bg-secondary/30 rounded-lg border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-accent ${isDragOver ? 'border-accent border-dashed bg-accent/5' : 'border-border/50'}`}
         onPointerMove={isDragging || isResizing ? handlePointerMove : undefined}
         onPointerUp={isDragging || isResizing ? handlePointerUp : undefined}
         onPointerLeave={isDragging || isResizing ? handlePointerUp : undefined}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        onClick={() => setActiveId(null)} // deselect on background click
+        onClick={() => setActiveId(null)}
       >
         <Image 
           src={productImageSrc} 
@@ -214,7 +327,7 @@ export function LogoMockupPreview({ productImageSrc }: LogoMockupPreviewProps) {
                 top: `${logo.position.y}%`,
                 width: `${logo.width}%`,
                 height: `${logo.height}%`,
-                transform: `translate(-50%, -50%) perspective(500px) rotateX(10deg) rotateY(-5deg)`,
+                transform: `translate(-50%, -50%) perspective(500px) rotateX(10deg) rotateY(-5deg) rotateZ(${logo.rotation || 0}deg)`,
                 mixBlendMode: isConfirmed ? 'normal' : 'multiply'
               }}
             >
@@ -238,8 +351,7 @@ export function LogoMockupPreview({ productImageSrc }: LogoMockupPreviewProps) {
                     className="absolute -top-4 -right-4 bg-red-500 text-white rounded-full p-1.5 z-30 shadow-md hover:bg-red-600 transition-transform hover:scale-110"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setLogos(prev => prev.filter(l => l.id !== logo.id));
-                      setActiveId(null);
+                      deleteActiveLogo();
                     }}
                   >
                     <X className="h-4 w-4" />
@@ -251,12 +363,14 @@ export function LogoMockupPreview({ productImageSrc }: LogoMockupPreviewProps) {
                   >
                     <Check className="h-4 w-4" />
                   </button>
-                  <div 
-                    className="absolute -bottom-3 -right-3 bg-white border border-border text-primary rounded-full p-1.5 cursor-nwse-resize z-30 shadow-md hover:scale-110 transition-transform flex items-center justify-center"
+                  <button 
+                    type="button"
+                    aria-label="Resize logo"
+                    className="absolute -bottom-3 -right-3 bg-background border border-border text-foreground rounded-full p-1.5 cursor-nwse-resize z-30 shadow-md hover:scale-110 transition-transform flex items-center justify-center"
                     onPointerDown={(e) => handlePointerDown(e, logo.id, 'resize')}
                   >
                     <Maximize2 className="h-3 w-3" />
-                  </div>
+                  </button>
                 </>
               )}
             </div>
@@ -271,7 +385,6 @@ export function LogoMockupPreview({ productImageSrc }: LogoMockupPreviewProps) {
           onValueChange={(val: any) => {
             if (!activeId || !activeLogo) return;
             const maxVal = Array.isArray(val) ? val[0] : val;
-            // Maintain aspect ratio while scaling via slider
             const ratio = activeLogo.width / activeLogo.height;
             let newWidth = maxVal;
             let newHeight = maxVal;
@@ -280,7 +393,7 @@ export function LogoMockupPreview({ productImageSrc }: LogoMockupPreviewProps) {
             } else {
               newWidth = maxVal * ratio;
             }
-            setLogos(prev => prev.map(l => l.id === activeId ? { ...l, width: newWidth, height: newHeight } : l));
+            updateActiveLogo({ width: newWidth, height: newHeight });
           }}
           min={10}
           max={100}
@@ -294,3 +407,5 @@ export function LogoMockupPreview({ productImageSrc }: LogoMockupPreviewProps) {
     </div>
   );
 }
+
+export default LogoMockupPreview;

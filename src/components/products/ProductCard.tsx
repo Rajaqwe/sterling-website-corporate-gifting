@@ -8,8 +8,10 @@ import Link from "next/link";
 import { Product } from "@/types/product";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Layers, Sparkles } from "lucide-react";
+import { ArrowRight, Eye, Layers, Sparkles } from "lucide-react";
 import { formatINR } from "@/lib/currency";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 interface ProductCardProps {
   product: Product;
@@ -24,11 +26,15 @@ export function ProductCard({ product, className = "", priority = false }: Produ
     (product as any).featuredImage || (product as any).images?.[0] || primaryMedia || "/placeholder-product.jpg"
   );
   const [imageError, setImageError] = useState(false);
+  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
 
   const title = product.title || product.name || "Corporate Gift";
   const displayCategory = (product as any).category?.name || "Corporate Gift";
   const lowestBulkPrice = Number(product.startingPrice ?? product.lowestPrice ?? (product as any).basePrice ?? (product as any).price ?? 0);
   const basePrice = (product as any).basePrice ? Number((product as any).basePrice) : Number((product as any).price ?? 0);
+  const minimumOrderQuantity = (product as any).minimumOrderQuantity || product.moq || 1;
+  const calculatedSavings = basePrice > 0 && lowestBulkPrice < basePrice ? Math.round(((basePrice - lowestBulkPrice) / basePrice) * 100) : 0;
+  const maxSavingsPercent = product.priceTiers?.[product.priceTiers.length - 1]?.savingsPercent || calculatedSavings;
 
   // Customization methods
   const customizations = product.customizations || product.customizationOptions || [];
@@ -37,7 +43,7 @@ export function ProductCard({ product, className = "", priority = false }: Produ
   return (
     <Card
       data-testid="product-card"
-      className={cn("group group/card flex flex-col h-full bg-background rounded-xl border border-border/40 overflow-hidden hover:-translate-y-1 hover:shadow-md transition-ui", className)}
+      className={cn("group group/card flex flex-col h-full bg-background rounded-xl border border-border/40 overflow-hidden hover:-translate-y-1 hover:shadow-lg transition-all duration-300", className)}
     >
       {/* Product Image Stage */}
       <div className="relative aspect-[4/5] w-full overflow-hidden bg-secondary/30">
@@ -86,7 +92,7 @@ export function ProductCard({ product, className = "", priority = false }: Produ
             data-testid="moq-badge"
             className="inline-flex items-center rounded-full bg-accent text-primary px-2.5 py-0.5 text-xs font-bold shadow-sm"
           >
-            MOQ: {(product as any).minimumOrderQuantity || product.moq || 1}
+            MOQ: {product.moq} units
           </span>
         </div>
 
@@ -158,13 +164,13 @@ export function ProductCard({ product, className = "", priority = false }: Produ
             </div>
           </div>
 
-          {basePrice > 0 && basePrice !== lowestBulkPrice && (
+          {basePrice > 0 && basePrice !== lowestBulkPrice && maxSavingsPercent > 0 && (
             <div className="text-right">
               <span className="text-[10px] text-muted-foreground block line-through">
                 {formatINR(basePrice)} / unit
               </span>
               <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-                Save up to {product.priceTiers?.[product.priceTiers.length - 1]?.savingsPercent || 25}%
+                Save up to {maxSavingsPercent}%
               </span>
             </div>
           )}
@@ -172,18 +178,77 @@ export function ProductCard({ product, className = "", priority = false }: Produ
         
         {/* Actions */}
         <div className="flex gap-2 pt-3 mt-1">
+          <Button type="button" variant="outline" size="sm" className="h-9 px-3 shrink-0" onClick={() => setIsQuickViewOpen(true)} aria-label={`Quick view ${title}`}>
+            <Eye className="h-4 w-4" />
+          </Button>
           <Link href={`/products/${product.slug}`} className="flex-1">
-            <button className="w-full h-9 rounded-md border border-border/60 hover:bg-secondary/50 text-xs font-semibold text-foreground transition-colors">
-              View Details
-            </button>
+            <span className="btn-secondary h-9 w-full rounded-md text-[11px] font-semibold flex items-center justify-center">VIEW PRODUCT</span>
           </Link>
-          <Link href={`/request-a-quote?product=${product.slug}`} className="flex-1">
-            <button className="w-full h-9 rounded-md bg-accent hover:bg-gold-hover text-primary text-xs font-semibold shadow-sm transition-colors">
-              Request Quote
-            </button>
-          </Link>
+          <Button 
+            type="button" 
+            className="flex-1 btn-primary h-9 rounded-md text-[11px] font-semibold px-2"
+            onClick={async (e) => {
+              e.preventDefault();
+              const { addToCart } = await import("@/app/products/actions");
+              const res = await addToCart(product.id, minimumOrderQuantity);
+              if (res.success) {
+                // To avoid needing useCart in a deeply nested possible Server Component tree before
+                // We just dispatch a custom event that CartDrawer can listen to, or rely on router.refresh
+                // Wait, useCart is safe here since ProductCard is a client component
+                // Actually, I will just call window.dispatchEvent to notify cart change if we don't have useCart hook right here
+                window.dispatchEvent(new Event("cart-updated"));
+                const { toast } = await import("sonner");
+                toast.success("Added to cart");
+              } else {
+                const { toast } = await import("sonner");
+                toast.error(res.error || "Failed to add to cart");
+              }
+            }}
+          >
+            ADD TO CART
+          </Button>
         </div>
       </CardContent>
+
+      <Sheet open={isQuickViewOpen} onOpenChange={setIsQuickViewOpen}>
+        <SheetContent side="right" className="w-full overflow-y-auto p-0 sm:max-w-lg">
+          <SheetHeader className="border-b border-border/60 p-6 text-left">
+            <span className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Quick view</span>
+            <SheetTitle className="mt-2 text-2xl font-serif font-bold text-primary">{title}</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-6 p-6">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-secondary/50">
+              {!imageError && <Image src={imageSrc} alt={title} fill sizes="(max-width: 640px) 100vw, 512px" className="object-cover" />}
+              {imageError && <div className="flex h-full items-center justify-center text-muted-foreground"><Layers className="h-10 w-10" /></div>}
+            </div>
+            <div className="flex items-center justify-between gap-3"><span className="text-sm text-muted-foreground">{displayCategory}</span><span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-primary">MOQ {minimumOrderQuantity}</span></div>
+            {product.tagline && <p className="text-sm leading-relaxed text-muted-foreground">{product.tagline}</p>}
+            <div className="rounded-xl border border-primary/15 bg-primary/[0.035] p-4"><span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Starting at</span><p className="mt-1 text-2xl font-bold text-primary">{formatINR(lowestBulkPrice)} <span className="text-sm font-normal text-muted-foreground">/ unit</span></p></div>
+            <div className="grid grid-cols-2 gap-3 text-sm"><div className="rounded-xl border border-border p-3"><span className="block text-xs text-muted-foreground">Branding</span><strong className="mt-1 block text-foreground">{customizations.length ? "Available" : "Ask our team"}</strong></div><div className="rounded-xl border border-border p-3"><span className="block text-xs text-muted-foreground">Category</span><strong className="mt-1 block text-foreground">{displayCategory}</strong></div></div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Link href={`/products/${product.slug}`} onClick={() => setIsQuickViewOpen(false)} className="btn-primary h-11 w-full rounded-md font-semibold text-sm flex items-center justify-center">VIEW PRODUCT</Link>
+              <Button 
+                onClick={async () => {
+                  const { addToCart } = await import("@/app/products/actions");
+                  const res = await addToCart(product.id, minimumOrderQuantity);
+                  if (res.success) {
+                    window.dispatchEvent(new Event("cart-updated"));
+                    const { toast } = await import("sonner");
+                    toast.success("Added to cart");
+                    setIsQuickViewOpen(false);
+                  } else {
+                    const { toast } = await import("sonner");
+                    toast.error(res.error || "Failed to add to cart");
+                  }
+                }} 
+                className="btn-secondary h-11 w-full rounded-md font-semibold text-sm flex items-center justify-center"
+              >
+                ADD TO CART
+              </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </Card>
   );
 }

@@ -1,5 +1,15 @@
 node_modules/
+.next/
 .wasp/
 .env
-.env.example
-.env.example
+.env.*
+!.env.example
+*.tsbuildinfo
+*.zip
+playwright-report/
+
+.vercel
+.agent/
+.agents/
+.claude/
+push_env.js

@@ -20,6 +20,16 @@ export interface PriceTier {
   savingsPercent?: number;
 }
 
+export type PricingOpportunity = {
+  currentTier: PriceTier | null;
+  nextTier: PriceTier | null;
+  unitsToNextTier: number | null;
+  currentUnitPrice: number;
+  nextUnitPrice: number | null;
+  incrementalSavingsPerUnit: number | null;
+  incrementalSavingsTotal: number | null;
+};
+
 export interface CustomizationOption {
   id: string;
   name: string;
@@ -131,6 +141,19 @@ export interface QuoteCalculation {
   isMoqSatisfied: boolean;
   isBelowMoq: boolean;
   activeTier?: PriceTier;
+  opportunity?: PricingOpportunity;
+}
+
+export interface CustomizationConfiguration {
+  customizationId: string;
+  placement?: string;
+}
+
+export interface ProductConfiguration {
+  quantity: number;
+  variantId: string | null;
+  customizations: CustomizationConfiguration[];
+  artworkAssetIds: string[];
 }
 
 export interface QuoteRequestCustomization {

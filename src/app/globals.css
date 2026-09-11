@@ -26,7 +26,7 @@
     
     /* Muted tones for subtle backgrounds */
     --muted: 42 20% 88%;
-    --muted-foreground: 30 10% 40%;
+    --muted-foreground: 30 15% 35%;
     
     /* Sterling Gold / Champagne Accent */
     --accent: 33 40% 59%;
@@ -70,7 +70,7 @@
     --secondary-foreground: 210 40% 98%;
     
     --muted: 40 20% 15%;
-    --muted-foreground: 40 10% 65%;
+    --muted-foreground: 40 10% 75%;
     
     --accent: 33 40% 59%;
     --accent-foreground: 222.2 47.4% 11.2%;
@@ -125,6 +125,16 @@
   :focus-visible {
     outline: 2px solid hsl(var(--ring));
     outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground font-medium transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
+  }
+  
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-md border border-input bg-background font-medium hover:bg-accent hover:text-accent-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
   }
 }
 

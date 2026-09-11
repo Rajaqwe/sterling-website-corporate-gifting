@@ -73,16 +73,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/login?message=Please sign in to access this page&type=error', request.url))
   }
 
-  // Strictly enforce Admin isolation
-  if ((isAdmin || isAdminApi) && user) {
-    const role = user.app_metadata?.role || 'CUSTOMER'
-    if (role !== 'ADMIN' && role !== 'SUPER_ADMIN') {
-      if (isAdminApi) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-      }
-      return NextResponse.redirect(new URL('/dashboard?message=Unauthorized. Administrator access required.&type=error', request.url))
-    }
-  }
+  // Authorization is now purely handled server-side via Prisma in requireAdmin()
+  // proxy.ts only ensures that a valid session exists for protected routes.
 
   // If user is logged in, prevent them from accessing login/register pages
   if (isAuthPage && user) {

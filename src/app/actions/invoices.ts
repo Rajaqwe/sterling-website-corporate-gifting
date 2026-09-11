@@ -3,15 +3,15 @@
 import { prisma } from '@/lib/prisma/client'
 import { revalidatePath } from 'next/cache'
 import { InvoiceStatus } from '@/generated/prisma'
-import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/auth/server'
 import crypto from 'crypto'
 
 export async function generateInvoiceForOrder(orderId: string) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) return { success: false, error: "Unauthorized" }
+    const auth = await getAuthUser()
+
+    if (!auth) return { success: false, error: "Unauthorized" }
+    const user = auth.supabaseUser
 
     const order = await prisma.order.findUnique({
       where: { id: orderId }
@@ -19,7 +19,8 @@ export async function generateInvoiceForOrder(orderId: string) {
 
     if (!order) return { success: false, error: "Order not found" };
 
-    const isAdmin = user.app_metadata?.role === 'ADMIN' || user.app_metadata?.role === 'SUPER_ADMIN'
+    // Check role against the DB (source of truth), not stale app_metadata
+    const isAdmin = auth.user.role === 'ADMIN' || auth.user.role === 'SUPER_ADMIN'
     if (!isAdmin && order.userId !== user.id) {
       return { success: false, error: "Forbidden: You do not own this order." }
     }

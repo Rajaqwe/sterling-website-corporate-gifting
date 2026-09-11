@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Image from "next/image";
 import { demoVideos } from "@/data/demoVideos";
 
 const SLIDE_DURATION = 4000;
@@ -10,22 +11,23 @@ export function DemoVideoCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isPageVisible, setIsPageVisible] = useState(true);
+  const [isManuallyPaused, setIsManuallyPaused] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState<Record<number, boolean>>({});
   
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const prefersReducedMotion = useRef(false);
+  const [isReducedMotion, setIsReducedMotion] = useState(false);
 
   // Initialize reduced motion preference
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-      prefersReducedMotion.current = mediaQuery.matches;
+      setIsReducedMotion(mediaQuery.matches);
       
       const listener = (e: MediaQueryListEvent) => {
-        prefersReducedMotion.current = e.matches;
+        setIsReducedMotion(e.matches);
       };
       
       mediaQuery.addEventListener('change', listener);
@@ -57,19 +59,11 @@ export function DemoVideoCarousel() {
     };
   }, []);
 
-  // Main Timer Logic
+  // Main Timer Logic (Removed fixed interval, relying on onEnded event now)
+  // We still need to handle the case where videos fail to load or something, but onEnded is more reliable.
   useEffect(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-
-    // Only run timer if page is visible, not hovered, and we have multiple videos
-    if (isPageVisible && !isHovered && demoVideos.length > 1) {
-      timerRef.current = setInterval(() => {
-        goToNext();
-      }, SLIDE_DURATION);
-    }
-
+    // Kept empty to avoid breaking existing hooks dependency rules or cleanups,
+    // though we can just remove the setInterval part.
     return () => {
       if (timerRef.current) {
         clearInterval(timerRef.current);
@@ -146,7 +140,7 @@ export function DemoVideoCarousel() {
         className="flex w-full h-full"
         style={{ 
           transform: `translateX(-${currentIndex * 100}%)`,
-          transition: prefersReducedMotion.current ? 'none' : 'transform 700ms cubic-bezier(0.25, 1, 0.5, 1)'
+          transition: isReducedMotion ? 'none' : 'transform 700ms cubic-bezier(0.25, 1, 0.5, 1)'
         }}
       >
         {demoVideos.map((video, index) => (
@@ -159,25 +153,44 @@ export function DemoVideoCarousel() {
             aria-label={`${index + 1} of ${demoVideos.length}`}
           >
             {/* Smooth transition poster image */}
-            <img 
-              src={video.poster} 
+            <Image
+              src={video.poster}
               alt={video.title}
-              className={`absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-1000 ${isPlaying[index] ? 'opacity-0' : 'opacity-100'}`}
+              fill
+              sizes="100vw"
+              priority={index === 0}
+              loading={index === 0 ? undefined : "lazy"}
+              className={`object-cover object-center transition-opacity duration-1000 ${isPlaying[index] ? 'opacity-0' : 'opacity-100'}`}
             />
-            {/* The video element */}
+            {/* The video element — only the active (and immediately adjacent) slide gets a real
+                src/preload so the browser isn't asked to fetch all five videos up front. */}
             <video
               ref={(el) => {
                 videoRefs.current[index] = el;
               }}
-              src={video.src}
+              src={Math.abs(index - currentIndex) <= 1 ? video.src : undefined}
+              preload={index === currentIndex ? "auto" : "none"}
               onPlaying={() => setIsPlaying(prev => ({ ...prev, [index]: true }))}
               onWaiting={() => setIsPlaying(prev => ({ ...prev, [index]: false }))}
+              onEnded={() => {
+                if (!isManuallyPaused) goToNext();
+              }}
               muted
               playsInline
-              loop
-              className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none"
+              // removed loop because we want to trigger onEnded
+              className="absolute inset-0 w-full h-full object-cover object-center pointer-events-auto cursor-pointer"
+              onClick={() => setIsManuallyPaused(prev => !prev)}
             />
-            <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-opacity duration-700" />
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-opacity duration-700 pointer-events-none" />
+            
+            {/* Pause indicator */}
+            {isManuallyPaused && currentIndex === index && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="bg-black/50 text-white rounded-full p-4 backdrop-blur-md animate-fade">
+                  <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -211,7 +224,7 @@ export function DemoVideoCarousel() {
                 : "w-2 bg-background/50 hover:bg-background/80"
             }`}
             aria-label={`Go to demo video ${index + 1}`}
-            aria-selected={currentIndex === index}
+            aria-current={currentIndex === index ? "true" : undefined}
           />
         ))}
       </div>

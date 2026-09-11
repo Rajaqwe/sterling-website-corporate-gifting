@@ -1,9 +1,49 @@
 import { prisma } from "@/lib/prisma/client";
+import { calculateProductPricing } from "@/lib/utils/pricing";
+
+export function validateBulkPricingTiers(tiers: { minQuantity: number; maxQuantity: number | null; price: any }[]) {
+  if (!tiers || tiers.length === 0) return true;
+
+  const sorted = [...tiers].sort((a, b) => a.minQuantity - b.minQuantity);
+  let openEndedCount = 0;
+
+  for (let i = 0; i < sorted.length; i++) {
+    const tier = sorted[i];
+    
+    if (tier.minQuantity < 1) throw new Error("Tier minQuantity must be at least 1.");
+    if (Number(tier.price) < 0) throw new Error("Tier price cannot be negative.");
+    
+    if (tier.maxQuantity !== null) {
+      if (tier.maxQuantity < tier.minQuantity) {
+        throw new Error(`Tier maxQuantity (${tier.maxQuantity}) cannot be less than minQuantity (${tier.minQuantity}).`);
+      }
+    } else {
+      openEndedCount++;
+    }
+
+    if (openEndedCount > 1) {
+      throw new Error("Only one open-ended tier is allowed.");
+    }
+
+    if (i > 0) {
+      const prevTier = sorted[i - 1];
+      if (prevTier.maxQuantity === null) {
+        throw new Error("An open-ended tier must be the last tier.");
+      }
+      if (tier.minQuantity <= prevTier.maxQuantity) {
+        throw new Error(`Tier overlaps: Tier minQuantity (${tier.minQuantity}) is less than or equal to previous tier maxQuantity (${prevTier.maxQuantity}).`);
+      }
+    }
+  }
+
+  return true;
+}
 
 export async function calculateServerProductTotal(
   productId: string,
   quantity: number,
-  selectedCustomizationIds: string[] = []
+  selectedCustomizationIds: string[] = [],
+  variantId?: string
 ) {
   const product = await prisma.product.findUnique({
     where: { id: productId },
@@ -16,6 +56,7 @@ export async function calculateServerProductTotal(
           brandingOption: true,
         },
       },
+      variants: variantId ? { where: { id: variantId } } : false,
     },
   });
 
@@ -27,59 +68,29 @@ export async function calculateServerProductTotal(
     throw new Error(`Quantity ${quantity} is below minimum order quantity ${product.minimumOrderQuantity}`);
   }
 
-  // 1. Calculate Base Price based on volume tier
-  let activeTier = product.bulkPricingTiers[0] || {
-    minQuantity: product.minimumOrderQuantity,
-    maxQuantity: null,
-    price: product.price,
-  };
+  const variant = variantId && product.variants ? product.variants[0] : null;
 
-  for (const tier of product.bulkPricingTiers) {
-    if (quantity >= tier.minQuantity) {
-      if (tier.maxQuantity === null || quantity <= tier.maxQuantity) {
-        activeTier = tier;
-        break;
-      }
-    }
-  }
+  // Map selectedCustomizationIds to full option objects so calculateProductPricing can process them
+  const selectedCustomizations = selectedCustomizationIds.map(id => {
+    const opt = product.brandingOptions.find(o => o.brandingOptionId === id);
+    return opt ? opt.brandingOption : id;
+  });
 
-  // If quantity is higher than the max of all defined tiers, select highest bracket.
-  // Use a non-mutating copy so product.bulkPricingTiers is not reordered as a side effect.
-  if (product.bulkPricingTiers.length > 0) {
-    const highestTier = [...product.bulkPricingTiers].sort(
-      (a: { minQuantity: number }, b: { minQuantity: number }) => b.minQuantity - a.minQuantity
-    )[0];
-    if (quantity >= highestTier.minQuantity) {
-      activeTier = highestTier;
-    }
-  }
-
-  const tierUnitPrice = Number(activeTier.price);
-  const productSubtotal = tierUnitPrice * quantity;
-
-  // 2. Calculate Customizations Setup Fees & Unit Costs
-  let customizationSetupTotal = 0;
-  let customizationUnitTotal = 0;
-
-  for (const id of selectedCustomizationIds) {
-    const option = product.brandingOptions.find(o => o.brandingOptionId === id);
-    if (option) {
-      customizationSetupTotal += 0; // BrandingOption schema doesn't have a setup fee
-      customizationUnitTotal += (Number(option.brandingOption.additionalCost || 0) * quantity);
-    }
-  }
-
-  const customizationSubtotal = customizationSetupTotal + customizationUnitTotal;
-  const total = productSubtotal + customizationSubtotal;
+  const pricing = calculateProductPricing({
+    product: product as any,
+    quantity,
+    variant,
+    customizations: selectedCustomizations as any,
+  });
 
   return {
-    baseUnitPrice: Number(product.price),
-    tierUnitPrice,
-    productSubtotal,
-    customizationSetupTotal,
-    customizationUnitTotal,
-    customizationSubtotal,
-    total,
+    baseUnitPrice: pricing.baseUnitPrice,
+    tierUnitPrice: pricing.tierUnitPrice,
+    productSubtotal: pricing.productSubtotal,
+    customizationSetupTotal: pricing.customizationSetupTotal,
+    customizationUnitTotal: pricing.customizationUnitTotal,
+    customizationSubtotal: pricing.customizationSubtotal,
+    total: pricing.estimatedTotal,
     product,
   };
 }

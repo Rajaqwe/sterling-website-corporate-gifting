@@ -75,6 +75,9 @@ export async function GET(request: Request) {
           console.error("Failed to sync role to Supabase app_metadata", e);
         }
       }
+
+      const { mergeGuestCart } = await import('@/lib/cart/merge-guest-cart');
+      await mergeGuestCart(user.id);
     }
     
     // Success - redirect to dashboard

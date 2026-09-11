@@ -116,7 +116,7 @@ function CompanyCard({
             <img 
               src={company.logoUrl} 
               alt={`${company.name} logo`} 
-              className="w-20 h-20 md:w-28 md:h-28 object-contain drop-shadow-sm transition-transform duration-500 group-hover:scale-110"
+              className="w-20 h-20 md:w-28 md:h-28 object-contain drop-shadow-sm transition-all duration-500 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
             />
             <span className="text-2xl md:text-3xl font-bold tracking-wide text-foreground font-serif">
               {company.name}

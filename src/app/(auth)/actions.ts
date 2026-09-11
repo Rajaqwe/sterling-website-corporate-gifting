@@ -5,6 +5,20 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { rateLimit } from '@/lib/security/rate-limit'
 import { headers } from 'next/headers'
+import { mergeGuestCart } from '@/lib/cart/merge-guest-cart'
+import { assertEnv } from '@/lib/env'
+
+// Server-enforced password policy. The UI hint is not a security control.
+const PASSWORD_MIN_LENGTH = 10;
+function validatePassword(password: string): string | null {
+  if (!password || password.length < PASSWORD_MIN_LENGTH) {
+    return `Password must be at least ${PASSWORD_MIN_LENGTH} characters long.`;
+  }
+  if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+    return 'Password must contain both letters and numbers.';
+  }
+  return null;
+}
 
 export async function login(formData: FormData) {
   const ip = (await headers()).get('x-forwarded-for') || 'anonymous';
@@ -28,8 +42,17 @@ export async function login(formData: FormData) {
     return redirect(`/login?message=${encodeURIComponent(error.message)}`)
   }
 
-  const role = data?.user?.app_metadata?.role;
-  const isAdmin = role === 'ADMIN' || role === 'SUPER_ADMIN';
+  let isAdmin = false;
+  if (data?.user) {
+    const { prisma } = await import('@/lib/prisma/client');
+    const dbUser = await prisma.user.findUnique({
+      where: { id: data.user.id },
+      select: { role: true }
+    });
+    const role = dbUser?.role || data.user.app_metadata?.role;
+    isAdmin = role === 'ADMIN' || role === 'SUPER_ADMIN';
+    await mergeGuestCart(data.user.id);
+  }
 
   revalidatePath('/', 'layout')
   
@@ -53,7 +76,7 @@ export async function signInWithOAuth(provider: 'google' | 'apple') {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback`,
+      redirectTo: `${assertEnv('NEXT_PUBLIC_APP_URL')}/auth/callback`,
     },
   })
 
@@ -88,11 +111,19 @@ export async function signup(formData: FormData) {
 
   const supabase = await createClient()
   
-  const email = formData.get('email') as string
+  const email = (formData.get('email') as string)?.trim().toLowerCase()
   const password = formData.get('password') as string
   const firstName = formData.get('firstName') as string
   const lastName = formData.get('lastName') as string
   const companyName = formData.get('companyName') as string | null
+
+  const passwordError = validatePassword(password);
+  if (passwordError) {
+    return redirect(`/register?message=${encodeURIComponent(passwordError)}&type=error`)
+  }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return redirect(`/register?message=${encodeURIComponent('Please enter a valid email address.')}&type=error`)
+  }
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -100,7 +131,10 @@ export async function signup(formData: FormData) {
   })
 
   if (error) {
-    return redirect(`/register?message=${encodeURIComponent(error.message)}`)
+    // Log the real cause server-side; return a generic message so attackers
+    // cannot enumerate registered emails from the signup response.
+    console.error('Signup failed:', error.message);
+    return redirect(`/register?message=${encodeURIComponent('Could not create your account. If this email is already registered, try signing in or resetting your password.')}&type=error`)
   }
 
   // Provision Prisma User
@@ -165,23 +199,41 @@ export async function signup(formData: FormData) {
 }
 
 export async function resetPassword(formData: FormData) {
+  const ip = (await headers()).get('x-forwarded-for') || 'anonymous';
+  const limitCheck = await rateLimit(`reset_${ip}`, 3, 60000); // 3 requests per minute
+
+  if (!limitCheck.success) {
+    return redirect(`/forgot-password?message=${encodeURIComponent('Too many requests. Please try again later.')}&type=error`)
+  }
+
   const supabase = await createClient()
-  const email = formData.get('email') as string
+  const email = (formData.get('email') as string)?.trim().toLowerCase()
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return redirect(`/forgot-password?message=${encodeURIComponent('Please enter a valid email address.')}&type=error`)
+  }
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/auth/callback?next=/reset-password`,
+    redirectTo: `${assertEnv('NEXT_PUBLIC_APP_URL')}/auth/callback?next=/reset-password`,
   })
 
   if (error) {
-    return redirect(`/forgot-password?message=${encodeURIComponent(error.message)}&type=error`)
+    console.error('Password reset request failed:', error.message);
   }
 
-  return redirect(`/forgot-password?message=${encodeURIComponent('Password reset link sent! Check your inbox.')}&type=success`)
+  // Always show the same response so the endpoint cannot be used to
+  // discover which emails have accounts.
+  return redirect(`/forgot-password?message=${encodeURIComponent('If an account exists for that email, a password reset link has been sent.')}&type=success`)
 }
 
 export async function updatePassword(formData: FormData) {
   const supabase = await createClient()
   const password = formData.get('password') as string
+
+  const passwordError = validatePassword(password);
+  if (passwordError) {
+    return redirect(`/reset-password?message=${encodeURIComponent(passwordError)}&type=error`)
+  }
 
   const { error } = await supabase.auth.updateUser({
     password: password

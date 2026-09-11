@@ -1,13 +1,14 @@
 "use client";
 
 import React from "react";
-import { PriceTier } from "@/types/product";
-import { Check, Sparkles } from "lucide-react";
+import { QuoteCalculation, PriceTier } from "@/types/product";
+import { Check, Sparkles, TrendingDown } from "lucide-react";
 import { formatINR } from "@/lib/currency";
 
 interface TieredPricingTableProps {
   priceTiers: PriceTier[];
   selectedQuantity: number;
+  quoteCalculation?: QuoteCalculation;
   basePrice?: number;
   onSelectTierQuantity?: (minQty: number) => void;
 }
@@ -15,6 +16,7 @@ interface TieredPricingTableProps {
 export function TieredPricingTable({
   priceTiers,
   selectedQuantity,
+  quoteCalculation,
   basePrice,
   onSelectTierQuantity,
 }: TieredPricingTableProps) {
@@ -66,8 +68,17 @@ export function TieredPricingTable({
               return (
                 <tr
                   key={idx}
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={isMatch}
                   onClick={() => onSelectTierQuantity && onSelectTierQuantity(tier.minQuantity)}
-                  className={`transition-colors cursor-pointer ${
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onSelectTierQuantity && onSelectTierQuantity(tier.minQuantity);
+                    }
+                  }}
+                  className={`transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset ${
                     isMatch
                       ? "bg-accent/15 font-semibold text-primary"
                       : "hover:bg-secondary/40 text-foreground"
@@ -101,6 +112,26 @@ export function TieredPricingTable({
           </tbody>
         </table>
       </div>
+
+      {quoteCalculation?.opportunity?.nextTier && (
+        <div className="mt-2 p-3 rounded-xl border border-accent/30 bg-accent/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom-2">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[11px] font-bold text-accent uppercase tracking-wider">Next Volume Tier</span>
+            <span className="text-sm font-semibold text-foreground">
+              {quoteCalculation.opportunity.nextTier.minQuantity} units → {formatINR(quoteCalculation.opportunity.nextUnitPrice || 0)} / unit
+            </span>
+          </div>
+          <div className="flex flex-col sm:items-end gap-1 text-sm">
+            <span className="text-muted-foreground">
+              Add <strong className="text-foreground">{quoteCalculation.opportunity.unitsToNextTier}</strong> more units
+            </span>
+            <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+              <TrendingDown className="h-3.5 w-3.5" />
+              Save another {formatINR(quoteCalculation.opportunity.incrementalSavingsTotal || 0)}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

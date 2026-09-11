@@ -28,11 +28,11 @@ const checkoutSchema = z.object({
 
 type CheckoutValues = z.infer<typeof checkoutSchema>;
 
-export function CheckoutForm({ quote }: { quote: any }) {
+export function CheckoutForm({ quote, summary }: { quote: any, summary: any }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("po");
 
-  const itemsTotal = quote.items.reduce((acc: number, item: any) => acc + Number(item.totalPrice), 0);
+  const itemsTotal = Number(summary.itemsTotal);
   const totalQuantity = quote.items.reduce((acc: number, item: any) => acc + item.quantity, 0);
 
   const { register, handleSubmit, formState: { errors } } = useForm<CheckoutValues>({
@@ -61,7 +61,7 @@ export function CheckoutForm({ quote }: { quote: any }) {
       };
 
       // 1. Create DB Order
-      const orderRes = await createOrderFromQuote(quote.id, shippingData);
+      const orderRes = await createOrderFromQuote(quote.id, shippingData, paymentMethod);
       
       if (!orderRes.success || !orderRes.orderId) {
         toast.error(orderRes.error || "Failed to create order");
@@ -111,6 +111,12 @@ export function CheckoutForm({ quote }: { quote: any }) {
         theme: {
           color: "#1e293b", // primary color
         },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+            toast.info("Payment window closed. You can try again.");
+          }
+        }
       };
 
       const rzp1 = new (window as any).Razorpay(options);
@@ -140,46 +146,46 @@ export function CheckoutForm({ quote }: { quote: any }) {
               </CardHeader>
               <CardContent className="space-y-4 pt-6">
                 <div className="space-y-2">
-                  <Label>Company Name *</Label>
-                  <Input {...register("companyName")} className={`bg-secondary/10 ${errors.companyName ? "border-destructive" : ""}`} />
+                  <Label htmlFor="companyName">Company Name *</Label>
+                  <Input id="companyName" {...register("companyName")} className={`bg-secondary/10 ${errors.companyName ? "border-destructive" : ""}`} />
                   {errors.companyName && <span className="text-xs text-destructive">{errors.companyName.message}</span>}
                 </div>
                 <div className="space-y-2">
-                  <Label>Contact Name *</Label>
-                  <Input {...register("fullName")} className={`bg-secondary/10 ${errors.fullName ? "border-destructive" : ""}`} />
+                  <Label htmlFor="fullName">Contact Name *</Label>
+                  <Input id="fullName" {...register("fullName")} className={`bg-secondary/10 ${errors.fullName ? "border-destructive" : ""}`} />
                   {errors.fullName && <span className="text-xs text-destructive">{errors.fullName.message}</span>}
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Email *</Label>
-                    <Input {...register("workEmail")} type="email" className={`bg-secondary/10 ${errors.workEmail ? "border-destructive" : ""}`} />
+                    <Label htmlFor="workEmail">Email *</Label>
+                    <Input id="workEmail" {...register("workEmail")} type="email" className={`bg-secondary/10 ${errors.workEmail ? "border-destructive" : ""}`} />
                     {errors.workEmail && <span className="text-xs text-destructive">{errors.workEmail.message}</span>}
                   </div>
                   <div className="space-y-2">
-                    <Label>Phone *</Label>
-                    <Input {...register("phone")} type="tel" className={`bg-secondary/10 ${errors.phone ? "border-destructive" : ""}`} />
+                    <Label htmlFor="phone">Phone *</Label>
+                    <Input id="phone" {...register("phone")} type="tel" className={`bg-secondary/10 ${errors.phone ? "border-destructive" : ""}`} />
                     {errors.phone && <span className="text-xs text-destructive">{errors.phone.message}</span>}
                   </div>
                 </div>
                 <div className="space-y-2 pt-4 border-t border-border/40">
-                  <Label>Address Line 1 *</Label>
-                  <Input placeholder="Building, Street, Area" {...register("addressLine1")} className={`bg-secondary/10 ${errors.addressLine1 ? "border-destructive" : ""}`} />
+                  <Label htmlFor="addressLine1">Address Line 1 *</Label>
+                  <Input id="addressLine1" placeholder="Building, Street, Area" {...register("addressLine1")} className={`bg-secondary/10 ${errors.addressLine1 ? "border-destructive" : ""}`} />
                   {errors.addressLine1 && <span className="text-xs text-destructive">{errors.addressLine1.message}</span>}
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="col-span-1 space-y-2">
-                    <Label>City *</Label>
-                    <Input {...register("city")} className={`bg-secondary/10 ${errors.city ? "border-destructive" : ""}`} />
+                    <Label htmlFor="city">City *</Label>
+                    <Input id="city" {...register("city")} className={`bg-secondary/10 ${errors.city ? "border-destructive" : ""}`} />
                     {errors.city && <span className="text-xs text-destructive">{errors.city.message}</span>}
                   </div>
                   <div className="col-span-1 space-y-2">
-                    <Label>State *</Label>
-                    <Input {...register("state")} className={`bg-secondary/10 ${errors.state ? "border-destructive" : ""}`} />
+                    <Label htmlFor="state">State *</Label>
+                    <Input id="state" {...register("state")} className={`bg-secondary/10 ${errors.state ? "border-destructive" : ""}`} />
                     {errors.state && <span className="text-xs text-destructive">{errors.state.message}</span>}
                   </div>
                   <div className="col-span-1 space-y-2">
-                    <Label>ZIP Code *</Label>
-                    <Input {...register("postalCode")} className={`bg-secondary/10 ${errors.postalCode ? "border-destructive" : ""}`} />
+                    <Label htmlFor="postalCode">ZIP Code *</Label>
+                    <Input id="postalCode" {...register("postalCode")} className={`bg-secondary/10 ${errors.postalCode ? "border-destructive" : ""}`} />
                     {errors.postalCode && <span className="text-xs text-destructive">{errors.postalCode.message}</span>}
                   </div>
                 </div>
@@ -236,15 +242,19 @@ export function CheckoutForm({ quote }: { quote: any }) {
                 <span className="font-medium">{formatINR(itemsTotal)}</span>
               </div>
               <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Tax (GST 18%)</span>
+                <span className="font-medium">{formatINR(summary.tax)}</span>
+              </div>
+              <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Shipping</span>
-                <span className="font-medium">TBD</span>
+                <span className="font-medium">{summary.shipping === 0 ? 'Free' : formatINR(summary.shipping)}</span>
               </div>
               <Separator className="my-2" />
               <div className="flex justify-between items-end">
                 <span className="font-bold text-foreground">Total</span>
                 <div className="text-right">
-                  <span className="font-bold text-xl text-primary block">{formatINR(itemsTotal)}</span>
-                  <span className="text-[10px] text-muted-foreground">Plus applicable GST</span>
+                  <span className="font-bold text-xl text-primary block">{formatINR(summary.total)}</span>
+                  <span className="text-[10px] text-muted-foreground">Final amount to be paid</span>
                 </div>
               </div>
               
@@ -263,7 +273,7 @@ export function CheckoutForm({ quote }: { quote: any }) {
                 type="submit" 
                 form="checkout-form" 
                 disabled={isProcessing}
-                className="w-full bg-accent text-primary hover:bg-gold-hover h-12 font-bold shadow-md text-sm transition-all"
+                className="btn-primary w-full hover:bg-gold-hover h-12 font-bold shadow-md text-sm transition-all"
               >
                 {isProcessing ? (
                   <>

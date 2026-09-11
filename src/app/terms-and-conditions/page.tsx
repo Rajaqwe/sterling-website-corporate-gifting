@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 export default function TermsAndConditionsPage() {
   return (
-    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 max-w-4xl min-h-[80vh]">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 md:py-24 max-w-4xl min-h-[80vh]">
       <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-8 tracking-tight">Terms & Conditions</h1>
       <div className="prose prose-slate max-w-none">
         
@@ -26,7 +26,7 @@ export default function TermsAndConditionsPage() {
       <p className="mb-4 text-slate-700 leading-relaxed">All website content, design, and imagery are the intellectual property of Sterling and may not be used without explicit permission.</p>
     
         
-  <div className="mt-12 p-6 bg-slate-50 rounded-lg border border-slate-100">
+  <div className="mt-12 p-6 bg-muted/50 rounded-lg border border-slate-100">
     <h3 className="font-semibold text-lg mb-2">Sterling</h3>
     <p className="text-slate-600 mb-1">Premium Corporate Gifting & B2B Solutions</p>
     <p className="text-slate-600 mb-1">India</p>

@@ -53,7 +53,7 @@ export function FilterControls({
     const handler = setTimeout(() => {
       const currentMin = searchParams.get("minPrice") || "";
       const currentMax = searchParams.get("maxPrice") || "";
-      
+
       if (minPrice !== currentMin || maxPrice !== currentMax) {
         updateFilters({
           minPrice: minPrice || null,
@@ -75,8 +75,8 @@ export function FilterControls({
 
   const toggleArrayFilter = (key: string, value: string) => {
     const current = searchParams.getAll(key);
-    const updated = current.includes(value) 
-      ? current.filter(v => v !== value) 
+    const updated = current.includes(value)
+      ? current.filter(v => v !== value)
       : [...current, value];
     updateFilters({ [key]: updated });
   };
@@ -123,15 +123,13 @@ export function FilterControls({
                     key={cat.id}
                     type="button"
                     onClick={() => toggleArrayFilter("category", val)}
-                    className={`flex items-center justify-between text-left text-sm py-1.5 px-2.5 rounded-lg transition-colors ${
-                      isSelected
+                    className={`flex items-center justify-between text-left text-sm py-1.5 px-2.5 rounded-lg transition-colors ${isSelected
                         ? "bg-primary text-primary-foreground font-medium"
                         : "text-foreground hover:bg-secondary/70"
-                    }`}
+                      }`}
                   >
                     <span className="flex items-center gap-2 truncate">
-                      <span className={`h-4 w-4 rounded flex items-center justify-center border transition-colors ${
-                          isSelected ? "border-accent bg-accent text-primary" : "border-muted-foreground/30 bg-background"
+                      <span className={`h-4 w-4 rounded flex items-center justify-center border transition-colors ${isSelected ? "border-accent bg-accent text-primary" : "border-muted-foreground/30 bg-background"
                         }`}>
                         {isSelected && <Check className="h-3 w-3 stroke-[3]" />}
                       </span>
@@ -160,13 +158,13 @@ export function FilterControls({
                   const isSelected = searchParams.getAll(attr.name).includes(actualVal);
                   return (
                     <div key={val.id} className="flex items-center space-x-3 py-1 px-1">
-                      <Checkbox 
-                        id={`attr-${attr.id}-${val.id}`} 
+                      <Checkbox
+                        id={`attr-${attr.id}-${val.id}`}
                         checked={isSelected}
                         onCheckedChange={() => toggleArrayFilter(attr.name, actualVal)}
                       />
-                      <Label 
-                        htmlFor={`attr-${attr.id}-${val.id}`} 
+                      <Label
+                        htmlFor={`attr-${attr.id}-${val.id}`}
                         className="text-sm font-normal cursor-pointer flex-1 flex justify-between"
                       >
                         <span>{actualVal}</span>
@@ -183,7 +181,7 @@ export function FilterControls({
         {/* Price Range Filter */}
         <AccordionItem value="price" className="border-b-0 mb-4">
           <AccordionTrigger className="py-2 text-sm font-bold uppercase tracking-wider text-muted-foreground hover:no-underline">
-            Price Range
+            Starting Unit Price
           </AccordionTrigger>
           <AccordionContent className="pt-2">
             <div className="flex flex-col gap-4 px-1 pb-2">
@@ -232,48 +230,60 @@ export function FilterControls({
             </div>
           </AccordionContent>
         </AccordionItem>
-        
+
         {/* Rating Filter */}
         <AccordionItem value="rating" className="border-b-0 mb-4">
           <AccordionTrigger className="py-2 text-sm font-bold uppercase tracking-wider text-muted-foreground hover:no-underline">
             Rating
           </AccordionTrigger>
           <AccordionContent className="pt-2">
-             <div className="flex flex-col gap-2 px-1">
-               {[4, 3, 2].map(r => (
-                  <div key={r} className="flex items-center space-x-3">
-                    <Checkbox 
-                      id={`rating-${r}`} 
-                      checked={selectedRating === String(r)}
-                      onCheckedChange={(checked) => updateFilters({ rating: checked ? String(r) : null })}
-                    />
-                    <Label htmlFor={`rating-${r}`} className="text-sm font-normal cursor-pointer flex items-center">
-                       {r}★ & above
-                    </Label>
-                  </div>
-               ))}
-             </div>
+            <div className="flex flex-col gap-2 px-1">
+              {[4, 3, 2].map(r => (
+                <div key={r} className="flex items-center space-x-3">
+                  <Checkbox
+                    id={`rating-${r}`}
+                    checked={selectedRating === String(r)}
+                    onCheckedChange={(checked) => updateFilters({ rating: checked ? String(r) : null })}
+                  />
+                  <Label htmlFor={`rating-${r}`} className="text-sm font-normal cursor-pointer flex items-center">
+                    {r}★ & above
+                  </Label>
+                </div>
+              ))}
+            </div>
           </AccordionContent>
         </AccordionItem>
-        
+
         {/* Offers Filter */}
         <AccordionItem value="offers" className="border-b-0 mb-4">
           <AccordionTrigger className="py-2 text-sm font-bold uppercase tracking-wider text-muted-foreground hover:no-underline">
             Offers & Discounts
           </AccordionTrigger>
           <AccordionContent className="pt-2">
-             <div className="flex flex-col gap-2 px-1">
-                <div className="flex items-center space-x-3">
-                  <Checkbox 
-                    id="isDiscounted" 
-                    checked={isDiscounted}
-                    onCheckedChange={(checked) => updateFilters({ isDiscounted: checked ? "true" : null })}
-                  />
-                  <Label htmlFor="isDiscounted" className="text-sm font-normal cursor-pointer">
-                      On Sale
-                  </Label>
-                </div>
-             </div>
+            <div className="flex flex-col gap-2 px-1">
+              <div className="flex items-center space-x-3">
+                <Checkbox
+                  id="isDiscounted"
+                  checked={isDiscounted}
+                  onCheckedChange={(checked) => updateFilters({ isDiscounted: checked ? "true" : null })}
+                />
+                <Label htmlFor="isDiscounted" className="text-sm font-normal cursor-pointer">
+                  On Sale
+                </Label>
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* MOQ Filter */}
+        <AccordionItem value="moq" className="border-b-0 mb-4">
+          <AccordionTrigger className="py-2 text-sm font-bold uppercase tracking-wider text-muted-foreground hover:no-underline">
+            Minimum Order Quantity (MOQ)
+          </AccordionTrigger>
+          <AccordionContent className="pt-2">
+            <div className="flex flex-col gap-2 px-1 text-xs text-muted-foreground">
+              Filter products by minimum order volume requirement.
+            </div>
           </AccordionContent>
         </AccordionItem>
       </Accordion>
@@ -297,32 +307,31 @@ export function ProductFilterSidebar(props: FilterSidebarProps) {
 export function MobileFilterDrawer(props: FilterSidebarProps) {
   const { totalResultsCount, ...filterProps } = props;
   const { searchParams } = useFilters();
-  
+
   const activeFilterCount = Array.from(searchParams.keys()).filter(k => k !== 'sort' && k !== 'q' && k !== 'page').reduce((acc, key) => {
     return acc + searchParams.getAll(key).length;
   }, 0);
 
   return (
     <Sheet>
-      <SheetTrigger 
+      <SheetTrigger
         render={
           <Button
             variant="outline"
-            size="sm"
             data-testid="mobile-filter-button"
-            className="lg:hidden flex items-center gap-2 h-9 border-border/80"
+            className="fixed left-0 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center justify-center gap-3 h-32 w-10 px-0 py-2 rounded-l-none rounded-r-xl border-y border-r border-primary/30 bg-card hover:bg-accent/10 hover:border-primary/60 text-foreground transition-all duration-300 shadow-xl"
           />
         }
       >
-        <Filter className="h-4 w-4 text-primary" />
-        <span>Filters</span>
+        <Filter className="h-5 w-5 text-primary" />
+        <span className="[writing-mode:vertical-lr] rotate-180 text-xs font-bold tracking-widest text-primary">FILTERS</span>
         {activeFilterCount > 0 && (
-          <span className="inline-flex items-center justify-center bg-accent text-primary text-[10px] font-bold rounded-full h-4 w-4">
+          <span className="absolute -top-2 -right-2 inline-flex items-center justify-center bg-accent text-primary text-[10px] font-bold rounded-full h-5 w-5 shadow-sm">
             {activeFilterCount}
           </span>
         )}
       </SheetTrigger>
-      <SheetContent side="left" className="w-[85vw] sm:max-w-md overflow-y-auto p-6">
+      <SheetContent side="left" className="w-[85vw] sm:max-w-[340px] overflow-y-auto p-6">
         <SheetHeader className="p-0 mb-4 text-left">
           <SheetTitle className="text-lg font-serif font-bold text-primary">
             Filter Products
@@ -334,7 +343,7 @@ export function MobileFilterDrawer(props: FilterSidebarProps) {
         />
 
         <SheetFooter className="p-0 mt-6 pt-4 border-t border-border/60">
-          <SheetClose 
+          <SheetClose
             render={
               <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-10" />
             }
@@ -347,4 +356,5 @@ export function MobileFilterDrawer(props: FilterSidebarProps) {
   );
 }
 
+export const FilterDrawer = MobileFilterDrawer;
 export default ProductFilterSidebar;

@@ -35,8 +35,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const callerRole = callerSupabaseUser.app_metadata?.role
-    if (callerRole !== 'SUPER_ADMIN') {
+    const callerDbUser = await prisma.user.findUnique({
+      where: { id: callerSupabaseUser.id },
+      select: { role: true },
+    })
+
+    const isSuperAdmin = callerDbUser?.role === 'SUPER_ADMIN' || callerSupabaseUser.app_metadata?.role === 'SUPER_ADMIN'
+    if (!isSuperAdmin) {
       return NextResponse.json(
         { error: 'Forbidden: only SUPER_ADMINs may change roles' },
         { status: 403 }

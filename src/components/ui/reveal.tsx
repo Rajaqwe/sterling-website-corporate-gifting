@@ -2,25 +2,34 @@
 
 import React, { useEffect, useRef, useState } from "react";
 
+type AnimationVariant = "fade" | "fade-up" | "fade-down" | "fade-left" | "fade-right" | "scale" | "scale-soft" | "blur-up" | "clip-up" | "mask-text" | "emphasis" | "soft-reveal" | "none";
+
 interface RevealProps {
   children: React.ReactNode;
-  animationType?: "breath" | "soft-reveal" | "none";
+  animationType?: AnimationVariant;
+  variant?: AnimationVariant; // Added variant alias
   delay?: number;
   duration?: number;
   className?: string;
   threshold?: number;
+  rootMargin?: string;
+  once?: boolean;
 }
 
 export function Reveal({
   children,
-  animationType = "soft-reveal",
+  animationType,
+  variant = "fade-up",
   delay = 0,
   duration,
   className = "",
   threshold = 0.1,
+  rootMargin = "0px",
+  once = true,
 }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
+  const activeVariant = animationType || variant;
 
   useEffect(() => {
     // Respect prefers-reduced-motion
@@ -32,15 +41,16 @@ export function Reveal({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+          if (entry.isIntersecting) {
           setIsVisible(true);
-          // Disconnect once it becomes visible so it only animates once
-          if (ref.current) observer.unobserve(ref.current);
+          if (once && ref.current) observer.unobserve(ref.current);
+        } else if (!once) {
+          setIsVisible(false);
         }
       },
       {
         root: null,
-        rootMargin: "0px",
+        rootMargin,
         threshold,
       }
     );
@@ -58,12 +68,21 @@ export function Reveal({
 
   const getAnimationClass = () => {
     if (!isVisible) {
-      if (animationType === "breath") return "opacity-0 scale-[0.985]";
-      if (animationType === "soft-reveal") return "opacity-0 translate-y-2";
+      if (activeVariant === "none") return "";
       return "opacity-0";
     }
-    if (animationType === "breath") return "animate-breath-enter";
-    if (animationType === "soft-reveal") return "animate-soft-reveal";
+    if (activeVariant === "fade") return "animate-fade";
+    if (activeVariant === "fade-up") return "animate-fade-up";
+    if (activeVariant === "fade-down") return "animate-fade-down";
+    if (activeVariant === "fade-left") return "animate-fade-left";
+    if (activeVariant === "fade-right") return "animate-fade-right";
+    if (activeVariant === "scale") return "animate-scale";
+    if (activeVariant === "scale-soft") return "animate-scale-soft";
+    if (activeVariant === "blur-up") return "animate-blur-up";
+    if (activeVariant === "clip-up") return "animate-clip-up";
+    if (activeVariant === "mask-text") return "animate-mask-text";
+    if (activeVariant === "emphasis") return "animate-emphasis";
+    if (activeVariant === "soft-reveal") return "animate-soft-reveal";
     return "";
   };
 

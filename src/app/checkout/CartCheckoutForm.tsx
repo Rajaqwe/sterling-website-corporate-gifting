@@ -28,11 +28,11 @@ const checkoutSchema = z.object({
 
 type CheckoutValues = z.infer<typeof checkoutSchema>;
 
-export function CartCheckoutForm({ cart }: { cart: any }) {
+export function CartCheckoutForm({ cart, summary }: { cart: any, summary: any }) {
   const [isProcessing, setIsProcessing] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [idempotencyKey] = useState(() => crypto.randomUUID());
 
-  const itemsTotal = cart.items.reduce((acc: number, item: any) => acc + (item.quantity * Number(item.product.price)), 0);
+  const itemsTotal = Number(summary.itemsTotal);
   const totalQuantity = cart.items.reduce((acc: number, item: any) => acc + item.quantity, 0);
 
   const { register, handleSubmit, formState: { errors } } = useForm<CheckoutValues>({
@@ -55,7 +55,7 @@ export function CartCheckoutForm({ cart }: { cart: any }) {
       };
 
       // 1. Create DB Order
-      const orderRes = await createOrderFromCart(shippingData);
+      const orderRes = await createOrderFromCart(shippingData, idempotencyKey);
       
       if (!orderRes.success || !orderRes.orderId) {
         toast.error(orderRes.error || "Failed to create order");
@@ -98,6 +98,12 @@ export function CartCheckoutForm({ cart }: { cart: any }) {
         theme: {
           color: "#1e293b",
         },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+            toast.info("Payment window closed. You can try again.");
+          }
+        }
       };
 
       const rzp1 = new (window as any).Razorpay(options);
@@ -127,46 +133,46 @@ export function CartCheckoutForm({ cart }: { cart: any }) {
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
               <div className="space-y-2">
-                <Label>Company Name *</Label>
-                <Input {...register("companyName")} className={`bg-secondary/10 ${errors.companyName ? "border-destructive" : ""}`} />
+                <Label htmlFor="companyName">Company Name *</Label>
+                <Input id="companyName" {...register("companyName")} className={`bg-secondary/10 ${errors.companyName ? "border-destructive" : ""}`} />
                 {errors.companyName && <span className="text-xs text-destructive">{errors.companyName.message}</span>}
               </div>
               <div className="space-y-2">
-                <Label>Contact Name *</Label>
-                <Input {...register("fullName")} className={`bg-secondary/10 ${errors.fullName ? "border-destructive" : ""}`} />
+                <Label htmlFor="fullName">Contact Name *</Label>
+                <Input id="fullName" {...register("fullName")} className={`bg-secondary/10 ${errors.fullName ? "border-destructive" : ""}`} />
                 {errors.fullName && <span className="text-xs text-destructive">{errors.fullName.message}</span>}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Email *</Label>
-                  <Input {...register("workEmail")} type="email" className={`bg-secondary/10 ${errors.workEmail ? "border-destructive" : ""}`} />
+                  <Label htmlFor="workEmail">Email *</Label>
+                  <Input id="workEmail" {...register("workEmail")} type="email" className={`bg-secondary/10 ${errors.workEmail ? "border-destructive" : ""}`} />
                   {errors.workEmail && <span className="text-xs text-destructive">{errors.workEmail.message}</span>}
                 </div>
                 <div className="space-y-2">
-                  <Label>Phone *</Label>
-                  <Input {...register("phone")} type="tel" className={`bg-secondary/10 ${errors.phone ? "border-destructive" : ""}`} />
+                  <Label htmlFor="phone">Phone *</Label>
+                  <Input id="phone" {...register("phone")} type="tel" className={`bg-secondary/10 ${errors.phone ? "border-destructive" : ""}`} />
                   {errors.phone && <span className="text-xs text-destructive">{errors.phone.message}</span>}
                 </div>
               </div>
               <div className="space-y-2 pt-4 border-t border-border/40">
-                <Label>Address Line 1 *</Label>
-                <Input placeholder="Building, Street, Area" {...register("addressLine1")} className={`bg-secondary/10 ${errors.addressLine1 ? "border-destructive" : ""}`} />
+                <Label htmlFor="addressLine1">Address Line 1 *</Label>
+                <Input id="addressLine1" placeholder="Building, Street, Area" {...register("addressLine1")} className={`bg-secondary/10 ${errors.addressLine1 ? "border-destructive" : ""}`} />
                 {errors.addressLine1 && <span className="text-xs text-destructive">{errors.addressLine1.message}</span>}
               </div>
               <div className="grid grid-cols-3 gap-4">
                 <div className="col-span-1 space-y-2">
-                  <Label>City *</Label>
-                  <Input {...register("city")} className={`bg-secondary/10 ${errors.city ? "border-destructive" : ""}`} />
+                  <Label htmlFor="city">City *</Label>
+                  <Input id="city" {...register("city")} className={`bg-secondary/10 ${errors.city ? "border-destructive" : ""}`} />
                   {errors.city && <span className="text-xs text-destructive">{errors.city.message}</span>}
                 </div>
                 <div className="col-span-1 space-y-2">
-                  <Label>State *</Label>
-                  <Input {...register("state")} className={`bg-secondary/10 ${errors.state ? "border-destructive" : ""}`} />
+                  <Label htmlFor="state">State *</Label>
+                  <Input id="state" {...register("state")} className={`bg-secondary/10 ${errors.state ? "border-destructive" : ""}`} />
                   {errors.state && <span className="text-xs text-destructive">{errors.state.message}</span>}
                 </div>
                 <div className="col-span-1 space-y-2">
-                  <Label>ZIP Code *</Label>
-                  <Input {...register("postalCode")} className={`bg-secondary/10 ${errors.postalCode ? "border-destructive" : ""}`} />
+                  <Label htmlFor="postalCode">ZIP Code *</Label>
+                  <Input id="postalCode" {...register("postalCode")} className={`bg-secondary/10 ${errors.postalCode ? "border-destructive" : ""}`} />
                   {errors.postalCode && <span className="text-xs text-destructive">{errors.postalCode.message}</span>}
                 </div>
               </div>
@@ -179,27 +185,11 @@ export function CartCheckoutForm({ cart }: { cart: any }) {
               <CardDescription>Select how you would like to settle this order.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
-              <label className={`flex items-start p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'card' ? 'border-accent bg-accent/5 ring-1 ring-accent/30' : 'border-border/60 hover:bg-secondary/20'}`}>
-                <input type="radio" name="payment" value="card" checked={paymentMethod === 'card'} onChange={() => setPaymentMethod('card')} className="mt-1 mr-4 accent-accent" />
+              <label className="flex items-start p-4 border rounded-xl cursor-pointer transition-all border-accent bg-accent/5 ring-1 ring-accent/30">
+                <input type="radio" name="payment" value="card" checked readOnly className="mt-1 mr-4 accent-accent" />
                 <div>
-                  <div className="font-semibold text-primary">Credit or Debit Card</div>
-                  <div className="text-xs text-muted-foreground mt-1">Pay instantly and securely online using any major card.</div>
-                </div>
-              </label>
-
-              <label className={`flex items-start p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'upi' ? 'border-accent bg-accent/5 ring-1 ring-accent/30' : 'border-border/60 hover:bg-secondary/20'}`}>
-                <input type="radio" name="payment" value="upi" checked={paymentMethod === 'upi'} onChange={() => setPaymentMethod('upi')} className="mt-1 mr-4 accent-accent" />
-                <div>
-                  <div className="font-semibold text-primary">Scan and Pay with UPI</div>
-                  <div className="text-xs text-muted-foreground mt-1">Pay via Google Pay, PhonePe, Paytm, or any UPI app.</div>
-                </div>
-              </label>
-
-              <label className={`flex items-start p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'netbanking' ? 'border-accent bg-accent/5 ring-1 ring-accent/30' : 'border-border/60 hover:bg-secondary/20'}`}>
-                <input type="radio" name="payment" value="netbanking" checked={paymentMethod === 'netbanking'} onChange={() => setPaymentMethod('netbanking')} className="mt-1 mr-4 accent-accent" />
-                <div>
-                  <div className="font-semibold text-primary">Netbanking</div>
-                  <div className="text-xs text-muted-foreground mt-1">Directly transfer via your bank's portal.</div>
+                  <div className="font-semibold text-primary">Pay securely via Razorpay</div>
+                  <div className="text-xs text-muted-foreground mt-1">Cards, UPI & Netbanking supported.</div>
                 </div>
               </label>
             </CardContent>
@@ -222,7 +212,7 @@ export function CartCheckoutForm({ cart }: { cart: any }) {
                     <span className="font-semibold text-foreground block truncate">{item.product?.name || `Product #${item.productId}`}</span>
                     <span className="text-muted-foreground">Qty: {item.quantity}</span>
                   </div>
-                  <span className="font-medium text-right">{formatINR(Number(item.product.price) * item.quantity)}</span>
+                  <span className="font-medium text-right">{formatINR(Number(item.unitPrice || item.product.price) * item.quantity)}</span>
                 </div>
               ))}
             </div>
@@ -232,15 +222,19 @@ export function CartCheckoutForm({ cart }: { cart: any }) {
               <span className="font-medium">{formatINR(itemsTotal)}</span>
             </div>
             <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Tax (GST 18%)</span>
+              <span className="font-medium">{formatINR(summary.tax)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Shipping</span>
-              <span className="font-medium">Free</span>
+              <span className="font-medium">{summary.shipping === 0 ? 'Free' : formatINR(summary.shipping)}</span>
             </div>
             <Separator className="my-2" />
             <div className="flex justify-between items-end">
               <span className="font-bold text-foreground">Total</span>
               <div className="text-right">
-                <span className="font-bold text-xl text-primary block">{formatINR(itemsTotal)}</span>
-                <span className="text-[10px] text-muted-foreground">Inclusive of GST</span>
+                <span className="font-bold text-xl text-primary block">{formatINR(summary.total)}</span>
+                <span className="text-[10px] text-muted-foreground">Final amount to be paid</span>
               </div>
             </div>
             
@@ -259,7 +253,7 @@ export function CartCheckoutForm({ cart }: { cart: any }) {
               type="submit" 
               form="checkout-form" 
               disabled={isProcessing}
-              className="w-full bg-accent text-primary hover:bg-gold-hover h-12 font-bold shadow-md text-sm transition-all"
+              className="btn-primary w-full hover:bg-gold-hover h-12 font-bold shadow-md text-sm transition-all"
             >
               {isProcessing ? (
                 <>

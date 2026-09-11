@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const footerLinks = {
   about: [
@@ -28,7 +29,7 @@ function SocialIcon({ children, href, label }: { children: React.ReactNode; href
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-foreground/10 text-primary-foreground/70 hover:bg-accent hover:text-white transition-all duration-300"
+      className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-sp-purple hover:text-white transition-all duration-300"
     >
       {children}
     </a>
@@ -37,20 +38,34 @@ function SocialIcon({ children, href, label }: { children: React.ReactNode; href
 
 export function Footer() {
   return (
-    <footer className="bg-primary text-primary-foreground border-t">
+    <footer className="bg-[var(--footer-bg)] text-white border-t border-border/10">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
           
           {/* Brand Column */}
           <div className="lg:col-span-2">
-            <Link href="/" className="inline-block mb-6 group">
-              <span className="font-serif text-2xl font-bold tracking-widest uppercase inline-block transition-ui group-hover:scale-[1.05] group-hover:text-accent">
-                Sterling
-              </span>
+            <Link href="/" className="inline-block mb-6 relative h-16 w-56">
+              <Image 
+                src="/logos/sterling-logo-full.svg" 
+                alt="Sterling Prime" 
+                fill 
+                className="object-contain object-left px-3"
+              />
             </Link>
-            <p className="text-primary-foreground/70 max-w-sm mb-6 leading-relaxed">
+            <p className="text-white/70 max-w-sm mb-6 leading-relaxed">
               Thoughtfully curated corporate gifts designed to strengthen relationships, celebrate milestones, and leave a lasting impression.
             </p>
+            {/* Trust Elements */}
+            <div className="flex flex-col gap-2 mb-6">
+              <div className="flex items-center gap-2 text-sm text-white/80">
+                <svg className="h-4 w-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                Pan-India / Global Delivery
+              </div>
+              <div className="flex items-center gap-2 text-sm text-white/80">
+                <svg className="h-4 w-4 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                Custom Branding & Bulk Pricing
+              </div>
+            </div>
             {/* Social Media Icons */}
             <div className="flex items-center gap-3">
               <SocialIcon href="https://linkedin.com/company/sterlinggifting" label="LinkedIn">
@@ -71,7 +86,7 @@ export function Footer() {
             <ul className="space-y-4">
               {footerLinks.services.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-primary-foreground/70 hover:text-white transition-colors">
+                  <Link href={link.href} className="text-white/70 hover:text-white transition-colors">
                     {link.name}
                   </Link>
                 </li>
@@ -84,7 +99,7 @@ export function Footer() {
             <ul className="space-y-4">
               {footerLinks.support.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-primary-foreground/70 hover:text-white transition-colors">
+                  <Link href={link.href} className="text-white/70 hover:text-white transition-colors">
                     {link.name}
                   </Link>
                 </li>
@@ -97,7 +112,7 @@ export function Footer() {
             <ul className="space-y-4">
               {footerLinks.about.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-primary-foreground/70 hover:text-white transition-colors">
+                  <Link href={link.href} className="text-white/70 hover:text-white transition-colors">
                     {link.name}
                   </Link>
                 </li>
@@ -108,10 +123,10 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="border-t border-primary-foreground/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-primary-foreground/50">
+          <p className="text-sm text-white/50">
             © {new Date().getFullYear()} Sterling Corporate Gifting. All rights reserved.
           </p>
-          <div className="flex gap-6 text-sm text-primary-foreground/50">
+          <div className="flex gap-6 text-sm text-white/50">
             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link href="/terms-and-conditions" className="hover:text-white transition-colors">Terms & Conditions</Link>
             <Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link>

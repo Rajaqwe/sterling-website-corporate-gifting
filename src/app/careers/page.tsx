@@ -1,3 +1,4 @@
+import { buttonVariants } from "@/components/ui/button";
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
@@ -44,9 +45,9 @@ export default function CareersPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero */}
-      <section className="relative bg-primary text-white py-20 md:py-15 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+      <section className="relative bg-muted/50 dark:bg-card border-b border-border/40 text-sp-navy dark:text-foreground pt-32 pb-20 md:py-15 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background pointer-events-none z-0" />
+        
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           <span className="inline-block mb-4 text-sm font-medium tracking-widest text-accent uppercase">
             Join Our Team
@@ -54,7 +55,7 @@ export default function CareersPage() {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-6 max-w-3xl mx-auto leading-tight">
             Build Your Career <br className="hidden md:block" />at Sterling
           </h1>
-          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             We&apos;re growing rapidly and looking for passionate individuals to join our mission 
             of delivering exceptional corporate gifting solutions.
           </p>
@@ -115,12 +116,10 @@ export default function CareersPage() {
                         ))}
                       </div>
                     </div>
-                    <Link href="/contact" className="shrink-0">
-                      <Button variant="outline" className="gap-2 group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
+                    <Link href="/contact" className={buttonVariants({ variant: "outline", className: "shrink-0 btn-primary gap-2 group-hover:text-white group-hover:border-primary transition-all" })}>
                         Apply
                         <ArrowRight className="h-4 w-4" />
-                      </Button>
-                    </Link>
+                      </Link>
                   </div>
                 </CardContent>
               </Card>
@@ -130,19 +129,17 @@ export default function CareersPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-primary text-white text-center">
+      <section className="py-20 bg-muted/50 dark:bg-card border-b border-border/40 text-sp-navy dark:text-foreground text-center">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
           <h2 className="text-3xl md:text-4xl font-serif font-bold mb-6">
             Don&apos;t see your role?
           </h2>
-          <p className="text-lg text-white/80 mb-10">
+          <p className="text-lg text-muted-foreground mb-10">
             We&apos;re always looking for talented people. Send us your resume and we&apos;ll reach out when there&apos;s a fit.
           </p>
-          <Link href="/contact">
-            <Button size="lg" className="bg-accent text-primary hover:bg-accent/90 h-12 px-8 text-base font-semibold">
+          <Link href="/contact" className={buttonVariants({ variant: "default", size: "lg", className: "btn-primary h-12 px-8 text-base font-semibold" })}>
               Send Your Resume
-            </Button>
-          </Link>
+            </Link>
         </div>
       </section>
     </div>

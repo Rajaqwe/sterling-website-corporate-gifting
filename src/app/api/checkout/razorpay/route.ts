@@ -39,6 +39,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    if (dbOrder.status !== "PENDING") {
+      return NextResponse.json({ error: "Order is no longer pending payment" }, { status: 400 });
+    }
+
     // Razorpay amount is in smallest currency unit (paise for INR)
     const amountInPaise = Math.round(Number(dbOrder.total) * 100);
 

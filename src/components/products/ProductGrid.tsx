@@ -5,6 +5,7 @@ import { Product } from "@/types/product";
 import { ProductCard } from "@/components/products/ProductCard";
 import { Button } from "@/components/ui/button";
 import { PackageSearch, RotateCcw } from "lucide-react";
+import { Reveal, StaggerContainer } from "@/components/ui/reveal";
 
 interface ProductGridProps {
   products: Product[];
@@ -48,18 +49,20 @@ export function ProductGrid({
   }
 
   return (
-    <div
+    <StaggerContainer
       data-testid="product-grid"
+      staggerDelay={50}
       className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ${className}`}
     >
       {products.map((product, idx) => (
-        <ProductCard
-          key={product.id || product.slug}
-          product={product}
-          priority={idx < 4}
-        />
+        <Reveal key={product.id || product.slug} className="h-full">
+          <ProductCard
+            product={product}
+            priority={idx < 4}
+          />
+        </Reveal>
       ))}
-    </div>
+    </StaggerContainer>
   );
 }
 

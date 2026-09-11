@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from "react";
-import { Search, X, Loader2 } from "lucide-react";
+import { Search, X, Loader2, FolderSearch, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { Command } from "cmdk";
@@ -11,6 +11,7 @@ export function SearchBar({ isLightText = false }: { isLightText?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<any[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string; slug: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   // Debounced search
@@ -21,7 +22,8 @@ export function SearchBar({ isLightText = false }: { isLightText?: boolean }) {
         try {
           const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
           const data = await res.json();
-          setResults(data.results || []);
+          setResults(data.products || data.results || []);
+          setCategories(data.categories || []);
         } catch (e) {
           console.error(e);
         } finally {
@@ -29,6 +31,7 @@ export function SearchBar({ isLightText = false }: { isLightText?: boolean }) {
         }
       } else {
         setResults([]);
+        setCategories([]);
       }
     }, 300);
 
@@ -59,6 +62,11 @@ export function SearchBar({ isLightText = false }: { isLightText?: boolean }) {
     }
   };
 
+  const handleCategorySelect = (slug: string) => {
+    setIsOpen(false);
+    router.push(`/corporate-gifts?category=${encodeURIComponent(slug)}`);
+  };
+
   return (
     <div className="relative inline-block">
       <Button 
@@ -74,10 +82,10 @@ export function SearchBar({ isLightText = false }: { isLightText?: boolean }) {
       {isOpen && (
         <>
           <div 
-            className="fixed inset-0 z-40 bg-transparent animate-in fade-in" 
+            className="fixed inset-0 z-40 bg-foreground/5 backdrop-blur-sm animate-fade" 
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[95vw] sm:w-[350px] origin-top-right bg-background border border-border/40 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95">
+          <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-[95vw] sm:w-[450px] origin-top-right bg-background border border-border/40 rounded-xl shadow-xl overflow-hidden animate-scale-soft">
             <Command 
             className="w-full flex flex-col" 
             shouldFilter={false} // We filter on the server
@@ -96,13 +104,18 @@ export function SearchBar({ isLightText = false }: { isLightText?: boolean }) {
                 placeholder="Search products, categories..." 
                 value={query}
                 onValueChange={setQuery}
-                className="flex h-12 w-full rounded-md bg-transparent py-3 text-sm outline-none focus-visible:outline-none focus-visible:ring-0 placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-12 w-full rounded-md bg-transparent py-3 pr-10 text-sm outline-none focus-visible:outline-none focus-visible:ring-0 placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 [&::-webkit-search-cancel-button]:hidden"
               />
               {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
             </div>
             
             <Command.List className="max-h-[300px] overflow-y-auto p-2 hide-scrollbar">
-              {query.length > 0 && results.length === 0 && !isLoading && (
+              {query.length === 1 && (
+                <Command.Empty className="py-6 text-center text-sm text-muted-foreground">
+                  Keep typing to search (at least 2 characters)...
+                </Command.Empty>
+              )}
+              {query.length > 1 && results.length === 0 && categories.length === 0 && !isLoading && (
                 <Command.Empty className="py-6 text-center text-sm text-muted-foreground">
                   No products found. Press Enter to search all.
                 </Command.Empty>
@@ -137,7 +150,22 @@ export function SearchBar({ isLightText = false }: { isLightText?: boolean }) {
                   ))}
                 </Command.Group>
               )}
+              {categories.length > 0 && (
+                <Command.Group heading="Categories" className="mt-2 px-2 text-xs font-medium text-muted-foreground">
+                  {categories.map((category) => (
+                    <Command.Item key={category.id} value={category.name} onSelect={() => handleCategorySelect(category.slug)} className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-2.5 text-sm outline-none data-[selected=true]:bg-primary/5 data-[selected=true]:text-primary">
+                      <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary text-primary"><FolderSearch className="h-4 w-4" /></span>
+                      <span className="flex-1 font-medium">{category.name}</span><ArrowRight className="h-4 w-4 text-muted-foreground" />
+                    </Command.Item>
+                  ))}
+                </Command.Group>
+              )}
             </Command.List>
+            {query.trim().length > 0 && (
+              <button type="button" onClick={handleSearchSubmit} className="flex w-full items-center justify-between border-t border-border/50 px-4 py-3 text-left text-sm font-semibold text-primary transition-colors hover:bg-secondary/40">
+                See all results for “{query.trim()}” <ArrowRight className="h-4 w-4" />
+              </button>
+            )}
                       </Command>
           </div>
         </>

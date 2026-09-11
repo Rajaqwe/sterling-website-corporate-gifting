@@ -9,7 +9,7 @@ import { AdminPagination } from "@/components/admin/AdminPagination";
 
 export default async function DashboardOrders(props: { searchParams?: Promise<{ page?: string }> }) {
   const searchParams = await props.searchParams;
-  const page = Number(searchParams?.page) || 1;
+  const page = Math.max(1, Math.min(10000, Math.floor(Number(searchParams?.page)) || 1));
   const pageSize = 10;
   const auth = await requireUser();
   const user = auth.user;

@@ -3,6 +3,7 @@
 import React from "react";
 import { CustomizationOption } from "@/types/product";
 import { Check, Palette } from "lucide-react";
+import { formatINR } from "@/lib/currency";
 
 interface ProductCustomizationProps {
   customizations: CustomizationOption[];
@@ -42,9 +43,18 @@ export function ProductCustomization({
           return (
             <div
               key={option.id}
+              role="button"
+              tabIndex={0}
+              aria-pressed={isSelected}
               data-testid={`customization-option-${option.id}`}
               onClick={() => onToggle(option.id)}
-              className={`flex flex-col p-3.5 rounded-xl border transition-all cursor-pointer ${
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onToggle(option.id);
+                }
+              }}
+              className={`flex flex-col p-3.5 rounded-xl border transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                 isSelected
                   ? "border-primary bg-primary/5 ring-1 ring-primary/20 shadow-xs"
                   : "border-border/60 bg-card hover:border-accent/50 hover:bg-secondary/20"
@@ -83,11 +93,11 @@ export function ProductCustomization({
                 {/* Pricing Badges */}
                 <div className="text-right shrink-0">
                   <span className="text-xs font-bold text-primary block">
-                    +${option.unitCost.toFixed(2)}{" "}
+                    +{formatINR(option.unitCost)}{" "}
                     <span className="text-[10px] font-normal text-muted-foreground">/ unit</span>
                   </span>
                   <span className="text-[10px] text-muted-foreground block">
-                    +${option.setupFee.toFixed(2)} setup fee
+                    +{formatINR(option.setupFee)} setup fee
                   </span>
                 </div>
               </div>

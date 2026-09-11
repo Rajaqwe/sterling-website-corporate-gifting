@@ -1,5 +1,5 @@
+import { buttonVariants } from "@/components/ui/button";
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
 import { Search, Home, ArrowLeft } from 'lucide-react'
 
 export default function NotFound() {
@@ -18,18 +18,14 @@ export default function NotFound() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4">
-          <Link href="/" className="w-full sm:w-auto">
-            <Button variant="default" className="w-full">
+          <Link href="/" className={buttonVariants({ variant: "default", className: "w-full sm:w-auto" })}>
               <Home className="mr-2 h-4 w-4" />
               Back to Home
-            </Button>
-          </Link>
-          <Link href="/corporate-gifts" className="w-full sm:w-auto">
-            <Button variant="outline" className="w-full">
+            </Link>
+          <Link href="/corporate-gifts" className={buttonVariants({ variant: "outline", className: "w-full sm:w-auto" })}>
               <Search className="mr-2 h-4 w-4" />
               Browse Gifts
-            </Button>
-          </Link>
+            </Link>
         </div>
       </div>
     </div>

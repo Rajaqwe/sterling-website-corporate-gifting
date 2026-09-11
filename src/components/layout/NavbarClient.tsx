@@ -1,13 +1,15 @@
 "use client";
+import { buttonVariants } from "@/components/ui/button";
 
 import React, { useState, useEffect, startTransition } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { User, Briefcase, Menu, LogOut, LayoutDashboard, ChevronDown } from "lucide-react";
+import { User, Briefcase, Menu, LogOut, LayoutDashboard, ChevronDown, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetClose } from "@/components/ui/sheet";
 import { SearchBar } from "./SearchBar";
-
+import { useTheme } from "next-themes";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 
 const navLinks = [
@@ -23,6 +25,25 @@ const mobileFooterLinks = [
   { name: "Event Gifts", href: "/event-gifts" },
 ];
 
+const ThemeToggle = ({ isLightText }: { isLightText?: boolean }) => {
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return <div className="w-9 h-9" />;
+  
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      className={`transition-colors ${isLightText ? "text-white/90 hover:text-white" : "text-foreground hover:text-primary"}`}
+      aria-label="Toggle Theme"
+    >
+      {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+    </Button>
+  );
+};
+
 export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => void }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -37,6 +58,9 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
   }, []);
 
   const pathname = usePathname();
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   
   const darkHeroPages = [
     "/",
@@ -54,6 +78,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
   ];
 
   const isLightText = darkHeroPages.includes(pathname) && !isScrolled;
+  const isDarkBg = isLightText || (mounted && theme === 'dark');
 
   return (
     <header 
@@ -73,14 +98,10 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
           
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center gap-2 group">
-              <span 
-                className={`font-serif font-bold tracking-widest uppercase inline-block transition-all duration-500 ease-in-out group-hover:scale-[1.05] group-hover:text-accent ${
-                  isScrolled ? "text-xl text-primary" : `text-3xl ${isLightText ? "text-white" : "text-primary"}`
-                }`}
-              >
-                Sterling
-              </span>
+            <Link href="/" className="flex items-center gap-2 group transition-[height,width]">
+              <div className={`relative transition-all duration-500 ease-in-out ${isScrolled ? "w-[120px] h-[36px]" : "w-[150px] h-[45px]"}`}>
+                <Image src="/logos/sterling-logo-full.svg" alt="Sterling Logo" fill className={`object-contain transition-all duration-500 ${isDarkBg ? "brightness-0 invert" : "mix-blend-multiply dark:mix-blend-normal"}`} priority />
+              </div>
             </Link>
           </div>
 
@@ -113,28 +134,24 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
           <div className="hidden md:flex items-center gap-4">
             <SearchBar isLightText={isLightText && !isScrolled} />
             
+            <ThemeToggle isLightText={isLightText && !isScrolled} />
+
             {user ? (
-              <Link href={(user.app_metadata?.role === 'ADMIN' || user.app_metadata?.role === 'SUPER_ADMIN') ? "/admin" : "/dashboard"}>
-                <Button variant="ghost" size="icon" aria-label="Account" className={`transition-colors duration-500 ${!isScrolled ? (isLightText ? "text-white hover:bg-background/20 hover:text-white" : "text-primary hover:bg-primary/10 hover:text-primary") : ""}`}>
+              <Link href={(user.app_metadata?.role === 'ADMIN' || user.app_metadata?.role === 'SUPER_ADMIN') ? "/admin" : "/dashboard"} className={`${buttonVariants({ variant: "ghost", size: "icon" })} ${isLightText && !isScrolled ? "text-white/90 hover:text-white" : "text-foreground hover:text-primary"}`}>
                   <User className="h-5 w-5" />
-                </Button>
-              </Link>
+                </Link>
             ) : (
-              <Link href="/login">
-                <Button variant="ghost" size="icon" aria-label="Account" className={`transition-colors duration-500 ${!isScrolled ? (isLightText ? "text-white hover:bg-background/20 hover:text-white" : "text-primary hover:bg-primary/10 hover:text-primary") : ""}`}>
+              <Link href="/login" className={`${buttonVariants({ variant: "ghost", size: "icon" })} ${isLightText && !isScrolled ? "text-white/90 hover:text-white" : "text-foreground hover:text-primary"}`}>
                   <User className="h-5 w-5" />
-                </Button>
-              </Link>
+                </Link>
             )}
 
             <CartDrawer isLightText={isLightText && !isScrolled} />
 
-            <Link href="/request-a-quote">
-              <Button variant={isScrolled ? "default" : "outline"} className={`gap-2 hidden lg:flex transition-all duration-500 ${!isScrolled && (isLightText ? "bg-transparent border-white text-white hover:bg-background/20 hover:text-white" : "border-primary text-primary hover:bg-primary/5")}`}>
+            <Link href="/request-a-quote" className={buttonVariants({ variant: "default" })}>
                 <Briefcase className="h-4 w-4" />
                 <span>Request a Quote</span>
-              </Button>
-            </Link>
+              </Link>
           </div>
 
           {/* Mobile Menu */}
@@ -142,7 +159,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
             <SearchBar isLightText={isLightText && !isScrolled} />
             <CartDrawer isLightText={isLightText && !isScrolled} />
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-              <SheetTrigger className={`inline-flex items-center justify-center rounded-md p-2 transition-colors duration-500 hover:bg-secondary ${!isScrolled && (isLightText ? "text-white hover:bg-background/20" : "text-primary")}`}>
+              <SheetTrigger aria-label="Open menu" className={`inline-flex items-center justify-center rounded-md p-2 transition-colors duration-500 hover:bg-secondary ${!isScrolled && (isLightText ? "text-white hover:bg-background/20" : "text-primary")}`}>
                 <Menu className="h-6 w-6" />
                 <span className="sr-only">Menu</span>
               </SheetTrigger>
@@ -184,18 +201,20 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                         Corporate Services
                         <ChevronDown className={`h-5 w-5 transition-transform duration-200 ${isServicesOpen ? "rotate-180 text-primary" : "text-muted-foreground"}`} />
                       </button>
-                      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isServicesOpen ? "max-h-64 opacity-100 mt-2" : "max-h-0 opacity-0"}`}>
-                        <div className="flex flex-col pl-4 border-l-2 border-primary/20 space-y-3 py-2">
-                          {mobileFooterLinks.map(link => (
-                            <Link 
-                              key={link.name}
-                              href={link.href}
-                              onClick={() => setIsMobileMenuOpen(false)}
-                              className="text-muted-foreground hover:text-primary transition-colors block"
-                            >
-                              {link.name}
-                            </Link>
-                          ))}
+                      <div className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isServicesOpen ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0"}`}>
+                        <div className="overflow-hidden">
+                          <div className="flex flex-col pl-4 border-l-2 border-primary/20 space-y-3 py-2">
+                            {mobileFooterLinks.map(link => (
+                              <Link 
+                                key={link.name}
+                                href={link.href}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="text-muted-foreground hover:text-primary transition-colors block"
+                              >
+                                {link.name}
+                              </Link>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -210,7 +229,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
 
                   {user ? (
                     <div className="flex flex-col gap-3">
-                      <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between bg-background p-3 rounded-xl border border-border/60 hover:border-primary/50 transition-colors">
+                      <Link href={(user.app_metadata?.role === 'ADMIN' || user.app_metadata?.role === 'SUPER_ADMIN') ? "/admin" : "/dashboard"} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between bg-background p-3 rounded-xl border border-border/60 hover:border-primary/50 transition-colors">
                         <div className="flex items-center gap-3">
                           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                             <LayoutDashboard className="h-4 w-4 text-primary" />

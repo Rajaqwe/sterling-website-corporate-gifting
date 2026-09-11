@@ -4,11 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { SearchBar } from "./SearchBar";
 
-const navLinks = [
-  { name: "Corporate Gifts", href: "/corporate-gifts" },
-  { name: "Collections", href: "/gift-collections" },
-  { name: "Personalised Gifts", href: "/personalised-gifts" },
-];
+
 
 import { createClient } from "@/lib/supabase/server";
 import { signOut } from "@/app/(auth)/actions";

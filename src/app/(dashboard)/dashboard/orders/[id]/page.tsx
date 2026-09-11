@@ -8,9 +8,12 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Download, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { PayNowButton } from "./PayNowButton";
+import { PaymentConfirming } from "@/components/dashboard/PaymentConfirming";
 
-export default async function OrderDetailPage(props: { params: Promise<{ id: string }> }) {
+export default async function OrderDetailPage(props: { params: Promise<{ id: string }>, searchParams: Promise<{ payment_success?: string }> }) {
   const params = await props.params;
+  const searchParams = await props.searchParams;
   const auth = await requireUser();
   const user = auth.user;
 
@@ -53,6 +56,18 @@ export default async function OrderDetailPage(props: { params: Promise<{ id: str
           </p>
         </div>
         <div className="flex items-center gap-3">
+          {order.status === 'PENDING' && searchParams.payment_success === '1' && (
+            <PaymentConfirming />
+          )}
+          {order.status === 'PENDING' && searchParams.payment_success !== '1' && (
+            <PayNowButton 
+              orderId={order.id} 
+              amount={Number(order.total)} 
+              customerName={order.shippingAddress?.fullName}
+              customerEmail={user?.email}
+              customerPhone={order.shippingAddress?.phone}
+            />
+          )}
           <a href={`/api/orders/${order.id}/pdf`} target="_blank">
             <Button variant="outline" type="button">
               <Download className="h-4 w-4 mr-2" /> Download Invoice

@@ -3,13 +3,14 @@
 import { prisma } from '@/lib/prisma/client'
 import { revalidatePath } from 'next/cache'
 import { OrderStatus } from '@/generated/prisma'
-import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/auth/server'
 import { TaxService } from '@/lib/pricing/TaxService'
 import { Money } from '@/lib/money'
+import { shippingSchema } from '@/lib/validations/shipping'
 import crypto from 'crypto'
 
 export async function createOrderFromQuote(
-  quoteId: string, 
+  quoteId: string,
   shippingData: {
     fullName: string;
     phone: string;
@@ -18,22 +19,47 @@ export async function createOrderFromQuote(
     state: string;
     postalCode: string;
     country?: string;
-  }
+  },
+  paymentMethod: string = 'card'
 ) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    
-    if (!user) {
+    const parsedShipping = shippingSchema.safeParse(shippingData);
+    if (!parsedShipping.success) {
+      const firstIssue = parsedShipping.error.issues[0];
+      return { success: false, error: firstIssue ? `${firstIssue.path.join('.')}: ${firstIssue.message}` : "Invalid shipping details." };
+    }
+    const validatedShipping = parsedShipping.data;
+
+    const parsedPaymentMethod = paymentMethod === 'po' ? 'po' : 'card';
+
+    const auth = await getAuthUser();
+    if (!auth) {
       return { success: false, error: "Unauthorized" }
     }
-    
-    const isAdmin = user.app_metadata?.role === 'ADMIN' || user.app_metadata?.role === 'SUPER_ADMIN';
+    const user = auth.supabaseUser;
+
+    const isAdmin = auth.user.role === 'ADMIN' || auth.user.role === 'SUPER_ADMIN';
 
     // 1. Fetch the approved quote
     const quote = await prisma.quoteRequest.findUnique({
       where: { id: quoteId },
-      include: { items: true }
+      include: {
+        items: {
+          select: {
+            id: true,
+            quoteId: true,
+            productId: true,
+            description: true,
+            quantity: true,
+            unitPrice: true,
+            totalPrice: true,
+            brandingOption: true,
+            notes: true,
+            createdAt: true,
+            updatedAt: true,
+          }
+        }
+      }
     });
 
     if (!quote || quote.status !== 'APPROVED') {
@@ -64,13 +90,25 @@ export async function createOrderFromQuote(
     // --- Atomic order creation (P0-3) ---
     // Wrap everything in a transaction so partial failures don't leave orphaned records
     const order = await prisma.$transaction(async (tx: any) => {
-      // Create addresses
+      // Create addresses from validated fields only (never spread raw client data)
+      const addressData = {
+        fullName: validatedShipping.fullName,
+        phone: validatedShipping.phone,
+        addressLine1: validatedShipping.addressLine1,
+        addressLine2: validatedShipping.addressLine2,
+        city: validatedShipping.city,
+        state: validatedShipping.state,
+        postalCode: validatedShipping.postalCode,
+        country: validatedShipping.country || 'India',
+        userId: user.id,
+      };
+
       const shippingAddress = await tx.address.create({
-        data: { ...shippingData, type: 'SHIPPING', userId: user.id }
+        data: { ...addressData, type: 'SHIPPING' }
       });
 
       const billingAddress = await tx.address.create({
-        data: { ...shippingData, type: 'BILLING', userId: user.id }
+        data: { ...addressData, type: 'BILLING' }
       });
 
       // Calculate totals from quote items (server-authoritative)
@@ -95,12 +133,13 @@ export async function createOrderFromQuote(
         }
       });
 
-      // Create order items from quote items
-      if (quote.items && quote.items.length > 0) {
+      // Create order items from quote items (skip items with no linked product)
+      const productItems = quote.items.filter((item: any) => item.productId);
+      if (productItems.length > 0) {
         await tx.orderItem.createMany({
-          data: quote.items.map((item: any) => ({
+          data: productItems.map((item: any) => ({
             orderId: newOrder.id,
-            productId: item.productId!,
+            productId: item.productId,
             productName: item.description,
             sku: "Q-ITEM",
             quantity: item.quantity,
@@ -111,11 +150,22 @@ export async function createOrderFromQuote(
         });
       }
 
-      // Mark quote as completed to prevent re-conversion
-      await tx.quoteRequest.update({
-        where: { id: quoteId },
-        data: { status: 'COMPLETED' }
-      });
+      // Mark quote as completed if payment method is 'po'. For 'card', it will be marked completed via Razorpay webhook.
+      if (parsedPaymentMethod === 'po') {
+        await tx.quoteRequest.update({
+          where: { id: quoteId },
+          data: { status: 'COMPLETED' }
+        });
+        await tx.auditLog.create({
+          data: {
+            actorId: user.id,
+            action: 'QUOTE_STATUS_CHANGED',
+            resource: 'Quote',
+            resourceId: quoteId,
+            metadata: { from: quote.status, to: 'COMPLETED', notes: 'Converted to order (PO payment)' }
+          }
+        });
+      }
 
       return newOrder;
     });

@@ -19,7 +19,7 @@ export function CartProvider({ children, initialCount }: { children: ReactNode; 
   }, [initialCount]);
 
   const incrementCart = (amount: number) => {
-    setCartCount((prev) => prev + amount);
+    setCartCount((prev) => Math.max(0, prev + amount));
   };
 
   return (

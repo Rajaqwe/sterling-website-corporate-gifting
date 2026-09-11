@@ -54,19 +54,22 @@ export async function POST(req: Request) {
 
           // --- Validate Order and Amount (P0-5) ---
           const order = await tx.order.findUnique({
-            where: { id: orderId }
+            where: { id: orderId },
+            include: { items: true } // Need items for inventory decrement
           });
 
           if (!order) {
             throw new Error(`Order ${orderId} not found`);
           }
 
-          if (order.status === "PROCESSING" || order.status === "DELIVERED") {
-            return; // Already processed
-          }
+          // Stock is decremented exactly once per order: either here when the
+          // order is still PENDING (payment-driven), or by transitionOrder()
+          // when an admin confirms it first. Any non-PENDING status means
+          // inventory was already handled — record the payment and stop.
+          const isStillPending = order.status === "PENDING";
 
-          if (order.status === "CANCELLED") {
-             throw new Error(`Order ${orderId} is cancelled`);
+          if (order.status === "CANCELLED" || order.status === "REFUNDED") {
+             throw new Error(`Order ${orderId} is ${order.status.toLowerCase()}`);
           }
 
           const receivedAmount = (session.amount_total ?? 0) / 100;
@@ -98,10 +101,52 @@ export async function POST(req: Request) {
             }
           });
           
-          await tx.order.update({
-            where: { id: orderId },
-            data: { status: 'PROCESSING' }
-          });
+          if (isStillPending) {
+            await tx.order.update({
+              where: { id: orderId },
+              data: { status: 'PROCESSING' }
+            });
+
+            // Decrement Inventory (P0 Commerce Integrity: Payment-confirmed decrementing)
+            for (const item of order.items) {
+              const variantId = (item.variantSnapshot as any)?.id;
+              if (variantId) {
+                const res = await tx.productVariant.updateMany({
+                  where: { id: variantId, stockQuantity: { gte: item.quantity } },
+                  data: { stockQuantity: { decrement: item.quantity } }
+                });
+                if (res.count === 0) {
+                  throw new Error(`Insufficient stock for variant ${variantId}`);
+                }
+              } else {
+                const res = await tx.product.updateMany({
+                  where: { id: item.productId, stockQuantity: { gte: item.quantity } },
+                  data: { stockQuantity: { decrement: item.quantity } }
+                });
+                if (res.count === 0) {
+                  throw new Error(`Insufficient stock for product ${item.productId}`);
+                }
+              }
+            }
+
+            // Clear matching items from user's cart (P0 Cart lifecycle)
+            const cart = await tx.cart.findUnique({
+              where: { userId: order.userId }
+            });
+
+            if (cart) {
+              for (const item of order.items) {
+                const variantId = (item.variantSnapshot as any)?.id || null;
+                await tx.cartItem.deleteMany({
+                  where: {
+                    cartId: cart.id,
+                    productId: item.productId,
+                    variantId: variantId,
+                  }
+                });
+              }
+            }
+          }
         });
       } catch (err: unknown) {
         const error = err as any; // Typecast for Prisma error code check

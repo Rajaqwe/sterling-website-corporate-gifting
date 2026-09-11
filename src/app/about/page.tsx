@@ -1,9 +1,11 @@
+import { buttonVariants } from "@/components/ui/button";
 
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Target, Users, Award, Globe, Sparkles } from "lucide-react";
+import { MarketingHero } from "@/components/marketing/MarketingHero";
 
 export const metadata: Metadata = {
   title: 'About Sterling | Sterling',
@@ -13,24 +15,10 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
-      <section className="relative bg-primary text-white py-20 md:py-15 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/5 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <span className="inline-block mb-4 text-sm font-medium tracking-widest text-accent uppercase">
-            Our Story
-          </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-6 max-w-3xl mx-auto leading-tight">
-            Crafting Meaningful <br className="hidden md:block" />Corporate Connections
-          </h1>
-          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed">
-            Sterling provides premium corporate gifting solutions designed to strengthen 
-            business relationships, enhance employee engagement, and elevate brand recognition.
-          </p>
-        </div>
-      </section>
+      <MarketingHero 
+        title="Crafting Meaningful Corporate Connections"
+        subtitle="Sterling provides premium corporate gifting solutions designed to strengthen business relationships, enhance employee engagement, and elevate brand recognition."
+      />
 
       {/* Stats Section */}
       <section className="relative z-10 -mt-12">
@@ -58,7 +46,7 @@ export default function AboutPage() {
       </section>
 
       {/* Mission & Vision */}
-      <section className="py-20 md:py-24 bg-background">
+      <section className="pt-32 pb-20 md:py-24 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
           <div className="grid md:grid-cols-2 gap-8">
             <Card className="border-none shadow-sm bg-secondary/30 overflow-hidden">
@@ -124,7 +112,7 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-primary text-white text-center">
+      <section className="py-20 bg-muted/50 dark:bg-card border-b border-border/40 text-sp-navy dark:text-white text-center">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
           <h2 className="text-3xl md:text-4xl font-serif font-bold mb-6">
             Let&apos;s build something memorable together.
@@ -133,16 +121,12 @@ export default function AboutPage() {
             Whether you&apos;re gifting 10 or 10,000 — we&apos;d love to help you create the perfect experience.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/request-a-quote">
-              <Button size="lg" className="w-full sm:w-auto bg-accent text-primary hover:bg-accent/90 h-12 px-8 text-base font-semibold">
+            <Link href="/request-a-quote" className={buttonVariants({ variant: "default", size: "lg", className: "btn-primary w-full sm:w-auto    h-12 px-8 text-base font-semibold" })}>
                 Request a Quote
-              </Button>
-            </Link>
-            <Link href="/contact">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto border-white text-primary hover:bg-background h-12 px-8 text-base">
+              </Link>
+            <Link href="/contact" className={buttonVariants({ variant: "outline", size: "lg", className: "btn-primary w-full sm:w-auto border-white hover:bg-background h-12 px-8 text-base" })}>
                 Contact Us
-              </Button>
-            </Link>
+              </Link>
           </div>
         </div>
       </section>

@@ -14,6 +14,9 @@ export function AdminSearchInput({ placeholder = "Search..." }: { placeholder?: 
 
   // Update URL after typing with a debounce
   useEffect(() => {
+    const currentQ = searchParams.get("q") || "";
+    if (currentQ === query) return; // Prevent infinite re-render loop on pagination
+
     const delay = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
       if (query) {
@@ -35,10 +38,11 @@ export function AdminSearchInput({ placeholder = "Search..." }: { placeholder?: 
     <div className="relative flex-1 max-w-md">
       <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${isPending ? "text-primary animate-pulse" : "text-slate-400"}`} />
       <Input 
+        type="search"
         placeholder={placeholder} 
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="pl-9 h-10" 
+        className="pl-9 pr-10 h-10" 
       />
     </div>
   );

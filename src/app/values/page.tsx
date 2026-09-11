@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Card, CardContent } from "@/components/ui/card";
 import { Award, Users, Heart, Lightbulb, Eye, Leaf } from "lucide-react";
+import { MarketingHero } from "@/components/marketing/MarketingHero";
 
 export const metadata: Metadata = {
   title: 'Our Values | Sterling',
@@ -10,25 +11,13 @@ export const metadata: Metadata = {
 export default function ValuesPage() {
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Hero */}
-      <section className="relative bg-primary text-white py-20 md:py-15 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/80" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-accent/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <span className="inline-block mb-4 text-sm font-medium tracking-widest text-accent uppercase">
-            What We Stand For
-          </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-6 max-w-3xl mx-auto leading-tight">
-            Our Core Values
-          </h1>
-          <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed">
-            These principles guide every decision we make — from product selection to client relationships.
-          </p>
-        </div>
-      </section>
+      <MarketingHero 
+        title="Our Core Values"
+        subtitle="These principles guide every decision we make — from product selection to client relationships."
+      />
 
       {/* Values Grid */}
-      <section className="py-20 md:py-24 bg-background">
+      <section className="pt-32 pb-20 md:py-24 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[

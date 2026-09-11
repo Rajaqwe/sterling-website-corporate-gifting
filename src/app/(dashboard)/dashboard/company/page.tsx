@@ -25,19 +25,31 @@ export default async function CompanyPage() {
     const auth = await requireUser();
     const companyId = formData.get("companyId") as string;
 
-    const isMember = await prisma.companyMember.findUnique({
+    const membership = await prisma.companyMember.findUnique({
       where: { companyId_userId: { companyId, userId: auth.user.id } },
     });
-    if (!isMember) return { error: "You don't have permission to edit this company." };
+    if (!membership || !membership.isActive || membership.role !== "COMPANY_ADMIN") {
+      return { error: "You don't have permission to edit this company." };
+    }
+
+    const name = (formData.get("name") as string)?.trim() ?? "";
+    const website = (formData.get("website") as string)?.trim() || null;
+    const gstNumber = (formData.get("gstNumber") as string)?.trim() || null;
+    const industry = (formData.get("industry") as string)?.trim() || null;
+
+    if (name.length < 2 || name.length > 150) {
+      return { error: "Company name must be between 2 and 150 characters." };
+    }
+    if (website && !/^https?:\/\/.+\..+/.test(website)) {
+      return { error: "Website must be a valid URL starting with http:// or https://" };
+    }
+    if (gstNumber && (gstNumber.length < 5 || gstNumber.length > 20)) {
+      return { error: "GST number must be between 5 and 20 characters." };
+    }
 
     await prisma.company.update({
       where: { id: companyId },
-      data: {
-        name:      (formData.get("name")      as string)?.trim(),
-        industry:  (formData.get("industry")  as string)?.trim() || null,
-        website:   (formData.get("website")   as string)?.trim() || null,
-        gstNumber: (formData.get("gstNumber") as string)?.trim() || null,
-      },
+      data: { name, industry, website, gstNumber },
     });
 
     revalidatePath("/dashboard/company");

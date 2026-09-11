@@ -127,6 +127,7 @@ exports.Prisma.UserScalarFieldEnum = {
   phone: 'phone',
   avatarUrl: 'avatarUrl',
   role: 'role',
+  permissions: 'permissions',
   isActive: 'isActive',
   emailVerified: 'emailVerified',
   lastLoginAt: 'lastLoginAt',
@@ -220,14 +221,14 @@ exports.Prisma.ProductScalarFieldEnum = {
   seoTitle: 'seoTitle',
   seoDescription: 'seoDescription',
   seoSlug: 'seoSlug',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  isDiscounted: 'isDiscounted',
   rating: 'rating',
   reviewCount: 'reviewCount',
-  isDiscounted: 'isDiscounted',
   likes: 'likes',
-  technicalSpecifications: 'technicalSpecifications',
   packageLogistics: 'packageLogistics',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  technicalSpecifications: 'technicalSpecifications'
 };
 
 exports.Prisma.ProductMediaScalarFieldEnum = {
@@ -241,10 +242,10 @@ exports.Prisma.ProductMediaScalarFieldEnum = {
   caption: 'caption',
   sortOrder: 'sortOrder',
   isPrimary: 'isPrimary',
-  isLiveProofing: 'isLiveProofing',
   isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  isLiveProofing: 'isLiveProofing'
 };
 
 exports.Prisma.ProductVariantScalarFieldEnum = {
@@ -323,14 +324,16 @@ exports.Prisma.QuoteRequestScalarFieldEnum = {
   deliveryLocation: 'deliveryLocation',
   requiredDeliveryDate: 'requiredDeliveryDate',
   eventType: 'eventType',
-  expiresAt: 'expiresAt',
   additionalRequirements: 'additionalRequirements',
   fileUrl: 'fileUrl',
   fileName: 'fileName',
   status: 'status',
   internalNotes: 'internalNotes',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  expiresAt: 'expiresAt',
+  reminderCount: 'reminderCount',
+  lastReminderAt: 'lastReminderAt'
 };
 
 exports.Prisma.QuoteItemScalarFieldEnum = {
@@ -343,6 +346,7 @@ exports.Prisma.QuoteItemScalarFieldEnum = {
   totalPrice: 'totalPrice',
   brandingOption: 'brandingOption',
   notes: 'notes',
+  configuration: 'configuration',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -372,6 +376,9 @@ exports.Prisma.OrderScalarFieldEnum = {
   billingAddressId: 'billingAddressId',
   notes: 'notes',
   purchaseOrderNumber: 'purchaseOrderNumber',
+  trackingNumber: 'trackingNumber',
+  shippingCourier: 'shippingCourier',
+  idempotencyKey: 'idempotencyKey',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -387,8 +394,10 @@ exports.Prisma.OrderItemScalarFieldEnum = {
   totalPrice: 'totalPrice',
   brandingOption: 'brandingOption',
   customizationDetails: 'customizationDetails',
+  createdAt: 'createdAt',
   variantSnapshot: 'variantSnapshot',
-  createdAt: 'createdAt'
+  brandingSnapshot: 'brandingSnapshot',
+  taxSnapshot: 'taxSnapshot'
 };
 
 exports.Prisma.PaymentScalarFieldEnum = {
@@ -474,6 +483,7 @@ exports.Prisma.CartItemScalarFieldEnum = {
   productId: 'productId',
   variantId: 'variantId',
   quantity: 'quantity',
+  configuration: 'configuration',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -515,6 +525,16 @@ exports.Prisma.PaymentWebhookEventScalarFieldEnum = {
   provider: 'provider',
   eventId: 'eventId',
   receivedAt: 'receivedAt'
+};
+
+exports.Prisma.StoreSettingsScalarFieldEnum = {
+  id: 'id',
+  defaultTaxRate: 'defaultTaxRate',
+  flatShippingRate: 'flatShippingRate',
+  contactEmail: 'contactEmail',
+  contactPhone: 'contactPhone',
+  updatedAt: 'updatedAt',
+  isSingleton: 'isSingleton'
 };
 
 exports.Prisma.SortOrder = {
@@ -660,7 +680,8 @@ exports.Prisma.ModelName = {
   Review: 'Review',
   ProductLike: 'ProductLike',
   CompanyInvitation: 'CompanyInvitation',
-  PaymentWebhookEvent: 'PaymentWebhookEvent'
+  PaymentWebhookEvent: 'PaymentWebhookEvent',
+  StoreSettings: 'StoreSettings'
 };
 
 /**

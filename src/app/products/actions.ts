@@ -62,10 +62,14 @@ export async function toggleWishlist(productId: string) {
 // CART ACTIONS
 // ------------------------------------------------------
 
-export async function addToCart(productId: string, quantity: number, variantId?: string) {
+export async function addToCart(
+  productId: string, 
+  quantity: number, 
+  variantId?: string,
+  configuration?: any // ProductConfiguration
+) {
   try {
     const user = await getUser();
-    if (!user) return { success: false, error: "Please log in to add to cart" };
 
     // --- Server-side validation (P1-9) ---
     if (!Number.isInteger(quantity) || quantity < 1) {
@@ -88,28 +92,54 @@ export async function addToCart(productId: string, quantity: number, variantId?:
       return { success: false, error: `Minimum order quantity is ${product.minimumOrderQuantity}` };
     }
 
-    // Validate variant belongs to this product
+    let currentStock = product.stockQuantity;
     if (variantId) {
       const variant = product.variants.find((v: any) => v.id === variantId);
       if (!variant || !variant.isActive) {
         return { success: false, error: "Selected variant is not available" };
       }
+      if (variant.stockQuantity !== null && variant.stockQuantity !== undefined) {
+        currentStock = variant.stockQuantity;
+      }
+    }
+
+    const { cookies } = await import("next/headers");
+    let sessionId = (await cookies()).get("guest_cart_session")?.value;
+    
+    let cartQuery: any = user ? { userId: user.id } : undefined;
+    if (!user) {
+      if (!sessionId) {
+        sessionId = crypto.randomUUID();
+        (await cookies()).set("guest_cart_session", sessionId, { maxAge: 60 * 60 * 24 * 30 });
+      }
+      cartQuery = { sessionId };
     }
 
     let cart = await prisma.cart.findUnique({
-      where: { userId: user.id },
+      where: user ? { userId: user.id } : { sessionId },
       include: { items: true },
     });
 
     if (!cart) {
       cart = await prisma.cart.create({
-        data: { userId: user.id },
+        data: user ? { userId: user.id } : { sessionId },
         include: { items: true },
       });
     }
 
+    // Cart merge logic P0-4: Items merge ONLY if product, variant, and configuration exactly match.
+    // To compare configurations, we stringify them (after ensuring predictable key order if needed, but for now JSON.stringify of the object is used).
+    const isConfigEqual = (c1: any, c2: any) => {
+      if (!c1 && !c2) return true;
+      if (!c1 || !c2) return false;
+      return JSON.stringify(c1) === JSON.stringify(c2);
+    };
+
     const existingItem = cart.items.find(
-      (i: any) => i.productId === productId && (i.variantId === variantId || (!i.variantId && !variantId))
+      (i: any) => 
+        i.productId === productId && 
+        (i.variantId === variantId || (!i.variantId && !variantId)) &&
+        isConfigEqual(i.configuration, configuration)
     );
 
     if (existingItem) {
@@ -124,6 +154,7 @@ export async function addToCart(productId: string, quantity: number, variantId?:
           productId,
           variantId,
           quantity,
+          configuration: configuration ? JSON.parse(JSON.stringify(configuration)) : null,
         },
       });
     }
@@ -149,6 +180,9 @@ export async function submitQuoteRequest(data: {
   requiredDeliveryDate?: string;
   notes?: string;
   customizationIds: string[];
+  variantId?: string;
+  fileUrl?: string;
+  fileName?: string;
   // quoteCalculation is intentionally NOT accepted — server calculates all pricing
 }) {
   try {
@@ -164,7 +198,8 @@ export async function submitQuoteRequest(data: {
     const pricing = await calculateServerProductTotal(
       data.productId,
       data.quantity,
-      data.customizationIds
+      data.customizationIds,
+      data.variantId
     );
 
     // Generate collision-resistant quote number (P1-1)
@@ -184,6 +219,8 @@ export async function submitQuoteRequest(data: {
         requiredDeliveryDate: data.requiredDeliveryDate ? new Date(data.requiredDeliveryDate) : null,
         additionalRequirements: data.notes,
         brandingRequired: data.customizationIds.length > 0,
+        fileUrl: data.fileUrl,
+        fileName: data.fileName,
         status: "NEW",
         items: {
           create: [{
@@ -225,7 +262,7 @@ export async function submitReview(productId: string, rating: number, content?: 
         productId,
         order: {
           userId: user.id,
-          status: { in: ['DELIVERED', 'COMPLETED' as any] },
+          status: { in: ['DELIVERED'] },
         },
       },
     });
@@ -287,43 +324,49 @@ export async function toggleLike(productId: string): Promise<ToggleLikeResult> {
     const user = await getUser();
     if (!user) return { success: false, error: "Please log in to like this product" };
 
-    const existingLike = await prisma.productLike.findUnique({
-      where: {
-        userId_productId: {
-          userId: user.id,
-          productId,
+    let isLiked = false;
+    let updated;
+
+    await prisma.$transaction(async (tx) => {
+      const existingLike = await tx.productLike.findUnique({
+        where: {
+          userId_productId: {
+            userId: user.id,
+            productId,
+          }
         }
+      });
+
+      if (existingLike) {
+        // Remove like
+        await tx.productLike.delete({
+          where: { id: existingLike.id }
+        });
+        updated = await tx.product.update({
+          where: { id: productId },
+          data: { likes: { decrement: 1 } },
+          select: { likes: true }
+        });
+        isLiked = false;
+      } else {
+        // Add like
+        await tx.productLike.create({
+          data: {
+            userId: user.id,
+            productId,
+          }
+        });
+        updated = await tx.product.update({
+          where: { id: productId },
+          data: { likes: { increment: 1 } },
+          select: { likes: true }
+        });
+        isLiked = true;
       }
     });
-
-    let updated;
-    if (existingLike) {
-      // Remove like
-      await prisma.productLike.delete({
-        where: { id: existingLike.id }
-      });
-      updated = await prisma.product.update({
-        where: { id: productId },
-        data: { likes: { decrement: 1 } },
-        select: { likes: true }
-      });
-    } else {
-      // Add like
-      await prisma.productLike.create({
-        data: {
-          userId: user.id,
-          productId,
-        }
-      });
-      updated = await prisma.product.update({
-        where: { id: productId },
-        data: { likes: { increment: 1 } },
-        select: { likes: true }
-      });
-    }
     
     revalidatePath("/products/[slug]", "page");
-    return { success: true, likes: updated.likes, isLiked: !existingLike };
+    return { success: true, likes: updated!.likes, isLiked };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to like product" };
   }

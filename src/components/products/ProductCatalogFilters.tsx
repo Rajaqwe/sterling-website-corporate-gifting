@@ -13,10 +13,11 @@ export function ActiveFilters() {
   if (category) activeFilters.push({ key: "category", value: category, label: `Category: ${category}` });
   
   const minPrice = searchParams.get("minPrice");
-  if (minPrice) activeFilters.push({ key: "minPrice", value: minPrice, label: `Min Price: ₹${minPrice}` });
-  
   const maxPrice = searchParams.get("maxPrice");
-  if (maxPrice) activeFilters.push({ key: "maxPrice", value: maxPrice, label: `Max Price: ₹${maxPrice}` });
+  if (minPrice || maxPrice) {
+    const label = minPrice && maxPrice ? `Budget: ₹${minPrice}–₹${maxPrice}` : minPrice ? `Budget: ₹${minPrice}+` : `Budget: Under ₹${maxPrice}`;
+    activeFilters.push({ key: "price", value: `${minPrice || ""}-${maxPrice || ""}`, label });
+  }
 
   if (activeFilters.length === 0) return null;
 
@@ -30,8 +31,9 @@ export function ActiveFilters() {
         >
           {filter.label}
           <button 
-            onClick={() => updateFilters({ [filter.key]: "" })}
-            className="hover:text-destructive focus:outline-none"
+            onClick={() => filter.key === "price" ? updateFilters({ minPrice: "", maxPrice: "" }) : updateFilters({ [filter.key]: "" })}
+            className="rounded-sm hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={`Remove ${filter.label} filter`}
           >
             <X className="h-3 w-3" />
           </button>
@@ -54,7 +56,8 @@ export function SortDropdown() {
   const currentSort = searchParams.get("sort") || "newest";
 
   return (
-    <select 
+    <select
+      aria-label="Sort catalogue products"
       value={currentSort}
       onChange={(e) => updateFilters({ sort: e.target.value })}
       className="text-sm border-border bg-background rounded-md px-3 py-1.5 focus:ring-accent focus:border-accent outline-none"

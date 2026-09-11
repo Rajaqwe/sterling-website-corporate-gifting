@@ -1,116 +1,92 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Users, Building2 } from "lucide-react";
+import { Download } from "lucide-react";
+import { requirePermission } from "@/lib/auth/permissions";
 import { prisma } from "@/lib/prisma/client";
 import { AdminSearchInput } from "@/components/admin/AdminSearchInput";
-import { AdminPagination } from "@/components/admin/AdminPagination";
+import { CustomerListClient } from "./CustomerListClient";
 
-export default async function AdminCustomers(props: { searchParams: Promise<{ page?: string, q?: string }> }) {
-  const searchParams = await props.searchParams;
-  const page = Number(searchParams.page) || 1;
-  const q = searchParams.q || "";
-  const take = 10;
-  const skip = (page - 1) * take;
+export default async function AdminCustomers(props: { searchParams: Promise<{ page?: string, q?: string, sort?: string, order?: string }> }) {
+  await requirePermission('customers.read');
+ const searchParams = await props.searchParams;
+ const page = Number(searchParams.page) || 1;
+ const q = searchParams.q || "";
+ const sort = searchParams.sort || "createdAt";
+ const order = searchParams.order || "desc";
+ const take = 10;
+ const skip = (page - 1) * take;
 
-  const where = q ? {
-    OR: [
-      { fullName: { contains: q, mode: 'insensitive' as const } },
-      { email: { contains: q, mode: 'insensitive' as const } },
-      { companyMembers: { some: { company: { name: { contains: q, mode: 'insensitive' as const } } } } },
-    ]
-  } : {};
+ const where = q ? {
+ OR: [
+ { fullName: { contains: q, mode: 'insensitive' as const } },
+ { email: { contains: q, mode: 'insensitive' as const } },
+ { companyMembers: { some: { company: { name: { contains: q, mode: 'insensitive' as const } } } } },
+ ]
+ } : {};
 
-  const [users, totalUsers] = await Promise.all([
-    prisma.user.findMany({
-      where,
-      include: {
-        companyMembers: {
-          include: { company: true }
-        }
-      },
-      orderBy: { createdAt: 'desc' },
-      skip,
-      take,
-    }),
-    prisma.user.count({ where })
-  ]);
+ let orderBy: any = {};
+ if (sort === 'fullName') {
+ orderBy = { fullName: order as any };
+ } else if (sort === 'email') {
+ orderBy = { email: order as any };
+ } else if (sort === 'role') {
+ orderBy = { role: order as any };
+ } else if (sort === 'isActive') {
+ orderBy = { isActive: order as any };
+ } else {
+ orderBy = { createdAt: 'desc' };
+ }
 
-  const totalPages = Math.ceil(totalUsers / take);
+ const [users, totalUsers] = await Promise.all([
+ prisma.user.findMany({
+ where,
+ include: {
+ companyMembers: {
+ include: { company: true }
+ }
+ },
+ orderBy,
+ skip,
+ take,
+ }),
+ prisma.user.count({ where })
+ ]);
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">Clients & Users</h1>
-          <p className="mt-2 text-slate-500">Manage corporate accounts and individual users.</p>
-        </div>
-      </div>
+ return (
+ <div className="space-y-6">
+ <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+ <div className="flex justify-between items-end gap-4 w-full">
+ <div>
+ <h1 className="text-3xl font-bold text-foreground">Clients & Users</h1>
+ <p className="mt-2 text-muted-foreground">Manage corporate accounts and individual users.</p>
+ </div>
+ <a href="/api/admin/exports/customers" target="_blank" className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 flex items-center gap-2 text-sm font-medium">
+ <Download className="w-4 h-4" /> Export CSV
+ </a>
+ </div>
+ </div>
 
-      <div className="flex items-center gap-4 bg-background p-4 border rounded-md shadow-sm">
-        <AdminSearchInput placeholder="Search customers by name, email, or company..." />
-      </div>
+ <div className="flex items-center gap-4 bg-background p-4 border rounded-md shadow-sm">
+ <AdminSearchInput placeholder="Search customers by name, email, or company..." />
+ </div>
 
-      <div className="border border-slate-200 rounded-md bg-background overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Client Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Company</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Joined</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="h-64 text-center">
-                  <div className="flex flex-col items-center justify-center space-y-3">
-                    <Users className="h-12 w-12 text-slate-300" />
-                    <h3 className="text-lg font-medium text-slate-900">No clients found</h3>
-                    <p className="text-slate-500 max-w-sm text-center">There are currently no active users matching your search.</p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : (
-              users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="font-medium text-slate-900">
-                    {user.fullName || 'N/A'}
-                  </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    {user.companyMembers.length > 0 ? (
-                      <div className="flex items-center text-sm text-slate-600">
-                        <Building2 className="mr-2 h-4 w-4 text-slate-400" />
-                        {user.companyMembers[0].company.name}
-                      </div>
-                    ) : (
-                      <span className="text-slate-400 italic">No company</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={user.role === 'ADMIN' ? 'default' : 'secondary'}>
-                      {user.role}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={user.isActive ? 'default' : 'destructive'} className={user.isActive ? "bg-green-100 text-green-800 hover:bg-green-100" : ""}>
-                      {user.isActive ? 'Active' : 'Inactive'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-sm text-slate-500">
-                    {user.createdAt.toLocaleDateString()}
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      <AdminPagination totalPages={totalPages} currentPage={page} />
-    </div>
-  );
+ <CustomerListClient 
+ users={users.map(u => ({
+ ...u,
+ companyMembers: u.companyMembers.map(cm => ({
+ ...cm,
+ createdAt: cm.createdAt.toISOString(),
+ updatedAt: cm.updatedAt.toISOString(),
+ company: {
+ ...cm.company,
+ createdAt: cm.company.createdAt.toISOString(),
+ updatedAt: cm.company.updatedAt.toISOString(),
+ }
+ })),
+ createdAt: u.createdAt.toISOString(),
+ updatedAt: u.updatedAt.toISOString(),
+ formattedDate: new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(u.createdAt)
+ }))} 
+ totalCount={totalUsers} 
+ />
+ </div>
+ );
 }

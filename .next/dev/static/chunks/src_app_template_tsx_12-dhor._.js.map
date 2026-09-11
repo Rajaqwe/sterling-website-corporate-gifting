@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/Admin/Documents/sterling%20%20website%20corporate%20gifting/src/app/template.tsx"],"sourcesContent":["\"use client\";\n\nimport React from \"react\";\nimport { usePathname } from \"next/navigation\";\n\nexport default function Template({ children }: { children: React.ReactNode }) {\n  const pathname = usePathname();\n\n  return (\n    <div key={pathname} className=\"motion-safe:animate-soft-reveal\">\n      {children}\n    </div>\n  );\n}\n"],"names":["Template","param","children","pathname","className"],"mappings":";;;;;AAGA;;;AAHA;;AAKe,SAASA,SAASC,KAA2C;QAA3CA,EAAEC,QAAQ,EAAiC,GAA3CD;;IAC/B,MAAME,WAAW,IAAA,oJAAW;IAE5B,qBACE,6LAAC;QAAmBC,WAAU;kBAC3BF;OADOC;;;;;AAId;GARwBH;;QACL,oJAAW;;;KADNA"}}]
-}

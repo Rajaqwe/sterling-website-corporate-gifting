@@ -10,7 +10,7 @@ import { AdminPagination } from "@/components/admin/AdminPagination";
 
 export default async function DashboardQuotes(props: { searchParams?: Promise<{ page?: string }> }) {
   const searchParams = await props.searchParams;
-  const page = Number(searchParams?.page) || 1;
+  const page = Math.max(1, Math.min(10000, Math.floor(Number(searchParams?.page)) || 1));
   const pageSize = 10;
   const auth = await requireUser();
   
@@ -21,7 +21,23 @@ export default async function DashboardQuotes(props: { searchParams?: Promise<{ 
   const [quotes, totalQuotes] = await Promise.all([
     prisma.quoteRequest.findMany({
       where: { userId: auth.user.id },
-      include: { items: true },
+      select: {
+        id: true,
+        quoteNumber: true,
+        companyName: true,
+        status: true,
+        createdAt: true,
+        expiresAt: true,
+        items: {
+          select: {
+            id: true,
+            quantity: true,
+            unitPrice: true,
+            totalPrice: true,
+            description: true,
+          }
+        }
+      },
       orderBy: { createdAt: 'desc' },
       skip: (page - 1) * pageSize,
       take: pageSize,

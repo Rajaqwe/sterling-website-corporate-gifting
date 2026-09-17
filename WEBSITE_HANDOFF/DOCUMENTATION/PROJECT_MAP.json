@@ -1,0 +1,12 @@
+{
+  "name": "Sterling Corporate",
+  "type": "Next.js B2B E-commerce",
+  "status": "Under Development",
+  "directories": [
+    "src/app",
+    "src/components",
+    "src/lib",
+    "prisma",
+    "public"
+  ]
+}

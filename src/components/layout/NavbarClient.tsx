@@ -88,7 +88,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
     >
       {/* Background with opacity transition for smoothness */}
       <div 
-        className={`absolute inset-0 bg-background/90 backdrop-blur-xl border-b border-border/40 shadow-sm transition-opacity duration-500 ease-in-out ${
+        className={`absolute inset-0 bg-background/85 backdrop-blur-2xl border-b border-border/50 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.06)] transition-opacity duration-500 ease-in-out ${
           isScrolled ? "opacity-100" : "opacity-0"
         }`} 
       />
@@ -99,39 +99,45 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center gap-2 group transition-[height,width]">
-              <div className={`relative transition-all duration-500 ease-in-out ${isScrolled ? "w-[120px] h-[36px]" : "w-[150px] h-[45px]"}`}>
-                <Image src="/logos/sterling-logo-full.svg" alt="Sterling Logo" fill className={`object-contain transition-all duration-500 ${isDarkBg ? "brightness-0 invert" : "mix-blend-multiply dark:mix-blend-normal"}`} priority />
+              <div className={`relative transition-all duration-500 ease-in-out ${isScrolled ? "w-[125px] h-[38px]" : "w-[155px] h-[46px]"}`}>
+                {/*
+                  The SVG embeds a PNG with an opaque white background.
+                  - Light backgrounds: multiply makes the white backdrop disappear.
+                  - Dark backgrounds: invert + screen does the same while keeping
+                    the mark light (brightness-0 invert would paint a solid
+                    white box over the hero).
+                */}
+                <Image src="/logos/sterling-logo-full.svg" alt="Sterling Logo" fill className={`object-contain transition-all duration-500 ${isDarkBg ? "invert mix-blend-screen" : "mix-blend-multiply dark:mix-blend-normal"}`} priority />
               </div>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-2 lg:gap-3 px-3 py-1.5 rounded-full bg-background/40 dark:bg-white/5 backdrop-blur-md border border-border/30">
             {navLinks.map((link) => {
               const isActive = pathname.startsWith(link.href);
               return (
                 <Link 
                   key={link.name} 
                   href={link.href}
-                  className={`text-sm font-medium transition-colors duration-500 relative py-1 ${
-                    isActive ? "text-accent font-semibold" : ""
-                  } ${
-                    isScrolled 
-                      ? isActive ? "" : "text-foreground hover:text-primary" 
-                      : isActive ? "" : `${isLightText ? "text-white/90 hover:text-white" : "text-foreground hover:text-primary/70"}`
+                  className={`text-sm font-medium px-4 py-1.5 rounded-full transition-all duration-300 relative ${
+                    isActive 
+                      ? "bg-accent/20 text-accent font-semibold shadow-sm border border-accent/30" 
+                      : isScrolled 
+                        ? "text-foreground/80 hover:text-foreground hover:bg-secondary/60" 
+                        : isLightText 
+                          ? "text-white/85 hover:text-white hover:bg-white/10" 
+                          : "text-foreground/80 hover:text-foreground hover:bg-secondary/60"
                   }`}
                 >
                   {link.name}
-                  {isActive && (
-                    <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent rounded-full animate-breath-enter" />
-                  )}
                 </Link>
               );
             })}
           </nav>
 
           {/* Icons & Actions */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
             <SearchBar isLightText={isLightText && !isScrolled} />
             
             <ThemeToggle isLightText={isLightText && !isScrolled} />
@@ -148,10 +154,10 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
 
             <CartDrawer isLightText={isLightText && !isScrolled} />
 
-            <Link href="/request-a-quote" className={buttonVariants({ variant: "default" })}>
-                <Briefcase className="h-4 w-4" />
-                <span>Request a Quote</span>
-              </Link>
+            <Link href="/request-a-quote" className="btn-gold h-10 px-5 text-xs font-heading font-bold uppercase tracking-wider flex items-center gap-2 shadow-md hover:shadow-lg transition-all duration-300">
+              <Briefcase className="h-3.5 w-3.5" />
+              <span>Request a Quote</span>
+            </Link>
           </div>
 
           {/* Mobile Menu */}

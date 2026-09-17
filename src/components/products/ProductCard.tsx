@@ -43,10 +43,10 @@ export function ProductCard({ product, className = "", priority = false }: Produ
   return (
     <Card
       data-testid="product-card"
-      className={cn("group group/card flex flex-col h-full bg-background rounded-xl border border-border/40 overflow-hidden hover:-translate-y-1 hover:shadow-lg transition-all duration-300", className)}
+      className={cn("group group/card flex flex-col h-full bg-card rounded-2xl border border-border/60 hover:border-accent/50 overflow-hidden hover:-translate-y-1.5 shadow-sm hover:shadow-[0_16px_36px_-10px_rgba(0,0,0,0.12)] transition-all duration-300", className)}
     >
       {/* Product Image Stage */}
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-secondary/30">
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-secondary/20">
         <Link
           href={`/products/${product.slug}`}
           className="block w-full h-full relative"
@@ -64,7 +64,7 @@ export function ProductCard({ product, className = "", priority = false }: Produ
               fill
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               priority={priority}
-              className="object-cover object-center transition-transform duration-[var(--motion-soft)] ease-[var(--ease-standard)] group-hover/card:scale-[1.03]"
+              className="object-cover object-center transition-transform duration-700 ease-out group-hover/card:scale-105"
               onError={() => {
                 setImageError(true);
                 setImageSrc("/placeholder-product.jpg");
@@ -74,15 +74,15 @@ export function ProductCard({ product, className = "", priority = false }: Produ
         </Link>
 
         {/* Top Badges */}
-        <div className="absolute top-3 inset-x-3 flex items-center justify-between pointer-events-none gap-2">
+        <div className="absolute top-3 inset-x-3 flex items-center justify-between pointer-events-none gap-2 z-10">
           {/* Promotional / Status Badge */}
           {product.badge ? (
-            <span className="inline-flex items-center gap-1 rounded-full bg-primary/90 px-2.5 py-0.5 text-xs font-medium text-primary-foreground backdrop-blur-sm shadow-sm">
-              <Sparkles className="h-3 w-3 text-accent" />
+            <span className="inline-flex items-center gap-1 rounded-full bg-primary/85 px-3 py-1 text-[11px] font-semibold text-primary-foreground backdrop-blur-md border border-white/20 shadow-md">
+              <Sparkles className="h-3 w-3 text-amber-300" />
               {product.badge}
             </span>
           ) : (
-            <span className="inline-flex items-center rounded-full bg-accent/20 px-2.5 py-0.5 text-xs font-medium text-accent-foreground backdrop-blur-sm border border-accent/20 shadow-sm">
+            <span className="inline-flex items-center rounded-full bg-background/80 px-2.5 py-1 text-[11px] font-medium text-foreground backdrop-blur-md border border-border/60 shadow-sm">
               {displayCategory}
             </span>
           )}
@@ -90,13 +90,11 @@ export function ProductCard({ product, className = "", priority = false }: Produ
           {/* MOQ Badge */}
           <span
             data-testid="moq-badge"
-            className="inline-flex items-center rounded-full bg-accent text-primary px-2.5 py-0.5 text-xs font-bold shadow-sm"
+            className="inline-flex items-center rounded-full bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#C5A880] text-primary px-3 py-1 text-[11px] font-heading font-bold shadow-md border border-amber-200/50"
           >
             MOQ: {product.moq} units
           </span>
         </div>
-
-        {/* Removed Hover CTA to keep image clean and ensure actions are always visible */}
       </div>
 
       {/* Content Area */}
@@ -178,15 +176,15 @@ export function ProductCard({ product, className = "", priority = false }: Produ
         
         {/* Actions */}
         <div className="flex gap-2 pt-3 mt-1">
-          <Button type="button" variant="outline" size="sm" className="h-9 px-3 shrink-0" onClick={() => setIsQuickViewOpen(true)} aria-label={`Quick view ${title}`}>
+          <Button type="button" variant="outline" size="sm" className="h-9 px-3 shrink-0 rounded-xl hover:bg-accent/15 hover:text-accent hover:border-accent/40 transition-colors" onClick={() => setIsQuickViewOpen(true)} aria-label={`Quick view ${title}`}>
             <Eye className="h-4 w-4" />
           </Button>
           <Link href={`/products/${product.slug}`} className="flex-1">
-            <span className="btn-secondary h-9 w-full rounded-md text-[11px] font-semibold flex items-center justify-center">VIEW PRODUCT</span>
+            <span className="btn-secondary h-9 w-full rounded-xl text-[11px] font-heading font-semibold flex items-center justify-center tracking-wider hover:border-accent/50 transition-colors">VIEW DETAILS</span>
           </Link>
           <Button 
             type="button" 
-            className="flex-1 btn-primary h-9 rounded-md text-[11px] font-semibold px-2"
+            className="flex-1 btn-primary h-9 rounded-xl text-[11px] font-heading font-semibold px-2 hover:shadow-md transition-all"
             onClick={async (e) => {
               e.preventDefault();
               const { addToCart } = await import("@/app/products/actions");

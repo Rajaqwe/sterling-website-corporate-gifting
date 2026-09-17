@@ -5,11 +5,17 @@ import {
   Box,
   BriefcaseBusiness,
   Building2,
+  CheckCircle2,
   Gift,
+  Headphones,
   Megaphone,
   Palette,
   PartyPopper,
+  ReceiptText,
+  ShieldCheck,
   Sparkles,
+  Star,
+  Truck,
   Users,
 } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -19,7 +25,7 @@ import { Reveal, StaggerContainer } from "@/components/ui/reveal";
 
 const needs = [
   { title: "Bulk Employee Gifting", description: "Welcome, recognise, and celebrate your people at scale.", href: "/employee-gifting", image: "/videos/posters/demo-2.jpg", icon: Users },
-  { title: "Client Gifting", description: "Make every relationship feel considered and premium.", href: "/corporate-gifts", image: "/videos/posters/demo-1.jpg", icon: BriefcaseBusiness },
+  { title: "Client Gifting", description: "Make every relationship feel considered and premium.", href: "/corporate-gifts", image: "/videos/posters/demo-4.jpg", icon: BriefcaseBusiness },
   { title: "Custom Branding", description: "Your brand on every premium gift item.", href: "/custom-branding", image: "/videos/posters/demo-1.jpg", icon: Palette },
   { title: "Employee Welcome Kits", description: "Set the tone from a new hire's first day.", href: "/employee-gifting", image: "/videos/posters/demo-3.jpg", icon: Box },
   { title: "Event & Conference Gifting", description: "Create memorable moments at every event.", href: "/event-gifts", image: "/videos/posters/demo-4.jpg", icon: PartyPopper },
@@ -51,21 +57,22 @@ const teams = [
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col overflow-hidden">
-      <section className="relative flex min-h-[780px] items-center overflow-hidden pb-24 pt-24 sm:pt-32 lg:min-h-[840px] lg:pt-36">
+      <section className="relative flex min-h-[820px] items-center overflow-hidden pb-24 pt-28 sm:pt-36 lg:min-h-[880px] lg:pt-40">
         <div className="absolute inset-0 -z-20"><DemoVideoCarousel /></div>
-        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(12,26,43,.82)_0%,rgba(12,26,43,.58)_44%,rgba(12,26,43,.26)_100%)]" />
-        <div className="absolute inset-x-0 bottom-0 -z-10 h-40 bg-gradient-to-t from-background to-transparent" />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(10,22,38,.86)_0%,rgba(10,22,38,.62)_48%,rgba(10,22,38,.30)_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 -z-10 h-44 bg-gradient-to-t from-background to-transparent" />
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <StaggerContainer staggerDelay={105} className="max-w-3xl text-white">
             <Reveal animationType="fade-up">
-              <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-white/90 backdrop-blur-sm">
-                <Sparkles className="h-3.5 w-3.5 text-amber-200" /> Premium corporate gifting
+              <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-white/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-white/95 backdrop-blur-md shadow-lg shadow-amber-500/10">
+                <Sparkles className="h-3.5 w-3.5 text-amber-300 animate-spin-slow" /> Bespoke Corporate Gifting Platform
               </span>
             </Reveal>
             <Reveal animationType="mask-text">
               <h1 className="font-heading max-w-3xl text-5xl font-bold leading-[1.04] tracking-[-0.045em] sm:text-6xl lg:text-7xl">
-                Meaningful Gifts.<br />Stronger Relationships.
+                <span className="text-gold-subtle drop-shadow-sm">Meaningful Gifts.</span><br />
+                <span className="text-white drop-shadow-md">Stronger Relationships.</span>
               </h1>
             </Reveal>
             <Reveal animationType="fade-up">
@@ -76,31 +83,65 @@ export default function Home() {
             <Reveal animationType="fade-up">
               <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
                 <Link href="/request-a-quote">
-                  <button className="btn-primary h-14 px-8 rounded-full font-heading font-semibold text-base shadow-xl flex items-center justify-center w-full sm:w-auto">
+                  <button className="btn-gold h-14 px-9 rounded-full font-heading font-bold text-base shadow-[0_12px_28px_-6px_rgba(212,175,55,0.4)] flex items-center justify-center w-full sm:w-auto hover:scale-[1.02] transition-transform shimmer-sweep">
                     GET A CORPORATE QUOTE <ArrowRight className="ml-2 h-5 w-5" />
                   </button>
                 </Link>
                 <Link href="/corporate-gifts">
-                  <button className="btn-secondary h-14 px-8 rounded-full font-heading font-semibold text-base shadow-lg flex items-center justify-center w-full sm:w-auto bg-white/10 text-white border-white hover:bg-white hover:text-sp-navy dark:hover:text-sp-navy">
+                  <button className="btn-secondary h-14 px-8 rounded-full font-heading font-semibold text-base shadow-lg flex items-center justify-center w-full sm:w-auto bg-white/10 text-white border-white/40 hover:bg-white hover:text-sp-navy dark:hover:text-sp-navy backdrop-blur-md">
                     EXPLORE COLLECTIONS
                   </button>
                 </Link>
+              </div>
+
+              {/* Enterprise Trust & Social Proof Bar */}
+              <div className="mt-12 pt-8 border-t border-white/15 flex flex-wrap items-center gap-6 sm:gap-10 text-white/80 text-xs sm:text-sm font-medium">
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                  </span>
+                  <span className="font-semibold text-white">500+ Enterprise Clients</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Star className="h-4 w-4 fill-amber-300 text-amber-300" />
+                  <span className="font-bold text-white">4.9/5</span>
+                  <span className="text-white/70">Client Rating</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-amber-300" />
+                  <span>Pan-India Direct Delivery</span>
+                </div>
               </div>
             </Reveal>
           </StaggerContainer>
         </div>
       </section>
 
-      <section className="border-y border-border/70 bg-card">
-        <div className="container mx-auto grid gap-4 px-4 py-8 text-center grid-cols-2 sm:grid-cols-3 md:grid-cols-6 sm:px-6 lg:px-8">
-          {[
-            ["Premium Quality", "Carefully vetted products"],
-            ["Custom Branding", "Your logo on every gift"],
-            ["Bulk Orders", "Seamless scaling capability"],
-            ["Pan India Delivery", "Delivered directly to recipients"],
-            ["GST Invoicing", "Compliant billing process"],
-            ["Dedicated Support", "Your personal gifting expert"],
-          ].map(([title, description]) => <div key={title} className="px-4"><p className="font-heading font-semibold text-sp-purple dark:text-white">{title}</p><p className="mt-1 font-sans text-sm leading-relaxed text-muted-foreground">{description}</p></div>)}
+      {/* Feature Ribbon (Elevated Luxury Cards) */}
+      <section className="border-y border-border/50 bg-card/60 backdrop-blur-md py-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+            {[
+              { title: "Premium Quality", description: "Carefully vetted products", icon: Sparkles },
+              { title: "Custom Branding", description: "Your logo on every gift", icon: Palette },
+              { title: "Bulk Scaling", description: "Seamless bulk volume", icon: Box },
+              { title: "Pan India Delivery", description: "Direct recipient dispatch", icon: Truck },
+              { title: "GST Invoicing", description: "100% compliant billing", icon: ReceiptText },
+              { title: "Dedicated Support", description: "Personal gifting concierge", icon: Headphones },
+            ].map(({ title, description, icon: Icon }) => (
+              <div 
+                key={title} 
+                className="group relative flex flex-col items-center text-center p-4 rounded-xl border border-border/40 bg-background/50 hover:bg-background hover:border-accent/40 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
+              >
+                <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-accent/15 text-accent group-hover:bg-accent group-hover:text-primary transition-colors duration-300">
+                  <Icon className="h-4 w-4" />
+                </div>
+                <p className="font-heading font-bold text-xs sm:text-sm text-foreground">{title}</p>
+                <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">{description}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -108,31 +149,81 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading eyebrow="Corporate Solutions" title="Built for Businesses" description="Comprehensive corporate gifting solutions tailored to your company's specific needs and milestones." />
           <StaggerContainer staggerDelay={70} className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {needs.map((need) => <Reveal key={need.title}><Link href={need.href} className="group relative flex min-h-64 overflow-hidden rounded-[22px] border border-border/70 bg-primary p-6 text-white shadow-sm transition-ui hover:-translate-y-1 hover:shadow-xl"><div className="absolute inset-0 bg-cover bg-center opacity-60 transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url('${need.image}')` }} /><div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-100 transition-opacity duration-500" /><div className="relative mt-auto transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-out"><need.icon className="mb-8 h-5 w-5 text-white/85" /><h3 className="text-2xl font-bold tracking-tight">{need.title}</h3><p className="mt-2 max-w-sm text-sm leading-relaxed text-white/90 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">{need.description}</p><span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold">Explore <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" /></span></div></Link></Reveal>)}
+            {needs.map((need) => (
+              <Reveal key={need.title}>
+                <Link 
+                  href={need.href} 
+                  className="group relative flex min-h-72 overflow-hidden rounded-[24px] border border-border/60 hover:border-amber-400/50 bg-primary p-7 text-white shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5"
+                >
+                  <div 
+                    className="absolute inset-0 bg-cover bg-center opacity-55 transition-transform duration-700 group-hover:scale-108 group-hover:opacity-65" 
+                    style={{ backgroundImage: `url('${need.image}')` }} 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
+                  
+                  {/* Subtle Top Luxury Badge */}
+                  <div className="relative z-10 flex items-center justify-between">
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/15 backdrop-blur-md text-amber-200 border border-white/20 shadow-sm group-hover:bg-amber-400 group-hover:text-primary transition-colors duration-300">
+                      <need.icon className="h-4 w-4" />
+                    </span>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-amber-200/90 group-hover:text-amber-200 transition-colors">
+                      Bespoke
+                    </span>
+                  </div>
+
+                  <div className="relative mt-auto transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500 ease-out z-10">
+                    <h3 className="text-2xl font-bold font-serif tracking-tight text-white group-hover:text-amber-100 transition-colors">{need.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-white/80 opacity-90 group-hover:opacity-100 transition-opacity duration-500">{need.description}</p>
+                    <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-amber-300 group-hover:text-amber-200">
+                      Explore Collection <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1.5" />
+                    </span>
+                  </div>
+                </Link>
+              </Reveal>
+            ))}
           </StaggerContainer>
         </div>
       </section>
 
-      <section className="bg-secondary/40 py-20 sm:py-28">
+      <section className="bg-secondary/35 py-20 sm:py-28 border-y border-border/50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid items-end gap-8 lg:grid-cols-[1fr_auto]"><SectionHeading eyebrow="Plan with a budget" title="Make your shortlist faster" description="Start with a practical per-unit range, then refine by category, brandability, and minimum order quantity." align="left" /><Link href="/corporate-gifts" className={cn(buttonVariants({ variant: "outline" }), "hidden lg:flex btn-primary border-primary/20 hover:text-white")}>View the catalogue <ArrowRight className="ml-2 h-4 w-4" /></Link></div>
-          <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{budgets.map((budget) => <Link key={budget.label} href={budget.href} className="group flex min-h-28 flex-col justify-between rounded-[18px] border border-border bg-card dark:bg-card border-border p-5 shadow-sm transition-transform hover:-translate-y-1 hover:shadow-md relative overflow-hidden"><span className="text-sm font-medium text-muted-foreground">Gift budget</span><div className="absolute top-0 left-0 w-full h-1 bg-gradient-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-            <span className="flex items-center justify-between font-heading font-bold text-sp-navy dark:text-white">{budget.label}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 text-sp-magenta" /></span></Link>)}</div>
+          <div className="grid items-end gap-8 lg:grid-cols-[1fr_auto]">
+            <SectionHeading eyebrow="Plan with a budget" title="Make your shortlist faster" description="Start with a practical per-unit range, then refine by category, brandability, and minimum order quantity." align="left" />
+            <Link href="/corporate-gifts" className="hidden lg:flex btn-primary h-12 px-6 rounded-full text-xs uppercase tracking-wider font-bold shadow-md hover:shadow-lg">
+              View Complete Catalogue <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </div>
+          <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {budgets.map((budget) => (
+              <Link 
+                key={budget.label} 
+                href={budget.href} 
+                className="group flex min-h-28 flex-col justify-between rounded-[20px] border border-border/80 bg-card dark:bg-card/70 p-5 shadow-sm hover:shadow-xl hover:border-accent/50 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden"
+              >
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#C5A880] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Price Tier</span>
+                <span className="flex items-center justify-between font-heading font-bold text-base sm:text-lg text-primary group-hover:text-accent transition-colors">
+                  {budget.label}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 text-accent" />
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
       <section className="py-20 sm:py-28">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeading eyebrow="A considered process" title="How Sterling works" description="A simple way to move a corporate gifting idea from brief to delivery." />
+          <SectionHeading eyebrow="A considered process" title="How Sterling works" description="A simple, streamlined journey from initial brief to guaranteed on-time delivery." />
           <StaggerContainer staggerDelay={100} className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {workflow.map(([step, title, description], idx) => (
+            {workflow.map(([step, title, description]) => (
               <Reveal key={step}>
-                <article className="group relative rounded-2xl border border-border/60 bg-card p-6 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2 overflow-hidden dark:bg-card/50">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full transition-transform duration-500 group-hover:scale-125 dark:bg-primary/10" />
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-xl font-black text-primary mb-6 transition-colors duration-500 group-hover:bg-primary group-hover:text-primary-foreground dark:bg-primary/20 dark:group-hover:bg-primary">
+                <article className="group relative rounded-2xl border border-border/60 bg-card p-7 shadow-sm hover:shadow-xl hover:border-accent/40 transition-all duration-500 hover:-translate-y-1.5 overflow-hidden dark:bg-card/50">
+                  <div className="absolute top-0 right-0 w-28 h-28 bg-accent/5 rounded-bl-full transition-transform duration-500 group-hover:scale-125 dark:bg-accent/10" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-accent text-lg font-black font-heading mb-6 transition-all duration-500 group-hover:bg-primary group-hover:text-primary-foreground shadow-sm">
                     {step.replace('#', '')}
                   </div>
-                  <h3 className="text-xl font-bold tracking-tight text-sp-navy dark:text-white relative z-10">{title}</h3>
+                  <h3 className="text-xl font-bold tracking-tight text-primary relative z-10 group-hover:text-accent transition-colors">{title}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground relative z-10">{description}</p>
                 </article>
               </Reveal>
@@ -141,49 +232,87 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-20 sm:py-28 bg-background border-y border-border">
+      <section className="py-20 sm:py-28 bg-card/40 border-y border-border/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <SectionHeading eyebrow="Custom Branding" title="Make Every Gift Carry Your Brand" description="Logo branding, custom packaging, personalized messages, custom inserts, and branded merchandise." align="center" />
+          <SectionHeading eyebrow="Custom Branding" title="Make Every Gift Carry Your Brand" description="Logo embossing, laser engraving, UV printing, customized packaging, and branded unboxing experiences." align="center" />
           <div className="mt-12 flex flex-col md:flex-row items-center justify-center gap-6">
             <div className="group flex-1 w-full text-center">
-              <div className="relative overflow-hidden bg-muted/50 dark:bg-slate-900/50 h-56 rounded-[24px] mb-5 flex items-center justify-center border border-slate-200 dark:border-slate-800 text-slate-400 transition-all duration-500 hover:shadow-lg hover:-translate-y-2">
-                <Box className="w-16 h-16 opacity-40 transition-transform duration-500 group-hover:scale-110" />
+              <div className="relative overflow-hidden bg-background/80 h-56 rounded-[24px] mb-5 flex items-center justify-center border border-border/80 shadow-sm transition-all duration-500 hover:shadow-lg hover:-translate-y-1">
+                <Box className="w-14 h-14 text-muted-foreground/60 transition-transform duration-500 group-hover:scale-110" />
               </div>
-              <h4 className="font-heading font-semibold text-lg text-slate-600 dark:text-slate-300">Blank Product</h4>
+              <h4 className="font-heading font-semibold text-base text-foreground">1. Premium Blank Base</h4>
             </div>
 
-            <ArrowRight className="hidden md:block w-10 h-10 text-slate-300 dark:text-slate-700 animate-pulse" />
+            <ArrowRight className="hidden md:block w-8 h-8 text-accent/60 animate-pulse" />
 
             <div className="group flex-1 w-full text-center">
-              <div className="relative overflow-hidden bg-gradient-to-br from-sp-purple/5 to-sp-blue/5 dark:from-sp-purple/10 dark:to-sp-blue/10 h-56 rounded-[24px] mb-5 flex items-center justify-center border border-sp-purple/30 text-sp-purple transition-all duration-500 hover:shadow-xl hover:shadow-sp-purple/20 hover:-translate-y-2">
-                <Palette className="w-16 h-16 opacity-80 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12" />
+              <div className="relative overflow-hidden bg-accent/5 h-56 rounded-[24px] mb-5 flex items-center justify-center border border-accent/40 shadow-sm transition-all duration-500 hover:shadow-xl hover:shadow-accent/10 hover:-translate-y-1">
+                <Palette className="w-14 h-14 text-accent transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6" />
               </div>
-              <h4 className="font-heading font-semibold text-lg text-sp-purple dark:text-sp-purple">Branded Product</h4>
+              <h4 className="font-heading font-semibold text-base text-accent">2. Bespoke Logo Application</h4>
             </div>
 
-            <ArrowRight className="hidden md:block w-10 h-10 text-sp-purple/40 animate-pulse delay-150" />
+            <ArrowRight className="hidden md:block w-8 h-8 text-accent/60 animate-pulse delay-150" />
 
             <div className="group flex-1 w-full text-center">
-              <div className="relative overflow-hidden bg-gradient-to-br from-sp-magenta/5 to-sp-orange/5 dark:from-sp-magenta/10 dark:to-sp-orange/10 h-56 rounded-[24px] mb-5 flex items-center justify-center border-2 border-sp-magenta text-sp-magenta transition-all duration-500 hover:shadow-2xl hover:shadow-sp-magenta/30 hover:-translate-y-2">
-                <div className="absolute inset-0 bg-gradient-to-br from-sp-magenta/0 to-sp-orange/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <Gift className="w-16 h-16 opacity-90 transition-transform duration-500 group-hover:scale-125 relative z-10" />
+              <div className="relative overflow-hidden bg-gradient-to-br from-accent/10 to-amber-500/10 h-56 rounded-[24px] mb-5 flex items-center justify-center border-2 border-accent shadow-md transition-all duration-500 hover:shadow-2xl hover:shadow-accent/25 hover:-translate-y-1">
+                <Gift className="w-14 h-14 text-accent transition-transform duration-500 group-hover:scale-110" />
               </div>
-              <h4 className="font-heading font-semibold text-lg text-sp-magenta">Finished Gift Box</h4>
+              <h4 className="font-heading font-bold text-base text-primary dark:text-amber-300">3. Finished Executive Unboxing</h4>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-sp-navy py-20 text-white sm:py-28">
+      <section className="bg-primary py-20 text-white sm:py-28">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading eyebrow="Built for gifting teams" title="The right pathway for every brief" description="Choose the route that best reflects what your team is trying to achieve." inverse />
-          <StaggerContainer staggerDelay={70} className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{teams.map((team) => <Reveal key={team.title}><Link href={team.href} className="group flex h-full min-h-60 flex-col rounded-2xl border border-white/15 bg-white/10 dark:bg-white/5 p-6 backdrop-blur-sm transition-ui hover:-translate-y-1 hover:bg-white/20 dark:hover:bg-white/10"><team.icon className="h-6 w-6 text-amber-200" /><h3 className="mt-8 text-xl font-bold">{team.title}</h3><p className="mt-2 text-sm leading-relaxed text-white/72">{team.description}</p><span className="mt-auto pt-6 text-sm font-semibold text-white">{team.cta} <ArrowRight className="ml-1 inline h-4 w-4 transition-transform group-hover:translate-x-1" /></span></Link></Reveal>)}</StaggerContainer>
+          <StaggerContainer staggerDelay={70} className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {teams.map((team) => (
+              <Reveal key={team.title}>
+                <Link href={team.href} className="group flex h-full min-h-60 flex-col rounded-2xl border border-white/15 bg-white/10 dark:bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/20 dark:hover:bg-white/10 hover:border-amber-300/40 shadow-md hover:shadow-xl">
+                  <team.icon className="h-6 w-6 text-amber-300 group-hover:scale-110 transition-transform duration-300" />
+                  <h3 className="mt-8 text-xl font-bold font-serif">{team.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/75">{team.description}</p>
+                  <span className="mt-auto pt-6 text-sm font-semibold text-amber-200 group-hover:text-amber-100 flex items-center gap-1">
+                    {team.cta} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </Link>
+              </Reveal>
+            ))}
+          </StaggerContainer>
         </div>
       </section>
 
       <section className="relative overflow-hidden bg-secondary/45 py-20 sm:py-28">
         <div className="signature-gradient absolute inset-x-0 top-0 h-1" />
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8"><div className="mx-auto max-w-3xl text-center"><Reveal animationType="fade-up"><span className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Need a hand choosing?</span></Reveal><Reveal animationType="mask-text"><h2 className="mt-4 text-4xl font-bold tracking-[-0.04em] text-primary sm:text-5xl">Tell us about the gift you have in mind.</h2></Reveal><Reveal animationType="fade-up"><p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">Share your audience, quantity, budget, and preferred delivery timeline. We’ll help you find a suitable starting point.</p></Reveal><Reveal animationType="fade-up"><div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row"><Link href="/request-a-quote" className="btn-primary h-12 px-7 rounded-full font-heading font-semibold text-sm shadow flex items-center justify-center">GET CORPORATE QUOTE <ArrowRight className="ml-2 h-4 w-4" /></Link><Link href="/corporate-gifts" className="btn-secondary h-12 px-7 rounded-full font-heading font-semibold text-sm shadow flex items-center justify-center">EXPLORE COLLECTIONS</Link></div></Reveal></div></div>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <Reveal animationType="fade-up">
+              <span className="text-xs font-bold uppercase tracking-[0.18em] text-accent">Dedicated Concierge</span>
+            </Reveal>
+            <Reveal animationType="mask-text">
+              <h2 className="mt-4 text-4xl font-bold tracking-[-0.04em] text-primary sm:text-5xl font-serif">
+                Tell us about the gift you have in mind.
+              </h2>
+            </Reveal>
+            <Reveal animationType="fade-up">
+              <p className="mx-auto mt-5 max-w-2xl text-base sm:text-lg leading-relaxed text-muted-foreground">
+                Share your recipient profile, quantity, budget, and target delivery date. Our corporate gifting specialists will prepare a tailored presentation deck within 24 hours.
+              </p>
+            </Reveal>
+            <Reveal animationType="fade-up">
+              <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
+                <Link href="/request-a-quote" className="btn-gold h-14 px-8 rounded-full font-heading font-bold text-sm tracking-wider uppercase shadow-xl flex items-center justify-center shimmer-sweep">
+                  GET CORPORATE QUOTE <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+                <Link href="/corporate-gifts" className="btn-secondary h-14 px-8 rounded-full font-heading font-semibold text-sm tracking-wider uppercase shadow-md flex items-center justify-center">
+                  EXPLORE COLLECTIONS
+                </Link>
+              </div>
+            </Reveal>
+          </div>
+        </div>
       </section>
     </div>
   );

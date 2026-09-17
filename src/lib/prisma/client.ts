@@ -9,12 +9,13 @@ const globalForPrisma = globalThis as unknown as {
 
 // Instantiate pg Pool with connection string
 // Supabase session-mode pooler is capped at pool_size: 15 connections.
-// In dev:  max: 10  keeps headroom while allowing parallel queries.
-// In prod: max: 3   because each serverless function instance gets its own pool;
-//          many instances × 3 stays well under the 15-connection ceiling.
+// Dev caps at 5: Turbopack HMR and parallel server renders can open many
+// sockets at once, and a second dev-server instance (e.g. a worktree copy)
+// shares the same 15-connection ceiling — 10 left zero headroom (EMAXCONNSESSION).
+// Prod keeps max: 3 because each serverless instance gets its own pool.
 const pool = globalForPrisma.pool ?? new Pool({
   connectionString: process.env.DATABASE_URL,
-  max: process.env.NODE_ENV === 'production' ? 3 : 10,
+  max: process.env.NODE_ENV === 'production' ? 3 : 5,
   idleTimeoutMillis: 30_000,      // release idle connections after 30 s
   connectionTimeoutMillis: 10_000, // fail fast if no connection available in 10 s
 })

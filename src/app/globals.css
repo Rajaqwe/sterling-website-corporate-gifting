@@ -130,11 +130,66 @@
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground font-medium transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
+    @apply relative inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground font-heading font-semibold transition-all duration-300 hover:bg-primary/90 hover:shadow-[0_10px_25px_-5px_rgba(11,19,43,0.3)] hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 overflow-hidden;
   }
   
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-md border border-input bg-background font-medium hover:bg-accent hover:text-accent-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
+    @apply relative inline-flex items-center justify-center rounded-full border border-border/80 bg-background/80 backdrop-blur-md font-heading font-semibold text-foreground hover:bg-secondary/70 hover:border-accent/40 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-gold {
+    @apply relative inline-flex items-center justify-center rounded-full font-heading font-semibold text-primary shadow-md transition-all duration-300 hover:shadow-[0_10px_25px_-5px_rgba(197,168,128,0.45)] hover:-translate-y-0.5 active:translate-y-0 overflow-hidden bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#C5A880];
+  }
+
+  /* Luxury Glassmorphism */
+  .glass-card {
+    @apply bg-background/75 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.06)];
+  }
+
+  .glass-card-dark {
+    @apply bg-white/10 dark:bg-white/5 backdrop-blur-xl border border-white/15 dark:border-white/10 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.2)];
+  }
+
+  .glass-pill {
+    @apply inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 dark:bg-white/10 px-4 py-1.5 backdrop-blur-md;
+  }
+
+  /* Metallic Gold Gradient Text */
+  .text-gold-gradient {
+    background: linear-gradient(135deg, #BF953F 0%, #FCF6BA 25%, #B38728 50%, #FBF5B7 75%, #AA771C 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gold-subtle {
+    background: linear-gradient(135deg, #D4AF37 0%, #F3E5AB 50%, #C5A880 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Ambient Halo Glow */
+  .ambient-halo-gold {
+    box-shadow: 0 0 50px -10px rgba(212, 175, 55, 0.15);
+  }
+
+  /* Luxury Shimmer Sweep effect */
+  .shimmer-sweep {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer-sweep::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(60deg, transparent 30%, rgba(255, 255, 255, 0.18) 50%, transparent 70%);
+    transform: rotate(25deg) translateY(-100%);
+    transition: transform 0.75s ease-out;
+  }
+  .shimmer-sweep:hover::after {
+    transform: rotate(25deg) translateY(100%);
   }
 }
 
@@ -237,6 +292,51 @@ html {
 
 .whatsapp-pulse {
   animation: whatsappPulse 3s var(--ease-standard) infinite;
+}
+
+/* Float Animation */
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-float-slow {
+  animation: floatSlow 4s ease-in-out infinite;
+}
+
+/* Subtle Breathing Gold Glow */
+@keyframes pulseGold {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+  }
+  50% {
+    box-shadow: 0 0 15px 2px rgba(212, 175, 55, 0.3);
+  }
+}
+
+.animate-pulse-gold {
+  animation: pulseGold 3s ease-in-out infinite;
+}
+
+/* Luxury Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 9999px;
+  border: 2px solid hsl(var(--background));
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--accent));
 }
 
 /* ========================== */

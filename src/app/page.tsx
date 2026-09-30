@@ -83,14 +83,14 @@ export default function Home() {
             <Reveal animationType="fade-up">
               <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
                 <Link href="/request-a-quote">
-                  <button className="btn-gold h-14 px-9 rounded-full font-heading font-bold text-base shadow-[0_12px_28px_-6px_rgba(212,175,55,0.4)] flex items-center justify-center w-full sm:w-auto hover:scale-[1.02] transition-transform shimmer-sweep">
+                  <span className="btn-gold h-14 px-9 rounded-full font-heading font-bold text-base shadow-[0_12px_28px_-6px_rgba(212,175,55,0.4)] flex items-center justify-center w-full sm:w-auto hover:scale-[1.02] transition-ui shimmer-sweep">
                     GET A CORPORATE QUOTE <ArrowRight className="ml-2 h-5 w-5" />
-                  </button>
+                  </span>
                 </Link>
                 <Link href="/corporate-gifts">
-                  <button className="btn-secondary h-14 px-8 rounded-full font-heading font-semibold text-base shadow-lg flex items-center justify-center w-full sm:w-auto bg-white/10 text-white border-white/40 hover:bg-white hover:text-sp-navy dark:hover:text-sp-navy backdrop-blur-md">
+                  <span className="btn-secondary h-14 px-8 rounded-full font-heading font-semibold text-base shadow-lg flex items-center justify-center w-full sm:w-auto bg-white/10 text-white border-white/40 hover:bg-white hover:text-sp-navy dark:hover:text-sp-navy backdrop-blur-md">
                     EXPLORE COLLECTIONS
-                  </button>
+                  </span>
                 </Link>
               </div>
 

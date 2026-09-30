@@ -72,7 +72,7 @@ export function PricingSummary({
             size="lg"
             onClick={onAddToCart}
             disabled={isAddingToCart}
-            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-12 font-bold shadow-sm transition-colors text-sm"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-12 font-bold shadow-sm transition-ui text-sm"
           >
             <ShoppingCart className="mr-2 h-4 w-4" />
             Add to Cart
@@ -82,7 +82,7 @@ export function PricingSummary({
           <Button
             onClick={onRequestQuote}
             variant="outline"
-            className="w-full border-accent text-accent-foreground hover:bg-accent/10 h-12 font-bold transition-colors text-sm"
+            className="w-full border-accent text-accent-foreground hover:bg-accent/10 h-12 font-bold transition-ui text-sm"
           >
             <Send className="mr-2 h-4 w-4" />
             Get Custom Quote

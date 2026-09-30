@@ -43,6 +43,9 @@ export function ProductDetailClient({
   const displayPrice = product.price;
   const displaySku = product.sku;
   const leadTimeLabel = product.leadTimeDays ? `${product.leadTimeDays} business days` : "Lead time confirmed with your quote";
+  const brandingLeadTimeLabel = product.brandingAvailable !== false && product.brandingLeadTimeDays
+    ? ` + ${product.brandingLeadTimeDays} days for branding`
+    : "";
   const shareText = `Check out this amazing corporate gift: ${title}`;
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
@@ -165,7 +168,7 @@ export function ProductDetailClient({
               </div>
               <div className="mt-5 grid gap-3 border-t border-primary/10 pt-4 sm:grid-cols-3">
                 <div className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground"><Palette className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span><strong className="block text-foreground">{product.brandingAvailable !== false ? "Branding available" : "Branding availability"}</strong>{product.brandingAvailable !== false ? "Choose options below." : "Confirm with our team."}</span></div>
-                <div className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground"><Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span><strong className="block text-foreground">Lead time</strong>{leadTimeLabel}</span></div>
+                <div className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground"><Clock3 className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span><strong className="block text-foreground">Lead time</strong>{leadTimeLabel}{brandingLeadTimeLabel}</span></div>
                 <div className="flex items-start gap-2 text-xs leading-relaxed text-muted-foreground"><PackageCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" /><span><strong className="block text-foreground">Bulk-ready</strong>Volume pricing shown below.</span></div>
               </div>
             </div>

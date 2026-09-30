@@ -274,9 +274,9 @@ export function ProductDetailClient({
               </Link>
             </div>
 
-            <div className="flex overflow-x-auto snap-x snap-mandatory hide-scrollbar gap-6 pb-4 sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:overflow-visible sm:snap-none">
+            <div className="flex snap-x snap-mandatory snap-always overflow-x-auto overscroll-x-contain hide-scrollbar gap-5 pb-5 scroll-px-4 sm:grid sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 sm:overflow-visible sm:snap-none">
               {relatedProducts.map((p) => (
-                <div key={p.id || p.slug} className="min-w-[280px] w-[80vw] sm:w-auto sm:min-w-0 snap-center shrink-0">
+                <div key={p.id || p.slug} className="min-w-[280px] w-[80vw] shrink-0 snap-center sm:w-auto sm:min-w-0">
                   <ProductCard product={{ ...p, category: p.category?.name, moq: p.minimumOrderQuantity, price: p.price }} />
                 </div>
               ))}

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Reveal, StaggerContainer } from "@/components/ui/reveal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Truck, BadgePercent, UserCheck, FileText, ShieldCheck, PackageCheck } from "lucide-react";
 
@@ -43,7 +44,7 @@ export default function BulkOrdersPage() {
               Everything you need for seamless large-volume corporate gifting.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <StaggerContainer staggerDelay={70} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { icon: BadgePercent, title: "Volume Pricing", desc: "Use product-level price tiers as a starting point, then request a quote for your specific quantity." },
               { icon: UserCheck, title: "Requirement-led Curation", desc: "Share the audience, product preferences, and quantity so the shortlist fits the brief." },
@@ -52,7 +53,8 @@ export default function BulkOrdersPage() {
               { icon: ShieldCheck, title: "Approval-led Process", desc: "Review proposed product and branding details before the order moves forward." },
               { icon: PackageCheck, title: "Corporate-ready Catalogue", desc: "Compare products by starting price, MOQ, customisation, and other business details." },
             ].map((item, i) => (
-              <Card key={i} className="border-none shadow-sm bg-secondary/20 overflow-hidden hover:shadow-md transition-all duration-300 group">
+              <Reveal key={i}>
+              <Card className="border-none shadow-sm bg-secondary/20 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-ui group">
                 <CardContent className="p-8">
                   <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-foreground dark:text-white transition-colors duration-300 mb-5">
                     <item.icon className="h-7 w-7" />
@@ -61,8 +63,9 @@ export default function BulkOrdersPage() {
                   <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
                 </CardContent>
               </Card>
+            </Reveal>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 

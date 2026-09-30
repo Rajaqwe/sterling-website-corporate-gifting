@@ -5,7 +5,7 @@ import React, { useState, useEffect, startTransition } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { User, Briefcase, Menu, LogOut, LayoutDashboard, ChevronDown, Sun, Moon } from "lucide-react";
+import { User, Briefcase, Menu, LogOut, LayoutDashboard, ChevronDown, Sun, Moon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetClose } from "@/components/ui/sheet";
 import { SearchBar } from "./SearchBar";
@@ -132,7 +132,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                 <Link 
                   key={link.name} 
                   href={link.href}
-                  className={`text-sm font-medium px-4 py-1.5 rounded-full transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--motion-ui)] ease-[var(--ease-standard)] relative ${
+                  className={`text-sm font-medium px-4 py-1.5 rounded-full transition-[color,background-color,border-color,box-shadow,transform] duration-300 ease-out relative ${
                     isActive 
                       ? "bg-accent/20 text-accent font-semibold shadow-sm border border-accent/30" 
                       : isScrolled 
@@ -143,6 +143,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                   }`}
                 >
                   {link.name}
+                  {isActive && <span aria-hidden="true" className="absolute inset-x-3 -bottom-px h-px rounded-full bg-accent" />}
                 </Link>
               );
             })}
@@ -188,7 +189,11 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                   <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="font-serif text-2xl font-bold tracking-widest text-primary uppercase">
                     Sterling
                   </Link>
-                  <SheetClose className="min-h-10 min-w-10 p-2 hover:bg-secondary rounded-full transition-ui touch-manipulation">
+                  <SheetClose
+                    aria-label="Close menu"
+                    className="min-h-10 min-w-10 p-2 hover:bg-secondary rounded-full transition-ui touch-manipulation text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-5 w-5" aria-hidden="true" />
                     <span className="sr-only">Close</span>
                   </SheetClose>
                 </div>
@@ -201,6 +206,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                           key={link.name} 
                           href={link.href}
                           onClick={() => setIsMobileMenuOpen(false)}
+                          aria-current={pathname.startsWith(link.href) ? "page" : undefined}
                           className={`text-lg font-medium py-3 transition-ui motion-safe:animate-fade-in ${
                             pathname.startsWith(link.href) ? "text-accent font-semibold" : "text-foreground hover:text-primary"
                           }`}

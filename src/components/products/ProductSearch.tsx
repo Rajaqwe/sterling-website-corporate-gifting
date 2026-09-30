@@ -1,47 +1,62 @@
 'use client';
 
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useTransition } from "react";
+import { Search } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useState, useTransition } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export function ProductSearch() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [query, setQuery] = useState(searchParams.get("q") || "");
   const [isPending, startTransition] = useTransition();
 
-  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const submitSearch = () => {
     const params = new URLSearchParams(searchParams.toString());
-    if (e.target.value) {
-      params.set('sort', e.target.value);
-    } else {
-      params.delete('sort');
-    }
-    startTransition(() => {
-      router.push(`${pathname}?${params.toString()}`);
-    });
+    const trimmed = query.trim();
+
+    if (trimmed) params.set("q", trimmed);
+    else params.delete("q");
+    params.delete("page");
+
+    const nextUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+    startTransition(() => router.push(nextUrl));
   };
 
   return (
-    <div className="relative w-full flex justify-end">
-      {/* Hidden inputs to satisfy E2E DOM test contract */}
-      <input type="hidden" data-testid="catalog-search-input" />
-      <span data-testid="results-counter" className="sr-only">0</span>
-      <select 
-        className="flex h-10 w-48 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-accent focus:ring-3 focus:ring-accent/30 focus:ring-offset-0 disabled:cursor-wait disabled:opacity-60 transition-ui"
-        onChange={handleSortChange}
-        defaultValue={searchParams.get('sort') || ''}
-        data-testid="sort-dropdown"
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        submitSearch();
+      }}
+      className="flex w-full max-w-xl items-center gap-2"
+      role="search"
+    >
+      <div className="relative flex-1">
+        <Search
+          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+          aria-hidden="true"
+        />
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search corporate gifts..."
+          aria-label="Search corporate gifts"
+          className="h-11 rounded-full border-border/70 bg-background pl-10 pr-4 shadow-sm focus-visible:ring-accent"
+          disabled={isPending}
+        />
+      </div>
+      <Button
+        type="submit"
+        size="icon"
+        aria-label="Search catalogue"
         disabled={isPending}
+        className="h-11 w-11 shrink-0 rounded-full transition-ui"
       >
-        <option value="">Sort By...</option>
-        <option value="recommended">Recommended</option>
-        <option value="popularity">Popularity</option>
-        <option value="newest">Newest</option>
-        <option value="price-asc">Price: Low to High</option>
-        <option value="price-desc">Price: High to Low</option>
-        <option value="rating-desc">Highest Rated</option>
-        <option value="discount-desc">Biggest Discount</option>
-      </select>
-    </div>
+        <Search className="h-4 w-4" aria-hidden="true" />
+      </Button>
+    </form>
   );
 }

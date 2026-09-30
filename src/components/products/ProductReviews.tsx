@@ -77,7 +77,7 @@ export function ProductReviews({ productId, reviews, isLoggedIn }: { productId: 
                className="min-h-[100px]"
                required
              />
-             <Button type="submit" disabled={isPending} className="self-end bg-accent text-primary font-bold">
+             <Button type="submit" disabled={isPending} className="self-end bg-accent text-primary font-bold transition-ui">
                {isPending ? "Submitting..." : "Submit Review"}
              </Button>
           </form>
@@ -114,7 +114,7 @@ export function ProductReviews({ productId, reviews, isLoggedIn }: { productId: 
              <div className="flex items-center gap-2">
                <span className="text-sm font-semibold">Rating:</span>
                {[1,2,3,4,5].map(star => (
-                 <button key={star} type="button" onClick={() => setRating(star)}>
+                 <button key={star} type="button" onClick={() => setRating(star)} aria-label={`Rate ${star} out of 5`} aria-pressed={rating === star} className="rounded-sm p-0.5 transition-ui hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
                    <Star className={`h-5 w-5 ${rating >= star ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground'}`} />
                  </button>
                ))}
@@ -124,17 +124,17 @@ export function ProductReviews({ productId, reviews, isLoggedIn }: { productId: 
                placeholder="Review Title" 
                value={title} 
                onChange={(e) => setTitle(e.target.value)}
-               className="p-2 border border-border/60 rounded-md text-sm bg-background"
+               className="flex min-h-10 w-full rounded-md border border-border/80 bg-background px-3 py-2 text-sm transition-ui focus-visible:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/30"
                required
              />
              <textarea 
                placeholder="Share your thoughts..."
                value={content}
                onChange={(e) => setContent(e.target.value)}
-               className="p-2 border border-border/60 rounded-md text-sm min-h-[100px] bg-background"
+               className="flex min-h-[100px] w-full rounded-md border border-border/80 bg-background px-3 py-2 text-sm transition-ui focus-visible:outline-none focus-visible:border-accent focus-visible:ring-3 focus-visible:ring-accent/30"
                required
              />
-             <Button type="submit" disabled={isPending} className="self-end bg-accent text-primary font-bold">
+             <Button type="submit" disabled={isPending} className="self-end bg-accent text-primary font-bold transition-ui">
                {isPending ? "Submitting..." : "Submit Review"}
              </Button>
           </form>

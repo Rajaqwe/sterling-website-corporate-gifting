@@ -43,24 +43,20 @@ export function ProductCustomization({
           return (
             <div
               key={option.id}
-              role="button"
-              tabIndex={0}
-              aria-pressed={isSelected}
               data-testid={`customization-option-${option.id}`}
-              onClick={() => onToggle(option.id)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  onToggle(option.id);
-                }
-              }}
-              className={`flex flex-col p-3.5 rounded-xl border transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+              className={`flex flex-col p-3.5 rounded-xl border transition-[background-color,border-color,box-shadow,transform] duration-[var(--motion-ui)] ease-[var(--ease-standard)] ${
                 isSelected
                   ? "border-primary bg-primary/5 ring-1 ring-primary/20 shadow-xs"
                   : "border-border/60 bg-card hover:border-accent/50 hover:bg-secondary/20"
               }`}
             >
-              <div className="flex items-start justify-between gap-3">
+              <button
+                type="button"
+                aria-pressed={isSelected}
+                onClick={() => onToggle(option.id)}
+                className="w-full rounded-lg text-left outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              >
+                <div className="flex items-start justify-between gap-3">
                 {/* Checkbox indicator & Option Details */}
                 <div className="flex items-start gap-3 flex-1">
                   <div
@@ -100,7 +96,8 @@ export function ProductCustomization({
                     +{formatINR(option.setupFee)} setup fee
                   </span>
                 </div>
-              </div>
+                </div>
+              </button>
 
               {/* Placement Options Sub-Selector (when selected) */}
               {isSelected && option.placementOptions && option.placementOptions.length > 1 && (
@@ -119,7 +116,7 @@ export function ProductCustomization({
                         onClick={() =>
                           onPlacementChange && onPlacementChange(option.id, placement)
                         }
-                        className={`text-[11px] px-2.5 py-0.5 rounded-md border transition-all ${
+                        className={`text-[11px] px-2.5 py-0.5 rounded-md border transition-ui ${
                           activePlacement === placement
                             ? "border-primary bg-primary text-primary-foreground font-semibold"
                             : "border-border/60 bg-background text-muted-foreground hover:text-foreground"

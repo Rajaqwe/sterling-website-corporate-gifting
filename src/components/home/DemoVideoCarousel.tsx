@@ -5,11 +5,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { demoVideos } from "@/data/demoVideos";
 
-const SLIDE_DURATION = 4000;
-
 export function DemoVideoCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isHovered, setIsHovered] = useState(false);
   const [isPageVisible, setIsPageVisible] = useState(true);
   const [isManuallyPaused, setIsManuallyPaused] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -17,7 +14,6 @@ export function DemoVideoCarousel() {
   const [isPlaying, setIsPlaying] = useState<Record<number, boolean>>({});
   
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [isReducedMotion, setIsReducedMotion] = useState(false);
 
   // Initialize reduced motion preference
@@ -61,18 +57,6 @@ export function DemoVideoCarousel() {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
-
-  // Main Timer Logic (Removed fixed interval, relying on onEnded event now)
-  // We still need to handle the case where videos fail to load or something, but onEnded is more reliable.
-  useEffect(() => {
-    // Kept empty to avoid breaking existing hooks dependency rules or cleanups,
-    // though we can just remove the setInterval part.
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, [currentIndex, isPageVisible, isHovered, goToNext]);
 
   // Video Playback Management
   useEffect(() => {
@@ -127,8 +111,6 @@ export function DemoVideoCarousel() {
   return (
     <div 
       className="relative w-full h-full overflow-hidden bg-slate-900 group"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEndHandler}
@@ -170,6 +152,9 @@ export function DemoVideoCarousel() {
               ref={(el) => {
                 videoRefs.current[index] = el;
               }}
+              role="button"
+              tabIndex={currentIndex === index ? 0 : -1}
+              aria-label={isManuallyPaused && currentIndex === index ? "Resume demo video" : "Pause demo video"}
               src={Math.abs(index - currentIndex) <= 1 ? video.src : undefined}
               preload={index === currentIndex ? "auto" : "none"}
               onPlaying={() => setIsPlaying(prev => ({ ...prev, [index]: true }))}
@@ -192,8 +177,14 @@ export function DemoVideoCarousel() {
                   return nextPaused;
                 });
               }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  e.currentTarget.click();
+                }
+              }}
             />
-            <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-opacity duration-700 pointer-events-none" />
+            <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-opacity duration-[var(--motion-standard)] ease-[var(--ease-standard)] pointer-events-none" />
             
             {/* Pause indicator */}
             {isManuallyPaused && currentIndex === index && (
@@ -230,7 +221,7 @@ export function DemoVideoCarousel() {
           <button
             key={index}
             onClick={(e) => { e.preventDefault(); goToIndex(index); }}
-            className={`h-2 transition-all duration-300 rounded-full ${
+            className={`h-2 transition-[width,background-color] duration-[var(--motion-ui)] ease-[var(--ease-standard)] rounded-full ${
               currentIndex === index 
                 ? "w-8 bg-accent" 
                 : "w-2 bg-background/50 hover:bg-background/80"

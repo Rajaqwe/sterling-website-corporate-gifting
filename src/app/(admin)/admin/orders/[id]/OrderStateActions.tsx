@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { updateOrderStatus } from "../actions";
 import { toast } from "sonner";
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus } from "@/generated/prisma";
 import { ALLOWED_TRANSITIONS } from "@/lib/orders/constants";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";

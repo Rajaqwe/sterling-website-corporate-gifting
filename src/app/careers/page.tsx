@@ -118,7 +118,7 @@ export default function CareersPage() {
                         ))}
                       </div>
                     </div>
-                    <Link href="/contact" className={buttonVariants({ variant: "outline", className: "shrink-0 btn-primary gap-2 group-hover:text-white group-hover:border-primary transition-all" })}>
+                    <Link href="/contact" className={buttonVariants({ variant: "outline", className: "shrink-0 gap-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all" })}>
                         Apply
                         <ArrowRight className="h-4 w-4" />
                       </Link>

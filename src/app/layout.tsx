@@ -107,10 +107,16 @@ export default async function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
         <AuthProvider accessToken={session?.access_token || null}>
           <CartProvider initialCount={initialCartCount}>
+            <a
+              href="#main-content"
+              className="sr-only fixed left-4 top-4 z-[100] rounded-lg bg-background px-4 py-3 text-sm font-semibold text-foreground shadow-lg focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              Skip to content
+            </a>
             <HideOnDashboard>
               <Navbar />
             </HideOnDashboard>
-            <main className="flex-1">
+            <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
               {children}
             </main>
             <ConditionalFooter />

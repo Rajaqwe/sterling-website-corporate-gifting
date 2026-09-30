@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { FilterDrawer } from "@/components/products/ProductFilterSidebar";
+import { MobileFilterDrawer, ProductFilterSidebar } from "@/components/products/ProductFilterSidebar";
 import Link from "next/link";
 import { Package, ArrowRight } from "lucide-react";
 import { Suspense } from "react";
@@ -57,7 +57,14 @@ export default async function CollectionsPage(
         </div>
       </div>
 
-      <div className="mt-10 flex flex-col gap-8 lg:flex-row">
+      <div className="mt-10 flex flex-col gap-8 lg:flex-row lg:items-start">
+        <div className="hidden lg:block lg:w-64 lg:shrink-0">
+          <ProductFilterSidebar
+            categories={filterData.categories}
+            attributes={filterData.attributes}
+            totalResultsCount={products.length}
+          />
+        </div>
         <div className="flex-1 w-full min-w-0">
           {products.length === 0 ? (
             <div className="text-center pt-32 pb-20 border rounded-lg bg-secondary/10">

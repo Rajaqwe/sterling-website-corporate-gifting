@@ -188,7 +188,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                   <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="font-serif text-2xl font-bold tracking-widest text-primary uppercase">
                     Sterling
                   </Link>
-                  <SheetClose className="p-2 hover:bg-secondary rounded-md transition-colors">
+                  <SheetClose className="p-2 hover:bg-secondary rounded-full transition-ui">
                     <span className="sr-only">Close</span>
                   </SheetClose>
                 </div>
@@ -260,7 +260,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                           onSignOut(); 
                         });
                         setIsMobileMenuOpen(false); 
-                      }} className="flex items-center gap-3 text-destructive p-3 hover:bg-destructive/10 rounded-xl transition-colors text-left">
+                      }} className="flex items-center gap-3 text-destructive p-3 hover:bg-destructive/10 rounded-xl transition-ui text-left">
                         <LogOut className="h-5 w-5" />
                         <span className="font-medium">Log out</span>
                       </button>

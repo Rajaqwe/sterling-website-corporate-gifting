@@ -52,6 +52,8 @@ export async function toggleWishlist(productId: string) {
     }
 
     revalidatePath("/products/[slug]", "page");
+    revalidatePath("/", "page");
+    revalidatePath("/reviews", "page");
     return { success: true };
   } catch (err: any) {
     return { success: false, error: err.message || "Failed to update wishlist" };

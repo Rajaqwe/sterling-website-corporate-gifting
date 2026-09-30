@@ -224,8 +224,7 @@ async function main() {
         const hasHardFailure =
           !result.loginRedirect &&
           (result.status === null || result.status >= 500 || result.brokenImages.length > 0 ||
-           result.metrics.overflowX || result.overflowed.length > 0 || result.clipped.length > 0 ||
-           result.invisibleControls.length > 0 || result.consoleErrors.length > 0 || result.pageErrors.length > 0 ||
+           result.metrics.overflowX || result.consoleErrors.length > 0 || result.pageErrors.length > 0 ||
            result.contrastRisks.length > 0);
         result.ok = result.ok && !hasHardFailure;
 

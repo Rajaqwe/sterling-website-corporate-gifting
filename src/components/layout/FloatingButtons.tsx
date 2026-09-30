@@ -10,20 +10,26 @@ export function FloatingButtons() {
   const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setShowBackToTop(window.scrollY > 400);
+    let frame = 0;
 
-      // Check if we are near the bottom of the page (within 150px)
-      const scrolledToBottom =
-        window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 150;
-      setIsNearBottom(scrolledToBottom);
+    const handleScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        setShowBackToTop(window.scrollY > 400);
+        setIsNearBottom(
+          window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 150
+        );
+        frame = 0;
+      });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    // Initial check
     handleScroll();
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   const scrollToTop = () => {

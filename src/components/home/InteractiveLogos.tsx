@@ -87,7 +87,7 @@ function CompanyCard({
   if (animationType === "flip") {
     return (
       <div 
-        className={`relative flex items-center justify-center h-[380px] md:h-[420px] border-r border-b border-border/40 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary ${isActive ? 'z-50' : 'z-10'}`}
+        className={`relative flex items-center justify-center h-[300px] sm:h-[360px] md:h-[420px] border-r border-b border-border/40 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary ${isActive ? 'z-50' : 'z-10'}`}
         style={{ perspective: "1200px" }}
         tabIndex={0}
         onMouseEnter={onMouseEnter}
@@ -102,7 +102,7 @@ function CompanyCard({
         aria-expanded={isActive}
       >
         <div 
-          className="w-full h-full relative transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
+          className="w-full h-full relative transition-transform duration-700 ease-out"
           style={{ 
             transformStyle: "preserve-3d", 
             transform: isActive ? "rotateY(180deg)" : "rotateY(0deg)",
@@ -161,7 +161,7 @@ function CompanyCard({
   // Default standard fallback animation
   return (
     <div 
-      className={`relative flex items-center justify-center h-[380px] md:h-[420px] border-r border-b border-border/40 bg-background cursor-pointer outline-none transition-colors duration-300 ${isActive ? 'z-50' : 'z-10'}`}
+      className={`relative flex items-center justify-center h-[300px] sm:h-[360px] md:h-[420px] border-r border-b border-border/40 bg-background cursor-pointer outline-none transition-colors duration-300 ${isActive ? 'z-50' : 'z-10'}`}
       tabIndex={0}
       onMouseEnter={onMouseEnter}
       onClick={onClick}

@@ -28,6 +28,7 @@ export function ProductCard({ product, className = "", priority = false }: Produ
   const [imageError, setImageError] = useState(false);
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [isQuickViewAdding, setIsQuickViewAdding] = useState(false);
 
   const title = product.title || product.name || "Corporate Gift";
   const displayCategory = (product as any).category?.name || "Corporate Gift";
@@ -93,7 +94,7 @@ export function ProductCard({ product, className = "", priority = false }: Produ
             data-testid="moq-badge"
             className="inline-flex items-center rounded-full bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#C5A880] text-primary px-3 py-1 text-[11px] font-heading font-bold shadow-md border border-amber-200/50"
           >
-            MOQ: {product.moq} units
+            MOQ: {minimumOrderQuantity} units
           </span>
         </div>
       </div>
@@ -234,23 +235,31 @@ export function ProductCard({ product, className = "", priority = false }: Produ
             <div className="grid grid-cols-2 gap-3 text-sm"><div className="rounded-xl border border-border p-3"><span className="block text-xs text-muted-foreground">Branding</span><strong className="mt-1 block text-foreground">{customizations.length ? "Available" : "Ask our team"}</strong></div><div className="rounded-xl border border-border p-3"><span className="block text-xs text-muted-foreground">Category</span><strong className="mt-1 block text-foreground">{displayCategory}</strong></div></div>
             <div className="grid gap-3 sm:grid-cols-2">
               <Link href={`/products/${product.slug}`} onClick={() => setIsQuickViewOpen(false)} className="btn-primary h-11 w-full rounded-md font-semibold text-sm flex items-center justify-center">VIEW PRODUCT</Link>
-              <Button 
+              <Button
+                disabled={isQuickViewAdding}
+                aria-busy={isQuickViewAdding}
                 onClick={async () => {
-                  const { addToCart } = await import("@/app/products/actions");
-                  const res = await addToCart(product.id, minimumOrderQuantity);
-                  if (res.success) {
-                    window.dispatchEvent(new Event("cart-updated"));
-                    const { toast } = await import("sonner");
-                    toast.success("Added to cart");
-                    setIsQuickViewOpen(false);
-                  } else {
-                    const { toast } = await import("sonner");
-                    toast.error(res.error || "Failed to add to cart");
+                  if (isQuickViewAdding) return;
+                  setIsQuickViewAdding(true);
+                  try {
+                    const { addToCart } = await import("@/app/products/actions");
+                    const res = await addToCart(product.id, minimumOrderQuantity);
+                    if (res.success) {
+                      window.dispatchEvent(new Event("cart-updated"));
+                      const { toast } = await import("sonner");
+                      toast.success("Added to cart");
+                      setIsQuickViewOpen(false);
+                    } else {
+                      const { toast } = await import("sonner");
+                      toast.error(res.error || "Failed to add to cart");
+                    }
+                  } finally {
+                    setIsQuickViewAdding(false);
                   }
-                }} 
-                className="btn-secondary h-11 w-full rounded-md font-semibold text-sm flex items-center justify-center"
+                }}
+                className="btn-secondary h-11 w-full rounded-md font-semibold text-sm flex items-center justify-center transition-ui disabled:pointer-events-none disabled:opacity-70"
               >
-                ADD TO CART
+                {isQuickViewAdding ? "ADDING..." : "ADD TO CART"}
               </Button>
             </div>
           </div>

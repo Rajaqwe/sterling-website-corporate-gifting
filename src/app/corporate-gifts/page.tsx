@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { MobileFilterDrawer, ProductFilterSidebar } from "@/components/products/ProductFilterSidebar";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ActiveFilters, SortDropdown } from "@/components/products/ProductCatalogFilters";
+import { ProductSearch } from "@/components/products/ProductSearch";
 import { Package } from "lucide-react";
 import { Suspense } from "react";
 
@@ -88,16 +89,19 @@ export default async function CorporateGiftsPage(
             />
           </div>
           <div className="flex-1 w-full min-w-0">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
-              <div className="text-sm text-muted-foreground">
+            <div className="mb-5 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+              <div className="text-sm text-muted-foreground shrink-0">
                 <span className="font-semibold text-foreground">{products.length}</span> {products.length === 1 ? "gift" : "gifts"} available
               </div>
-              <Suspense fallback={<div className="h-9 w-40 bg-muted animate-pulse rounded-md" />}>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Sort by:</span>
-                  <SortDropdown />
-                </div>
-              </Suspense>
+              <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center xl:max-w-3xl xl:justify-end">
+                <ProductSearch />
+                <Suspense fallback={<div className="h-9 w-40 bg-muted animate-pulse rounded-md" />}>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-sm text-muted-foreground">Sort by:</span>
+                    <SortDropdown />
+                  </div>
+                </Suspense>
+              </div>
             </div>
 
             <Suspense fallback={<div className="h-8 w-64 bg-muted animate-pulse rounded-full mb-6" />}>

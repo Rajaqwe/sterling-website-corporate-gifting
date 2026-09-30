@@ -26,17 +26,17 @@ export default function AboutPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
           <StaggerContainer staggerDelay={60} className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { number: "40+", label: "Corporate Clients" },
-              { number: "10,000+", label: "Gifts Delivered" },
-              { number: "50+", label: "Product Categories" },
-              { number: "98%", label: "Client Satisfaction" },
-            ].map((stat, i) => (
-              <Card key={i} className="border-none shadow-lg bg-background text-center">
-                <CardContent className="py-6 px-4">
-                  <div className="text-2xl md:text-3xl font-serif font-bold text-primary mb-1">
-                    {stat.number}
+              { title: "Corporate-first", label: "Built around business gifting workflows" },
+              { title: "Custom branding", label: "Branding options across eligible products" },
+              { title: "Bulk orders", label: "Designed for quantity-led requirements" },
+              { title: "GST-ready", label: "Business-friendly invoice support" },
+            ].map((stat) => (
+              <Card key={stat.title} className="border-none shadow-lg bg-background text-center">
+                <CardContent className="min-h-[124px] py-6 px-4 flex flex-col justify-center">
+                  <div className="text-lg md:text-xl font-serif font-bold text-primary mb-2">
+                    {stat.title}
                   </div>
-                  <div className="text-xs md:text-sm text-muted-foreground font-medium">
+                  <div className="text-xs md:text-sm leading-relaxed text-muted-foreground font-medium">
                     {stat.label}
                   </div>
                 </CardContent>

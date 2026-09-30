@@ -26,37 +26,37 @@ export default function ValuesPage() {
                 icon: Award, 
                 title: "Quality Without Compromise", 
                 desc: "We source only premium, durable products that meet the highest standards of craftsmanship. Every item is tested before it reaches our catalog.",
-                accent: "bg-amber-500/10 text-amber-600"
+                accent: "bg-amber-500/10 text-amber-600 dark:text-amber-300"
               },
               { 
                 icon: Users, 
                 title: "Reliability You Can Count On", 
                 desc: "We deliver on our promises with on-time fulfillment and consistent service excellence. Your deadlines are our deadlines.",
-                accent: "bg-blue-500/10 text-blue-600"
+                accent: "bg-blue-500/10 text-blue-600 dark:text-blue-400"
               },
               { 
                 icon: Heart, 
                 title: "Customer First, Always", 
                 desc: "Your success is our priority. We provide dedicated, responsive support for every order — whether it's 25 units or 25,000.",
-                accent: "bg-rose-500/10 text-rose-600"
+                accent: "bg-rose-500/10 text-rose-600 dark:text-rose-400"
               },
               { 
                 icon: Lightbulb, 
                 title: "Creative Innovation", 
                 desc: "We offer innovative customization options and unique curation to make your gifts stand out from the ordinary corporate fare.",
-                accent: "bg-purple-500/10 text-purple-600"
+                accent: "bg-purple-500/10 text-purple-600 dark:text-purple-400"
               },
               { 
                 icon: Eye, 
                 title: "Radical Transparency", 
                 desc: "Clear communication, honest pricing, upfront timelines, and no hidden charges. What we quote is what you pay.",
-                accent: "bg-cyan-500/10 text-cyan-600"
+                accent: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400"
               },
               { 
                 icon: Leaf, 
                 title: "Sustainability Matters", 
                 desc: "Commitment to eco-friendly options, responsible packaging, and ethical sourcing throughout our supply chain.",
-                accent: "bg-green-500/10 text-green-600"
+                accent: "bg-green-500/10 text-green-600 dark:text-green-400"
               },
             ].map((value, i) => (
               <Reveal key={i}>

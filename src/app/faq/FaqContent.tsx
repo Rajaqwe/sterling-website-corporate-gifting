@@ -149,7 +149,7 @@ export function FaqContent() {
             <Link href="/contact" className={buttonVariants({ variant: "default", size: "lg", className: "btn-primary w-full sm:w-auto    h-12 px-8 text-base font-semibold" })}>
                 Contact Us
               </Link>
-            <Link href="/request-a-quote" className={buttonVariants({ variant: "outline", size: "lg", className: "btn-primary w-full sm:w-auto border-white hover:bg-background h-12 px-8 text-base" })}>
+            <Link href="/request-a-quote" className={buttonVariants({ variant: "outline", size: "lg", className: "w-full sm:w-auto border-primary text-primary hover:bg-primary hover:text-primary-foreground h-12 px-8 text-base" })}>
                 Request a Quote
               </Link>
           </div>

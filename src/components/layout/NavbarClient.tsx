@@ -36,7 +36,7 @@ const ThemeToggle = ({ isLightText }: { isLightText?: boolean }) => {
       variant="ghost"
       size="icon"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className={`transition-colors ${isLightText ? "text-white/90 hover:text-white" : "text-foreground hover:text-primary"}`}
+      className={`transition-ui ${isLightText ? "text-white/90 hover:text-white" : "text-foreground hover:text-primary"}`}
       aria-label="Toggle Theme"
     >
       {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
@@ -111,7 +111,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center gap-2 group transition-[height,width]">
-              <div className={`relative transition-all duration-500 ease-in-out ${isScrolled ? "w-[125px] h-[38px]" : "w-[155px] h-[46px]"}`}>
+              <div className={`relative transition-[width,height] duration-500 ease-[var(--ease-standard)] ${isScrolled ? "w-[125px] h-[38px]" : "w-[155px] h-[46px]"}`}>
                 {/*
                   The SVG embeds a PNG with an opaque white background.
                   - Light backgrounds: multiply makes the white backdrop disappear.
@@ -177,7 +177,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
             <SearchBar isLightText={isLightText && !isScrolled} />
             <CartDrawer isLightText={isLightText && !isScrolled} />
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-              <SheetTrigger aria-label="Open menu" className={`inline-flex items-center justify-center rounded-md p-2 transition-colors duration-500 hover:bg-secondary ${!isScrolled && (isLightText ? "text-white hover:bg-background/20" : "text-primary")}`}>
+              <SheetTrigger aria-label="Open menu" className={`inline-flex min-h-10 min-w-10 items-center justify-center rounded-full p-2 transition-ui touch-manipulation hover:bg-secondary ${!isScrolled && (isLightText ? "text-white hover:bg-background/20" : "text-primary")}`}>
                 <Menu className="h-6 w-6" />
                 <span className="sr-only">Menu</span>
               </SheetTrigger>
@@ -188,7 +188,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                   <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="font-serif text-2xl font-bold tracking-widest text-primary uppercase">
                     Sterling
                   </Link>
-                  <SheetClose className="p-2 hover:bg-secondary rounded-full transition-ui">
+                  <SheetClose className="min-h-10 min-w-10 p-2 hover:bg-secondary rounded-full transition-ui touch-manipulation">
                     <span className="sr-only">Close</span>
                   </SheetClose>
                 </div>

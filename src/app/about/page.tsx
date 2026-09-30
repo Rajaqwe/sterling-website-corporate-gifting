@@ -114,7 +114,7 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-muted/50 dark:bg-card border-b border-border/40 text-sp-navy dark:text-white text-center">
+      <section className="py-20 bg-muted/50 dark:bg-card border-b border-border/40 text-foreground text-center">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
           <h2 className="text-3xl md:text-4xl font-serif font-bold mb-6">
             Let&apos;s build something memorable together.

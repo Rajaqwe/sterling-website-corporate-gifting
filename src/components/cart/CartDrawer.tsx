@@ -156,15 +156,15 @@ export function CartDrawer({ isLightText = false }: { isLightText?: boolean }) {
                     </span>
                   )}
                   <div className="flex items-center justify-between mt-2">
-                    <div className="flex items-center border border-border/40 rounded-md">
+                    <div className="flex items-center border border-border/40 rounded-lg overflow-hidden">
                       <button 
                         disabled={isUpdating === item.id || item.quantity <= 1}
                         onClick={() => handleQuantityChange(item.id, item.quantity, -1)}
-                        className="px-2 py-1 text-muted-foreground hover:text-foreground disabled:opacity-50"
+                        className="h-10 w-10 text-muted-foreground hover:bg-secondary hover:text-foreground disabled:opacity-50 transition-ui touch-manipulation"
                       >
                         -
                       </button>
-                      <span className="text-xs font-medium w-6 text-center">
+                      <span className="text-xs font-medium w-8 text-center">
                         {isUpdating === item.id ? <Loader2 className="h-3 w-3 animate-spin mx-auto" /> : item.quantity}
                       </span>
                       <button 
@@ -189,7 +189,7 @@ export function CartDrawer({ isLightText = false }: { isLightText?: boolean }) {
                   variant="ghost"
                   size="icon"
                   aria-label="Remove item from cart"
-                  className="h-8 w-8 text-muted-foreground hover:text-destructive shrink-0"
+                  className="h-10 w-10 text-muted-foreground hover:text-destructive shrink-0 transition-ui touch-manipulation"
                   onClick={() => handleRemove(item.id, item.quantity)}
                   disabled={isRemoving === item.id}
                 >

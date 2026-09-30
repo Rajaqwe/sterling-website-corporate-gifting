@@ -36,14 +36,17 @@ export function DemoVideoCarousel() {
   }, []);
 
   const goToNext = useCallback(() => {
+    setIsManuallyPaused(false);
     setCurrentIndex((prev) => (prev === demoVideos.length - 1 ? 0 : prev + 1));
   }, []);
 
   const goToPrev = useCallback(() => {
+    setIsManuallyPaused(false);
     setCurrentIndex((prev) => (prev === 0 ? demoVideos.length - 1 : prev - 1));
   }, []);
 
   const goToIndex = (index: number) => {
+    setIsManuallyPaused(false);
     setCurrentIndex(index);
   };
 
@@ -76,8 +79,7 @@ export function DemoVideoCarousel() {
     videoRefs.current.forEach((video, index) => {
       if (!video) return;
       
-      if (index === currentIndex && isPageVisible) {
-        // Active video: try to play
+      if (index === currentIndex && isPageVisible && !isManuallyPaused) {
         video.play().catch((err) => {
           // Autoplay might be blocked by browser; this is fine for muted videos,
           // but we catch it to prevent console errors crashing the component.
@@ -90,7 +92,7 @@ export function DemoVideoCarousel() {
         // video.currentTime = 0; 
       }
     });
-  }, [currentIndex, isPageVisible]);
+  }, [currentIndex, isPageVisible, isManuallyPaused]);
 
   // Touch Swipe Logic
   const minSwipeDistance = 50;
@@ -179,14 +181,24 @@ export function DemoVideoCarousel() {
               playsInline
               // removed loop because we want to trigger onEnded
               className="absolute inset-0 w-full h-full object-cover object-center pointer-events-auto cursor-pointer"
-              onClick={() => setIsManuallyPaused(prev => !prev)}
+              onClick={() => {
+                setIsManuallyPaused((prev) => {
+                  const nextPaused = !prev;
+                  if (nextPaused) {
+                    videoRefs.current[index]?.pause();
+                  } else if (index === currentIndex && isPageVisible) {
+                    videoRefs.current[index]?.play().catch(() => {});
+                  }
+                  return nextPaused;
+                });
+              }}
             />
             <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px] transition-opacity duration-700 pointer-events-none" />
             
             {/* Pause indicator */}
             {isManuallyPaused && currentIndex === index && (
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="bg-black/50 text-white rounded-full p-4 backdrop-blur-md animate-fade">
+                <div className="bg-black/50 text-white rounded-full p-4 backdrop-blur-md animate-fade-in">
                   <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6zm8 0h4v16h-4z"/></svg>
                 </div>
               </div>

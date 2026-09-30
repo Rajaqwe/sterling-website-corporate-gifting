@@ -102,7 +102,7 @@ function CompanyCard({
         aria-expanded={isActive}
       >
         <div 
-          className="w-full h-full relative duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
+          className="w-full h-full relative transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
           style={{ 
             transformStyle: "preserve-3d", 
             transform: isActive ? "rotateY(180deg)" : "rotateY(0deg)",

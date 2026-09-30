@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { Search, X, Loader2, FolderSearch, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
@@ -14,6 +15,7 @@ export function SearchBar({ isLightText = false }: { isLightText?: boolean }) {
   const [categories, setCategories] = useState<{ id: string; name: string; slug: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   // Debounced search
   useEffect(() => {
     const controller = new AbortController();
@@ -50,6 +52,10 @@ export function SearchBar({ isLightText = false }: { isLightText?: boolean }) {
       clearTimeout(timer);
     };
   }, [query]);
+
+  useEffect(() => {
+    setIsOpen(false);
+  }, [pathname]);
 
   // Global hotkey Ctrl+K
   useEffect(() => {

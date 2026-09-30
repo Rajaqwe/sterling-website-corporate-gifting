@@ -87,7 +87,7 @@ export function FaqContent() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       {/* Hero */}
-      <section className="relative bg-muted/50 dark:bg-card border-b border-border/40 text-sp-navy dark:text-foreground pt-32 pb-20 md:py-15	 overflow-hidden">
+      <section className="relative bg-muted/50 dark:bg-card border-b border-border/40 text-sp-navy dark:text-foreground pt-32 pb-20 md:py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background pointer-events-none z-0" />
         
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">

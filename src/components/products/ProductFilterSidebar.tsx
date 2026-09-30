@@ -319,12 +319,12 @@ export function MobileFilterDrawer(props: FilterSidebarProps) {
           <Button
             variant="outline"
             data-testid="mobile-filter-button"
-            className="fixed left-0 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center justify-center gap-3 h-32 w-10 px-0 py-2 rounded-l-none rounded-r-xl border-y border-r border-primary/30 bg-card hover:bg-accent/10 hover:border-primary/60 text-foreground transition-all duration-300 shadow-xl"
+            className="fixed left-0 top-1/2 -translate-y-1/2 z-40 flex min-h-12 min-w-12 flex-col items-center justify-center gap-2.5 h-32 w-12 px-0 py-2 rounded-l-none rounded-r-xl border-y border-r border-primary/30 bg-card hover:bg-accent/10 hover:border-primary/60 text-foreground transition-ui shadow-xl touch-manipulation"
           />
         }
       >
         <Filter className="h-5 w-5 text-primary" />
-        <span className="[writing-mode:vertical-lr] rotate-180 text-xs font-bold tracking-widest text-primary">FILTERS</span>
+        <span className="[writing-mode:vertical-lr] rotate-180 text-[11px] font-bold tracking-[0.16em] text-primary">FILTERS</span>
         {activeFilterCount > 0 && (
           <span className="absolute -top-2 -right-2 inline-flex items-center justify-center bg-accent text-primary text-[10px] font-bold rounded-full h-5 w-5 shadow-sm">
             {activeFilterCount}

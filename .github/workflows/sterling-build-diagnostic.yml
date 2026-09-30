@@ -1,0 +1,32 @@
+name: Sterling Build Diagnostic
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+      - name: Tailwind/PostCSS check
+        run: npx tailwindcss -i ./src/app/globals.css -o /tmp/sterling-tailwind.css
+
+      - name: Next build check
+        run: npm run build

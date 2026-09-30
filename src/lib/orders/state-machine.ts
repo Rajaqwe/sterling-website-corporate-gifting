@@ -1,4 +1,4 @@
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus } from '@/generated/prisma';
 import { prisma } from '@/lib/prisma/client';
 
 import { ALLOWED_TRANSITIONS } from './constants';

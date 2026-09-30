@@ -57,6 +57,22 @@ model Company {
   orders             Order[]
 }
 
+model ProjectGalleryItem {
+  id             String   @id @default(uuid())
+  title          String
+  description    String?
+  imageUrl       String
+  altText        String?
+  projectType    String?
+  clientName     String?
+  quantityLabel  String?
+  deliveryLabel  String?
+  isPublished    Boolean  @default(false)
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
 model CompanyMember {
   id        String      @id @default(uuid())
   companyId String

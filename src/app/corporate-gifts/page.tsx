@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { FilterDrawer } from "@/components/products/ProductFilterSidebar";
+import { MobileFilterDrawer, ProductFilterSidebar } from "@/components/products/ProductFilterSidebar";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ActiveFilters, SortDropdown } from "@/components/products/ProductCatalogFilters";
 import { Package } from "lucide-react";
@@ -79,7 +79,14 @@ export default async function CorporateGiftsPage(
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col gap-8 sm:mt-10 lg:flex-row">
+        <div className="mt-8 flex flex-col gap-8 sm:mt-10 lg:flex-row lg:items-start">
+          <div className="hidden lg:block lg:w-64 lg:shrink-0">
+            <ProductFilterSidebar
+              categories={filterData.categories}
+              attributes={filterData.attributes}
+              totalResultsCount={products.length}
+            />
+          </div>
           <div className="flex-1 w-full min-w-0">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
               <div className="text-sm text-muted-foreground">

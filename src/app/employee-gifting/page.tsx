@@ -101,7 +101,6 @@ export default function EmployeeGiftingPage() {
                   </div>
                 </CardContent>
               </Card>
-            </Reveal>
             ))}
           </StaggerContainer>
         </div>

@@ -57,7 +57,7 @@ const teams = [
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col overflow-hidden">
-      <section className="relative flex min-h-[820px] items-center overflow-hidden pb-24 pt-28 sm:pt-36 lg:min-h-[880px] lg:pt-40">
+      <section className="relative flex min-h-[720px] items-center overflow-hidden pb-20 pt-28 sm:min-h-[780px] sm:pt-36 lg:min-h-[880px] lg:pb-24 lg:pt-40">
         <div className="absolute inset-0 -z-20"><DemoVideoCarousel /></div>
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(10,22,38,.86)_0%,rgba(10,22,38,.62)_48%,rgba(10,22,38,.30)_100%)]" />
         <div className="absolute inset-x-0 bottom-0 -z-10 h-44 bg-gradient-to-t from-background to-transparent" />

@@ -19,6 +19,13 @@ export function ActiveFilters() {
     activeFilters.push({ key: "price", value: `${minPrice || ""}-${maxPrice || ""}`, label });
   }
 
+  const minMoq = searchParams.get("minMoq");
+  const maxMoq = searchParams.get("maxMoq");
+  if (minMoq || maxMoq) {
+    const label = minMoq && maxMoq ? `MOQ: ${minMoq}–${maxMoq}` : minMoq ? `MOQ: ${minMoq}+` : `MOQ: Under ${maxMoq}`;
+    activeFilters.push({ key: "moq", value: `${minMoq || ""}-${maxMoq || ""}`, label });
+  }
+
   if (activeFilters.length === 0) return null;
 
   return (
@@ -31,7 +38,13 @@ export function ActiveFilters() {
         >
           {filter.label}
           <button 
-            onClick={() => filter.key === "price" ? updateFilters({ minPrice: "", maxPrice: "" }) : updateFilters({ [filter.key]: "" })}
+            onClick={() =>
+              filter.key === "price"
+                ? updateFilters({ minPrice: "", maxPrice: "" })
+                : filter.key === "moq"
+                  ? updateFilters({ minMoq: "", maxMoq: "" })
+                  : updateFilters({ [filter.key]: "" })
+            }
             className="rounded-full p-0.5 hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-ui"
             aria-label={`Remove ${filter.label} filter`}
           >

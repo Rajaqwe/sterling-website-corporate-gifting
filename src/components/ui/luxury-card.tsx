@@ -9,7 +9,7 @@ const LuxuryCard = React.forwardRef<
   <Card
     ref={ref}
     className={cn(
-      "bg-surface-elevated border-border/60 transition-all duration-200 hover:border-accent/40 hover:shadow-lg hover:-translate-y-0.5",
+      "bg-surface-elevated border-border/60 transition-[transform,box-shadow,border-color] duration-300 ease-[var(--ease-standard)] hover:border-accent/40 hover:shadow-lg hover:-translate-y-0.5 motion-reduce:transform-none",
       className
     )}
     {...props}

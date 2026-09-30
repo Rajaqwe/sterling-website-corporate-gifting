@@ -54,7 +54,7 @@ export function ProductCustomization({
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => onToggle(option.id)}
-                className="w-full rounded-lg text-left outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                className="w-full min-h-11 rounded-lg text-left outline-none focus-visible:ring-2 focus-visible:ring-primary/50 touch-manipulation"
               >
                 <div className="flex items-start justify-between gap-3">
                 {/* Checkbox indicator & Option Details */}
@@ -116,7 +116,7 @@ export function ProductCustomization({
                         onClick={() =>
                           onPlacementChange && onPlacementChange(option.id, placement)
                         }
-                        className={`text-[11px] px-2.5 py-0.5 rounded-md border transition-ui ${
+                        className={`min-h-9 text-[11px] px-3 py-1 rounded-md border transition-ui touch-manipulation ${
                           activePlacement === placement
                             ? "border-primary bg-primary text-primary-foreground font-semibold"
                             : "border-border/60 bg-background text-muted-foreground hover:text-foreground"

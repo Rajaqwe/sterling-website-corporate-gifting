@@ -20,6 +20,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DemoVideoCarousel } from "@/components/home/DemoVideoCarousel";
 import { CorporateProcurementTrust } from "@/components/home/CorporateProcurementTrust";
+import { VerifiedTestimonials } from "@/components/home/VerifiedTestimonials";
 import { Reveal, StaggerContainer } from "@/components/ui/reveal";
 
 const needs = [
@@ -261,6 +262,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <VerifiedTestimonials />
 
       <section className="bg-slate-950 py-20 text-white sm:py-28 dark:bg-slate-950">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

@@ -38,7 +38,7 @@ function SocialIcon({ children, href, label }: { children: React.ReactNode; href
 
 export function Footer() {
   return (
-    <footer className="bg-primary text-primary-foreground border-t border-border/10">
+    <footer className="bg-primary text-primary-foreground dark:bg-slate-950 dark:text-slate-100 border-t border-border/10">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
           

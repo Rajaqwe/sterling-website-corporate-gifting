@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { ArrowRight, Clock3, Eye, Layers, PackageCheck, Palette, Sparkles } from "lucide-react";
 import { formatINR } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
+import { WhatsAppConciergeButton } from "@/components/contact/WhatsAppConciergeButton";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 interface ProductCardProps {
@@ -265,6 +266,7 @@ export function ProductCard({ product, className = "", priority = false }: Produ
                 <strong className="mt-1 block text-foreground">{leadTimeDays > 0 ? String(leadTimeDays) + " business days" : "Confirm with team"}</strong>
               </div>
             </div>
+            <WhatsAppConciergeButton productName={title} productUrl={typeof window !== "undefined" ? window.location.href : undefined} quantity={minimumOrderQuantity} intent="bulk enquiry" label="Ask on WhatsApp" compact className="sm:col-span-2" />
             <div className="grid gap-3 sm:grid-cols-2">
               <Link href={`/products/${product.slug}`} onClick={() => setIsQuickViewOpen(false)} className="btn-primary h-11 w-full rounded-md font-semibold text-sm flex items-center justify-center">VIEW PRODUCT</Link>
               <Button

@@ -122,8 +122,8 @@ async function main() {
           const response = await page.goto(new URL(route, BASE).toString(), {waitUntil:'domcontentloaded', timeout:30000});
           result.status = response?.status() ?? null;
           result.finalUrl = page.url();
-          await page.waitForLoadState('networkidle', {timeout:15000}).catch(()=>{});
-          await sleep(300);
+          await page.waitForLoadState('networkidle', {timeout:2000}).catch(()=>{});
+          await sleep(150);
           result.loginRedirect = /\/login(?:\?|$)/.test(new URL(page.url()).pathname) &&
             (route.startsWith('/admin') || route.startsWith('/dashboard'));
           result.metrics = await page.evaluate(() => {

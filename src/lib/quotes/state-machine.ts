@@ -1,4 +1,4 @@
-import { QuoteStatus } from '@prisma/client';
+import { QuoteStatus } from '@/generated/prisma';
 import { prisma } from '@/lib/prisma/client';
 
 import { ALLOWED_QUOTE_TRANSITIONS } from './constants';

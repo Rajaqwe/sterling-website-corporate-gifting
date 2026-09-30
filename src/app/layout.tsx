@@ -6,7 +6,6 @@ const poppins = Poppins({ subsets: ['latin'], variable: '--font-serif', weight: 
 
 import "./globals.css";
 import { Suspense } from "react";
-import { assertEnv } from "@/lib/env";
 import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/layout/Navbar";
 import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
@@ -22,7 +21,7 @@ import NextTopLoader from 'nextjs-toploader';
 import { Toaster } from 'sonner';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(assertEnv('NEXT_PUBLIC_APP_URL')),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
   title: {
     template: "%s | Sterling Corporate",
     default: "Sterling | Premium B2B Corporate Gifting",

@@ -41,7 +41,7 @@ export function ProductReviews({ productId, reviews, isLoggedIn }: { productId: 
 
   if (!reviews || reviews.length === 0) {
     return (
-      <div className="w-full bg-card rounded-2xl border border-border/60 p-6 shadow-xs mt-10">
+      <div className="w-full bg-card rounded-2xl border border-border/60 p-6 shadow-xs mt-10 motion-safe:animate-fade-in">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-serif font-bold text-primary">Customer Reviews</h3>
           <Button 

@@ -1,4 +1,4 @@
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus } from '@/generated/prisma';
 
 export type TransitionMap = {
   [key in OrderStatus]: OrderStatus[];

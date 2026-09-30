@@ -60,7 +60,7 @@ export function SortDropdown() {
       aria-label="Sort catalogue products"
       value={currentSort}
       onChange={(e) => updateFilters({ sort: e.target.value })}
-      className="text-sm border-border bg-background rounded-md px-3 py-1.5 focus:ring-accent focus:border-accent outline-none"
+      className="h-9 text-sm border border-border bg-background rounded-lg px-3 py-1.5 focus:ring-3 focus:ring-accent/30 focus:border-accent outline-none transition-ui cursor-pointer"
     >
       <option value="newest">Newest</option>
       <option value="price-asc">Price: Low to High</option>

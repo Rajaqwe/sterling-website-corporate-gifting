@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Target, Users, Award, Globe, Sparkles } from "lucide-react";
 import { MarketingHero } from "@/components/marketing/MarketingHero";
+import { Reveal, StaggerContainer } from "@/components/ui/reveal";
 
 export const metadata: Metadata = {
   title: 'About Sterling | Sterling',
@@ -23,7 +24,7 @@ export default function AboutPage() {
       {/* Stats Section */}
       <section className="relative z-10 -mt-12">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StaggerContainer staggerDelay={60} className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               { number: "40+", label: "Corporate Clients" },
               { number: "10,000+", label: "Gifts Delivered" },
@@ -40,15 +41,16 @@ export default function AboutPage() {
                   </div>
                 </CardContent>
               </Card>
+              </Reveal>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
       {/* Mission & Vision */}
       <section className="pt-32 pb-20 md:py-24 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
-          <div className="grid md:grid-cols-2 gap-8">
+          <StaggerContainer staggerDelay={90} className="grid md:grid-cols-2 gap-8">
             <Card className="border-none shadow-sm bg-secondary/30 overflow-hidden">
               <CardContent className="p-8 md:p-10">
                 <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary mb-6">
@@ -75,7 +77,7 @@ export default function AboutPage() {
                 </p>
               </CardContent>
             </Card>
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
@@ -117,14 +119,14 @@ export default function AboutPage() {
           <h2 className="text-3xl md:text-4xl font-serif font-bold mb-6">
             Let&apos;s build something memorable together.
           </h2>
-          <p className="text-lg text-white/80 mb-10">
+          <p className="text-lg text-muted-foreground mb-10">
             Whether you&apos;re gifting 10 or 10,000 — we&apos;d love to help you create the perfect experience.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/request-a-quote" className={buttonVariants({ variant: "default", size: "lg", className: "btn-primary w-full sm:w-auto    h-12 px-8 text-base font-semibold" })}>
                 Request a Quote
               </Link>
-            <Link href="/contact" className={buttonVariants({ variant: "outline", size: "lg", className: "btn-primary w-full sm:w-auto border-white hover:bg-background h-12 px-8 text-base" })}>
+            <Link href="/contact" className={buttonVariants({ variant: "outline", size: "lg", className: "btn-secondary w-full sm:w-auto h-12 px-8 text-base" })}>
                 Contact Us
               </Link>
           </div>

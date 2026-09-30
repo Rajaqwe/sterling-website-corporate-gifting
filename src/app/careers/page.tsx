@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Reveal, StaggerContainer } from "@/components/ui/reveal";
 import { MapPin, Clock, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -45,7 +46,7 @@ export default function CareersPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero */}
-      <section className="relative bg-muted/50 dark:bg-card border-b border-border/40 text-sp-navy dark:text-foreground pt-32 pb-20 md:py-15 overflow-hidden">
+      <section className="relative bg-muted/50 dark:bg-card border-b border-border/40 text-sp-navy dark:text-foreground pt-32 pb-20 md:py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background pointer-events-none z-0" />
         
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
@@ -65,7 +66,7 @@ export default function CareersPage() {
       {/* Why Join Us */}
       <section className="py-16 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <StaggerContainer staggerDelay={60} className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             {[
               { label: "Fast Growth", value: "5x YoY" },
               { label: "Team Size", value: "10+" },
@@ -77,7 +78,7 @@ export default function CareersPage() {
                 <div className="text-xs text-muted-foreground font-medium">{stat.label}</div>
               </div>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 
@@ -90,7 +91,8 @@ export default function CareersPage() {
           </div>
           <div className="space-y-4">
             {openings.map((job, i) => (
-              <Card key={i} className="border-none shadow-sm bg-background overflow-hidden hover:shadow-md transition-all duration-300 group">
+              <Reveal key={i} delay={i * 55}>
+                <Card className="border-none shadow-sm bg-background overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-ui group">
                 <CardContent className="p-6 md:p-8">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex-1">
@@ -123,6 +125,7 @@ export default function CareersPage() {
                   </div>
                 </CardContent>
               </Card>
+              </Reveal>
             ))}
           </div>
         </div>

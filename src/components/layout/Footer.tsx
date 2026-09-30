@@ -99,7 +99,7 @@ export function Footer() {
             <ul className="space-y-4">
               {footerLinks.support.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-white/70 hover:text-white transition-colors">
+                  <Link href={link.href} className="text-white/70 hover:text-white hover:translate-x-0.5 inline-block transition-ui">
                     {link.name}
                   </Link>
                 </li>
@@ -126,7 +126,7 @@ export function Footer() {
           <p className="text-sm text-white/50">
             © {new Date().getFullYear()} Sterling Corporate Gifting. All rights reserved.
           </p>
-          <div className="flex gap-6 text-sm text-white/50">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-white/50">
             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link href="/terms-and-conditions" className="hover:text-white transition-colors">Terms & Conditions</Link>
             <Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link>

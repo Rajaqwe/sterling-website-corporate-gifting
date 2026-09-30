@@ -3,6 +3,7 @@ import { FilterDrawer } from "@/components/products/ProductFilterSidebar";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { Package, Star, Clock } from "lucide-react";
+import Image from "next/image";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
@@ -104,7 +105,7 @@ export default async function PersonalisedGiftsPage(
                            </span>
                         )}
                       </div>
-                      <h3 className="font-medium text-primary mb-2 line-clamp-2 group-hover:text-amber-600 transition-colors flex-1">
+                      <h3 className="font-medium text-primary mb-2 line-clamp-2 group-hover:text-accent transition-colors flex-1">
                         {product.name}
                       </h3>
                       <div className="flex items-center justify-between mt-4 border-t pt-4">

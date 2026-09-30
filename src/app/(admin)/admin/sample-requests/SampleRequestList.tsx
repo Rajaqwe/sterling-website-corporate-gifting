@@ -2,11 +2,11 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { CalendarDays, ClipboardCheck, ExternalLink, Mail, MapPin, PackageCheck, Phone } from "lucide-react";
-import { SampleRequestStatus } from "@/generated/prisma";
 import { updateSampleRequestStatus } from "./actions";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+type SampleRequestStatus = "NEW" | "REVIEWING" | "CONTACTED" | "APPROVED" | "FULFILLED" | "DECLINED" | "CANCELLED";
 type RequestItem = { id: string; referenceNumber: string; fullName: string; companyName: string; workEmail: string; phone: string; estimatedQuantity: number; sampleType: string; deliveryLocation: string | null; requiredBy: string | null; brandingRequired: boolean; notes: string | null; status: SampleRequestStatus; createdAt: string; product: { id: string; name: string; slug: string } | null; };
 const statuses: SampleRequestStatus[] = ["NEW","REVIEWING","CONTACTED","APPROVED","FULFILLED","DECLINED","CANCELLED"];
 const label=(status: string)=>status.replaceAll("_"," ");

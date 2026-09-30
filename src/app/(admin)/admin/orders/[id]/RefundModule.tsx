@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { processRefund } from "../actions";
 import { toast } from "sonner";
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus } from "@/generated/prisma";
 
 export function RefundModule({ orderId, status }: { orderId: string, status: OrderStatus }) {
  const [amount, setAmount] = useState("");

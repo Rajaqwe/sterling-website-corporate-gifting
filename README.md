@@ -1,4 +1,4 @@
-# <YOUR_APP_NAME>
+# <sterling prime webstie>
 
 Built with [Wasp](https://wasp.sh), based on the [Open Saas](https://opensaas.sh) template.
 

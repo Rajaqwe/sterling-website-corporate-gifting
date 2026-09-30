@@ -40,7 +40,7 @@ export function FloatingButtons() {
   const bottomPositionClass = isNearBottom ? "bottom-24" : "bottom-6";
 
   return (
-    <div className={`fixed right-4 sm:right-6 z-50 flex flex-col-reverse items-end gap-4 transition-all duration-300 ease-out ${bottomPositionClass}`}>
+    <div className={`fixed right-4 sm:right-6 z-50 flex flex-col-reverse items-end gap-4 transition-[bottom,opacity,transform] duration-[var(--motion-ui)] ease-[var(--ease-standard)] ${bottomPositionClass}`}>
       {/* WhatsApp Floating Button */}
       <div
         className="relative flex items-center"
@@ -48,7 +48,7 @@ export function FloatingButtons() {
         onMouseLeave={() => setShowTooltip(false)}
       >
         <div
-          className={`absolute right-full mr-4 hidden sm:block bg-primary text-primary-foreground text-sm px-4 py-2 rounded-xl shadow-lg whitespace-nowrap transition-all duration-300 font-sans ${showTooltip ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}
+          className={`absolute right-full mr-4 hidden sm:block bg-primary text-primary-foreground text-sm px-4 py-2 rounded-xl shadow-lg whitespace-nowrap transition-[opacity,transform] duration-[var(--motion-ui)] ease-[var(--ease-standard)] font-sans ${showTooltip ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}
         >
           Need help with your corporate gifting?
           {/* Triangle pointer */}
@@ -76,7 +76,7 @@ export function FloatingButtons() {
       <button
         onClick={scrollToTop}
         aria-label="Back to top"
-        className={`inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all duration-300 hover:-translate-y-1 ${showBackToTop
+        className={`inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-[background-color,opacity,transform] duration-[var(--motion-ui)] ease-[var(--ease-standard)] hover:-translate-y-1 ${showBackToTop
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-4 pointer-events-none absolute"
           }`}

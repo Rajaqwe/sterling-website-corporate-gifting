@@ -45,14 +45,21 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
 }
 
 export async function generateStaticParams() {
-  const products = await prisma.product.findMany({
-    select: { slug: true },
-    where: { status: 'ACTIVE' }
-  });
-  
-  return products.map((product) => ({
-    slug: product.slug,
-  }));
+  try {
+    const products = await prisma.product.findMany({
+      select: { slug: true },
+      where: { status: 'ACTIVE' }
+    });
+
+    return products.map((product) => ({
+      slug: product.slug,
+    }));
+  } catch (error) {
+    // The build environment may not have database connectivity.
+    // Product pages can still be rendered on demand at runtime.
+    console.warn("Skipping product pre-rendering because the database is unavailable during build.", error);
+    return [];
+  }
 }
 
 export default async function ProductDetailPage(props: { params: Promise<{ slug: string }> }) {

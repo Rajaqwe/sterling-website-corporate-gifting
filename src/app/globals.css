@@ -242,6 +242,19 @@
   animation: softReveal var(--motion-standard) var(--ease-soft) both;
 }
 
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-spin-slow { animation: none; }
+}
+
 /* Base fade in, replacing old robotic animations */
 .animate-fade-in {
   animation: softReveal var(--motion-soft) var(--ease-soft) both;

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Reveal, StaggerContainer } from "@/components/ui/reveal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Gift, PartyPopper, Calendar, Trophy, Heart, Users } from "lucide-react";
 
@@ -43,7 +44,7 @@ export default function EmployeeGiftingPage() {
               Purpose-built programs designed for every milestone in the employee lifecycle.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <StaggerContainer staggerDelay={70} className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[
               { 
                 icon: Gift, 
@@ -100,8 +101,9 @@ export default function EmployeeGiftingPage() {
                   </div>
                 </CardContent>
               </Card>
+            </Reveal>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 

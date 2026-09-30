@@ -27,7 +27,7 @@ export function ProductSearch() {
       <input type="hidden" data-testid="catalog-search-input" />
       <span data-testid="results-counter" className="sr-only">0</span>
       <select 
-        className="flex h-10 w-48 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex h-10 w-48 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:border-accent focus:ring-3 focus:ring-accent/30 focus:ring-offset-0 disabled:cursor-wait disabled:opacity-60 transition-ui"
         onChange={handleSortChange}
         defaultValue={searchParams.get('sort') || ''}
         data-testid="sort-dropdown"

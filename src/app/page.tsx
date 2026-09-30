@@ -156,7 +156,7 @@ export default function Home() {
                   className="group relative flex min-h-72 overflow-hidden rounded-[24px] border border-border/60 hover:border-amber-400/50 bg-primary p-7 text-white shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5"
                 >
                   <div 
-                    className="absolute inset-0 bg-cover bg-center opacity-55 transition-transform duration-700 group-hover:scale-108 group-hover:opacity-65" 
+                    className="absolute inset-0 bg-cover bg-center opacity-55 transition-transform duration-700 group-hover:scale-[1.08] group-hover:opacity-65" 
                     style={{ backgroundImage: `url('${need.image}')` }} 
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
@@ -252,7 +252,7 @@ export default function Home() {
               <h4 className="font-heading font-semibold text-base text-accent">2. Bespoke Logo Application</h4>
             </div>
 
-            <ArrowRight className="hidden md:block w-8 h-8 text-accent/60 animate-pulse delay-150" />
+            <ArrowRight className="hidden md:block w-8 h-8 text-accent/60 animate-pulse [animation-delay:150ms]" />
 
             <div className="group flex-1 w-full text-center">
               <div className="relative overflow-hidden bg-gradient-to-br from-accent/10 to-amber-500/10 h-56 rounded-[24px] mb-5 flex items-center justify-center border-2 border-accent shadow-md transition-all duration-500 hover:shadow-2xl hover:shadow-accent/25 hover:-translate-y-1">

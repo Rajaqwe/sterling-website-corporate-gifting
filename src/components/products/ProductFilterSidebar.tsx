@@ -67,6 +67,8 @@ export function FilterControls({
   const selectedCategories = searchParams.getAll("category");
   const selectedRating = searchParams.get("rating");
   const isDiscounted = searchParams.get("isDiscounted") === "true";
+  const selectedMinMoq = searchParams.get("minMoq") || "";
+  const selectedMaxMoq = searchParams.get("maxMoq") || "";
 
   // Calculate total active filters
   const activeFilterCount = Array.from(searchParams.keys()).filter(k => k !== 'sort' && k !== 'q' && k !== 'page').reduce((acc, key) => {
@@ -281,8 +283,34 @@ export function FilterControls({
             Minimum Order Quantity (MOQ)
           </AccordionTrigger>
           <AccordionContent className="pt-2">
-            <div className="flex flex-col gap-2 px-1 text-xs text-muted-foreground">
-              Filter products by minimum order volume requirement.
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { label: "1–50", min: "1", max: "50" },
+                { label: "51–100", min: "51", max: "100" },
+                { label: "101–500", min: "101", max: "500" },
+                { label: "500+", min: "500", max: "" },
+              ].map((option) => {
+                const active = selectedMinMoq === option.min && selectedMaxMoq === option.max;
+                return (
+                  <button
+                    key={option.label}
+                    type="button"
+                    onClick={() =>
+                      active
+                        ? updateFilters({ minMoq: null, maxMoq: null })
+                        : updateFilters({ minMoq: option.min, maxMoq: option.max })
+                    }
+                    className={`min-h-10 rounded-lg border px-2.5 py-2 text-xs font-semibold transition-ui touch-manipulation ${
+                      active
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-secondary/70"
+                    }`}
+                    aria-pressed={active}
+                  >
+                    {option.label} units
+                  </button>
+                );
+              })}
             </div>
           </AccordionContent>
         </AccordionItem>

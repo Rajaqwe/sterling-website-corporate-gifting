@@ -107,6 +107,10 @@ export interface Product {
   rating?: number;
   reviewCount?: number;
   leadTime?: string;
+  leadTimeDays?: number;
+  minimumOrderQuantity?: number;
+  brandingAvailable?: boolean;
+  brandingLeadTimeDays?: number;
   isFeatured?: boolean;
   featured?: boolean;
   isBestSeller?: boolean;

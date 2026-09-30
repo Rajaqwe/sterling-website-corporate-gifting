@@ -133,15 +133,15 @@
 
 @layer components {
   .btn-primary {
-    @apply relative inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground font-heading font-semibold transition-all duration-300 hover:bg-primary/90 hover:shadow-[0_10px_25px_-5px_rgba(11,19,43,0.3)] hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 overflow-hidden;
+    @apply relative inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground font-heading font-semibold transition-[background-color,border-color,box-shadow,transform,color] duration-[var(--motion-ui)] ease-[var(--ease-standard)] hover:bg-primary/90 hover:shadow-[0_10px_25px_-5px_rgba(11,19,43,0.3)] hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 overflow-hidden;
   }
   
   .btn-secondary {
-    @apply relative inline-flex items-center justify-center rounded-full border border-border/80 bg-background/80 backdrop-blur-md font-heading font-semibold text-foreground hover:bg-secondary/70 hover:border-accent/40 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
+    @apply relative inline-flex items-center justify-center rounded-full border border-border/80 bg-background/80 backdrop-blur-md font-heading font-semibold text-foreground hover:bg-secondary/70 hover:border-accent/40 hover:shadow-md transition-[background-color,border-color,box-shadow,transform,color] duration-[var(--motion-ui)] ease-[var(--ease-standard)] hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
   }
 
   .btn-gold {
-    @apply relative inline-flex items-center justify-center rounded-full font-heading font-semibold text-primary shadow-md transition-all duration-300 hover:shadow-[0_10px_25px_-5px_rgba(197,168,128,0.45)] hover:-translate-y-0.5 active:translate-y-0 overflow-hidden bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#C5A880];
+    @apply relative inline-flex items-center justify-center rounded-full font-heading font-semibold text-primary shadow-md transition-[background-color,border-color,box-shadow,transform,color] duration-[var(--motion-ui)] ease-[var(--ease-standard)] hover:shadow-[0_10px_25px_-5px_rgba(197,168,128,0.45)] hover:-translate-y-0.5 active:translate-y-0 overflow-hidden bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#C5A880];
   }
 
   /* Luxury Glassmorphism */
@@ -192,6 +192,10 @@
     transform: rotate(25deg) translateY(-100%);
     transition: transform 0.75s ease-out;
   }
+  @media (prefers-reduced-motion: reduce) {
+    .shimmer-sweep::after { display: none; }
+  }
+
   .shimmer-sweep:hover::after {
     transform: rotate(25deg) translateY(100%);
   }

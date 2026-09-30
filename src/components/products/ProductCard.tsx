@@ -27,6 +27,7 @@ export function ProductCard({ product, className = "", priority = false }: Produ
   );
   const [imageError, setImageError] = useState(false);
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
   const title = product.title || product.name || "Corporate Gift";
   const displayCategory = (product as any).category?.name || "Corporate Gift";
@@ -184,12 +185,17 @@ export function ProductCard({ product, className = "", priority = false }: Produ
           </Link>
           <Button 
             type="button" 
-            className="flex-1 btn-primary h-9 rounded-xl text-[11px] font-heading font-semibold px-2 hover:shadow-md transition-all"
+            className="flex-1 btn-primary h-9 rounded-xl text-[11px] font-heading font-semibold px-2 hover:shadow-md transition-ui disabled:opacity-70 disabled:pointer-events-none"
+            disabled={isAddingToCart}
+            aria-busy={isAddingToCart}
             onClick={async (e) => {
               e.preventDefault();
-              const { addToCart } = await import("@/app/products/actions");
-              const res = await addToCart(product.id, minimumOrderQuantity);
-              if (res.success) {
+              if (isAddingToCart) return;
+              setIsAddingToCart(true);
+              try {
+                const { addToCart } = await import("@/app/products/actions");
+                const res = await addToCart(product.id, minimumOrderQuantity);
+                if (res.success) {
                 // To avoid needing useCart in a deeply nested possible Server Component tree before
                 // We just dispatch a custom event that CartDrawer can listen to, or rely on router.refresh
                 // Wait, useCart is safe here since ProductCard is a client component
@@ -200,10 +206,13 @@ export function ProductCard({ product, className = "", priority = false }: Produ
               } else {
                 const { toast } = await import("sonner");
                 toast.error(res.error || "Failed to add to cart");
+                }
+              } finally {
+                setIsAddingToCart(false);
               }
             }}
           >
-            ADD TO CART
+            {isAddingToCart ? "ADDING..." : "ADD TO CART"}
           </Button>
         </div>
       </CardContent>

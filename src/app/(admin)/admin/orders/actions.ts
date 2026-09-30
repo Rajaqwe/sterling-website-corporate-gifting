@@ -2,7 +2,7 @@
 
 import { requirePermission } from "@/lib/auth/permissions";
 import { transitionOrder } from "@/lib/orders/state-machine";
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus } from "@/generated/prisma";
 import { prisma } from "@/lib/prisma/client";
 import { revalidatePath } from "next/cache";
 

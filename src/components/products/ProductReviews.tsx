@@ -5,6 +5,8 @@
 import React, { useState, useTransition } from "react";
 import { Star, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { submitReview } from "@/app/products/actions";
 
@@ -56,24 +58,23 @@ export function ProductReviews({ productId, reviews, isLoggedIn }: { productId: 
              <div className="flex items-center gap-2">
                <span className="text-sm font-semibold">Rating:</span>
                {[1,2,3,4,5].map(star => (
-                 <button key={star} type="button" onClick={() => setRating(star)}>
-                   <Star className={`h-5 w-5 ${rating >= star ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground'}`} />
+                 <button key={star} type="button" onClick={() => setRating(star)} aria-label={`Rate ${star} out of 5`} aria-pressed={rating === star} className="rounded-sm p-0.5 transition-ui hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+                   <Star className={`h-5 w-5 transition-transform ${rating >= star ? 'fill-amber-400 text-amber-400' : 'text-muted-foreground'}`} />
                  </button>
                ))}
              </div>
-             <input 
-               type="text" 
-               placeholder="Review Title" 
-               value={title} 
+             <Input
+               type="text"
+               placeholder="Review Title"
+               value={title}
                onChange={(e) => setTitle(e.target.value)}
-               className="p-2 border border-border/60 rounded-md text-sm bg-background"
                required
              />
-             <textarea 
+             <Textarea
                placeholder="Share your thoughts..."
                value={content}
                onChange={(e) => setContent(e.target.value)}
-               className="p-2 border border-border/60 rounded-md text-sm min-h-[100px] bg-background"
+               className="min-h-[100px]"
                required
              />
              <Button type="submit" disabled={isPending} className="self-end bg-accent text-primary font-bold">

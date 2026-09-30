@@ -116,7 +116,7 @@ export function TieredPricingTable({
       </div>
 
       {quoteCalculation?.opportunity?.nextTier && (
-        <div className="mt-2 p-3 rounded-xl border border-accent/30 bg-accent/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in slide-in-from-bottom-2">
+        <div className="mt-2 p-3 rounded-xl border border-accent/30 bg-accent/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-fade-in">
           <div className="flex flex-col gap-0.5">
             <span className="text-[11px] font-bold text-accent uppercase tracking-wider">Next Volume Tier</span>
             <span className="text-sm font-semibold text-foreground">

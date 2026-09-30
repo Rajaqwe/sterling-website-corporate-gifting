@@ -129,7 +129,7 @@ export function ProductConfiguratorClient({
                       key={variant.id}
                       type="button"
                       onClick={() => setSelectedVariantId(variant.id)}
-                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${isSelected
+                      className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-ui active:scale-[0.98] ${isSelected
                           ? "border-primary bg-primary text-primary-foreground shadow-sm scale-[0.98]"
                           : "border-border/60 bg-background text-foreground hover:bg-secondary/60 hover:-translate-y-[1px]"
                         }`}

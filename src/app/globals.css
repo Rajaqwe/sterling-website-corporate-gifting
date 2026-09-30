@@ -115,6 +115,11 @@
   }
   body {
     @apply bg-background text-foreground antialiased selection:bg-accent selection:text-white;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :where(a, button, [role="button"], input, textarea, select) {
+    -webkit-tap-highlight-color: transparent;
   }
   
   /* Typography improvements for premium feel */
@@ -344,6 +349,7 @@
 
 html {
   scroll-behavior: smooth;
+  overscroll-behavior-x: none;
 }
 
 /* ========================== */

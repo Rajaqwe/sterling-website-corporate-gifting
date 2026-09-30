@@ -24,17 +24,42 @@ export default async function CollectionsPage(
   const where = buildPrismaWhereClause(filters);
   const orderBy = buildPrismaOrderBy(filters.sort);
 
-  const [products, filterData] = await Promise.all([
-    prisma.product.findMany({
-      where,
-      include: {
-        category: true,
-        media: true,
-      },
-      orderBy,
-    }),
-    getAvailableFilters()
-  ]);
+  let products: any[] = [];
+  let filterData: any = { categories: [], attributes: [] };
+
+  try {
+    [products, filterData] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        include: {
+          category: true,
+          media: true,
+        },
+        orderBy,
+      }),
+      getAvailableFilters(),
+    ]);
+  } catch (error) {
+    console.error("[gift-collections] DB error:", error);
+
+    return (
+      <div className="container mx-auto flex min-h-[60vh] items-center justify-center px-4 py-24 sm:px-6 lg:px-8">
+        <div className="max-w-lg text-center">
+          <Package className="mx-auto mb-5 h-14 w-14 text-muted-foreground" />
+          <h1 className="text-3xl font-serif font-bold text-primary">
+            {path.includes("corporate-gifts") ? "Corporate Gifts Catalogue" : "Gift Collections"}
+          </h1>
+          <p className="mt-3 text-lg text-muted-foreground">
+            We&apos;re having trouble loading the catalogue right now. Please try again in a moment.
+          </p>
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link href="/" className={buttonVariants({ variant: "outline" })}>Back to Home</Link>
+            <Link href="/request-a-quote" className={buttonVariants()}>Request a Quote</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

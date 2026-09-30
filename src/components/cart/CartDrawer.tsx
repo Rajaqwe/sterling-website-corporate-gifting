@@ -34,9 +34,14 @@ export function CartDrawer({ isLightText = false }: { isLightText?: boolean }) {
   };
 
   useEffect(() => {
-    if (isOpen) {
-      loadCart();
-    }
+    if (isOpen) loadCart();
+
+    const handleCartUpdated = () => {
+      if (isOpen) loadCart();
+    };
+
+    window.addEventListener("cart-updated", handleCartUpdated);
+    return () => window.removeEventListener("cart-updated", handleCartUpdated);
   }, [isOpen]);
 
   const handleRemove = async (itemId: string, quantity: number) => {

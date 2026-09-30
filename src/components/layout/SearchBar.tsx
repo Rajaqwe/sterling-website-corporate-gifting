@@ -162,7 +162,7 @@ export function SearchBar({ isLightText = false }: { isLightText?: boolean }) {
                         <span className="font-medium text-foreground truncate block">{product.name}</span>
                         <span className="text-xs text-muted-foreground truncate">{product.category}</span>
                       </div>
-                      <span className="font-semibold text-xs ml-2 opacity-0 group-data-[selected=true]:opacity-100 transition-[opacity] duration-[var(--motion-fast)]">
+                      <span className="font-semibold text-xs ml-2 opacity-0 group-data-[selected=true]:opacity-100 transition-opacity duration-200 ease-out">
                         Enter ↵
                       </span>
                     </Command.Item>
@@ -181,7 +181,7 @@ export function SearchBar({ isLightText = false }: { isLightText?: boolean }) {
               )}
             </Command.List>
             {query.trim().length > 0 && (
-              <button type="button" onClick={handleSearchSubmit} className="flex w-full items-center justify-between border-t border-border/50 px-4 py-3 text-left text-sm font-semibold text-primary transition-[background-color,color] duration-[var(--motion-ui)] ease-[var(--ease-standard)] hover:bg-secondary/40">
+              <button type="button" onClick={handleSearchSubmit} className="flex w-full items-center justify-between border-t border-border/50 px-4 py-3 text-left text-sm font-semibold text-primary transition-[background-color,color] duration-300 ease-out hover:bg-secondary/40">
                 See all results for “{query.trim()}” <ArrowRight className="h-4 w-4" />
               </button>
             )}

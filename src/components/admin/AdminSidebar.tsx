@@ -29,6 +29,7 @@ import {
   Bell,
   Cpu,
   ExternalLink,
+  Image as ImageIcon,
   LucideIcon,
 } from "lucide-react";
 
@@ -79,7 +80,10 @@ const navGroups: NavGroup[] = [
   },
   {
     label: "Content",
-    items: [{ name: "Reviews", href: "/admin/reviews", icon: Star }],
+    items: [
+      { name: "Reviews", href: "/admin/reviews", icon: Star },
+      { name: "Project Gallery", href: "/admin/project-gallery", icon: ImageIcon },
+    ],
   },
   {
     label: "Reports",

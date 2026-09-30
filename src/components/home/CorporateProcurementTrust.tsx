@@ -53,6 +53,12 @@ export function CorporateProcurementTrust() {
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
                 <Link
+                  href="/procurement-support"
+                  className="inline-flex h-12 items-center justify-center rounded-full border border-border bg-background px-6 text-sm font-semibold text-foreground transition-[border-color,background-color,transform] duration-300 ease-out hover:-translate-y-0.5 hover:border-accent/50 hover:bg-accent/5"
+                >
+                  Procurement support
+                </Link>
+                <Link
                   href="/contact"
                   className="inline-flex h-12 items-center justify-center rounded-full border border-border bg-background px-6 text-sm font-semibold text-foreground transition-[border-color,background-color,transform] duration-300 ease-out hover:-translate-y-0.5 hover:border-accent/50 hover:bg-accent/5"
                 >

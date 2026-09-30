@@ -64,7 +64,7 @@ export function Reveal({
         observer.unobserve(ref.current);
       }
     };
-  }, [threshold]);
+  }, [once, rootMargin, threshold]);
 
   const getAnimationClass = () => {
     if (!isVisible) {

@@ -19,6 +19,7 @@ export async function createOrderFromQuote(
     state: string;
     postalCode: string;
     country?: string;
+    purchaseOrderNumber?: string;
   },
   paymentMethod: string = 'card'
 ) {
@@ -130,6 +131,7 @@ export async function createOrderFromQuote(
           total: total.toDecimal(),
           shippingAddressId: shippingAddress.id,
           billingAddressId: billingAddress.id,
+          purchaseOrderNumber: shippingData.purchaseOrderNumber?.trim() || undefined,
         }
       });
 

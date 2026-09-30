@@ -29,12 +29,13 @@ export function ProductGallery({ images, title, badge, moq }: ProductGalleryProp
           </div>
         ) : (
           <Image
+            key={activeIndex}
             src={activeImage}
             alt={`${title} - View ${activeIndex + 1}`}
             fill
             priority
             sizes="(max-width: 1024px) 100vw, 55vw"
-            className="object-cover object-center transition-ui"
+            className="object-cover object-center transition-ui animate-fade-in"
             onError={() => {
               setHasError((prev) => ({ ...prev, [activeIndex]: true }));
             }}

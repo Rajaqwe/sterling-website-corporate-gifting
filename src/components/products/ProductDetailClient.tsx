@@ -102,7 +102,7 @@ export function ProductDetailClient({
       <div className="border-b border-border/40 bg-secondary/30">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
           <nav className="flex items-center gap-1.5 text-xs text-muted-foreground flex-wrap" aria-label="Breadcrumb">
-            <Link href="/" className="hover:text-primary transition-colors">Home</Link>
+            <Link href="/" className="hover:text-primary transition-ui">Home</Link>
             <ChevronRight className="h-3 w-3" />
             <Link href="/corporate-gifts" className="hover:text-primary transition-colors">Corporate Gifts</Link>
             <ChevronRight className="h-3 w-3" />
@@ -178,7 +178,7 @@ export function ProductDetailClient({
             <div className="pt-2 border-t border-border/50 flex items-center gap-2">
               <Button
                 variant="outline"
-                className={`h-10 flex items-center justify-center gap-1.5 transition-ui px-3 ${isLiked ? "border-red-200 bg-red-50/50 dark:bg-red-950/20" : ""}`}
+                className={`h-11 flex items-center justify-center gap-1.5 transition-ui px-3 ${isLiked ? "border-red-200 bg-red-50/50 dark:bg-red-950/20" : ""}`}
                 onClick={handleLike}
                 disabled={isLiking}
                 aria-label="Like Product"
@@ -188,7 +188,7 @@ export function ProductDetailClient({
               </Button>
 
               <DropdownMenu>
-                <DropdownMenuTrigger className="h-10 w-10 flex items-center justify-center border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md transition-ui" aria-label="Share">
+                <DropdownMenuTrigger className="h-11 w-11 flex items-center justify-center border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-xl transition-ui touch-manipulation" aria-label="Share">
                   <Share2 className="h-4 w-4" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-48 bg-card shadow-lg rounded-xl border border-border/60">

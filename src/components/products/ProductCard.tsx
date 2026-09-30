@@ -8,7 +8,7 @@ import Link from "next/link";
 import { Product } from "@/types/product";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { ArrowRight, Eye, Layers, Sparkles } from "lucide-react";
+import { ArrowRight, Clock3, Eye, Layers, PackageCheck, Palette, Sparkles } from "lucide-react";
 import { formatINR } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -34,7 +34,10 @@ export function ProductCard({ product, className = "", priority = false }: Produ
   const displayCategory = (product as any).category?.name || "Corporate Gift";
   const lowestBulkPrice = Number(product.startingPrice ?? product.lowestPrice ?? (product as any).basePrice ?? (product as any).price ?? 0);
   const basePrice = (product as any).basePrice ? Number((product as any).basePrice) : Number((product as any).price ?? 0);
-  const minimumOrderQuantity = (product as any).minimumOrderQuantity || product.moq || 1;
+  const minimumOrderQuantity = Number((product as any).minimumOrderQuantity ?? product.moq ?? 1);
+  const leadTimeDays = Number((product as any).leadTimeDays ?? 0);
+  const brandingAvailable = (product as any).brandingAvailable !== false;
+  const brandingLeadTimeDays = Number((product as any).brandingLeadTimeDays ?? 0);
   const calculatedSavings = basePrice > 0 && lowestBulkPrice < basePrice ? Math.round(((basePrice - lowestBulkPrice) / basePrice) * 100) : 0;
   const maxSavingsPercent = product.priceTiers?.[product.priceTiers.length - 1]?.savingsPercent || calculatedSavings;
 
@@ -149,6 +152,25 @@ export function ProductCard({ product, className = "", priority = false }: Produ
           </div>
         )}
 
+        {/* Buying at a glance */}
+        <div className="grid grid-cols-3 gap-2 border-t border-border/40 pt-3">
+          <div className="rounded-xl bg-secondary/45 px-2.5 py-2.5 text-center dark:bg-secondary/25">
+            <PackageCheck className="mx-auto h-4 w-4 text-accent" aria-hidden="true" />
+            <span className="mt-1 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">MOQ</span>
+            <span className="mt-0.5 block text-xs font-bold text-foreground">{minimumOrderQuantity} units</span>
+          </div>
+          <div className="rounded-xl bg-secondary/45 px-2.5 py-2.5 text-center dark:bg-secondary/25">
+            <Clock3 className="mx-auto h-4 w-4 text-accent" aria-hidden="true" />
+            <span className="mt-1 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Lead time</span>
+            <span className="mt-0.5 block text-xs font-bold text-foreground">{leadTimeDays > 0 ? String(leadTimeDays) + " days" : "Confirm"}</span>
+          </div>
+          <div className="rounded-xl bg-secondary/45 px-2.5 py-2.5 text-center dark:bg-secondary/25">
+            <Palette className="mx-auto h-4 w-4 text-accent" aria-hidden="true" />
+            <span className="mt-1 block text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Branding</span>
+            <span className="mt-0.5 block text-xs font-bold text-foreground">{brandingAvailable ? "Available" : "Not available"}</span>
+          </div>
+        </div>
+
         {/* B2B Pricing Section */}
         <div className="mt-auto pt-3 border-t border-border/40 flex items-end justify-between">
           <div>
@@ -232,7 +254,17 @@ export function ProductCard({ product, className = "", priority = false }: Produ
             <div className="flex items-center justify-between gap-3"><span className="text-sm text-muted-foreground">{displayCategory}</span><span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-primary">MOQ {minimumOrderQuantity}</span></div>
             {product.tagline && <p className="text-sm leading-relaxed text-muted-foreground">{product.tagline}</p>}
             <div className="rounded-xl border border-primary/15 bg-primary/[0.035] p-4"><span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Starting at</span><p className="mt-1 text-2xl font-bold text-primary">{formatINR(lowestBulkPrice)} <span className="text-sm font-normal text-muted-foreground">/ unit</span></p></div>
-            <div className="grid grid-cols-2 gap-3 text-sm"><div className="rounded-xl border border-border p-3"><span className="block text-xs text-muted-foreground">Branding</span><strong className="mt-1 block text-foreground">{customizations.length ? "Available" : "Ask our team"}</strong></div><div className="rounded-xl border border-border p-3"><span className="block text-xs text-muted-foreground">Category</span><strong className="mt-1 block text-foreground">{displayCategory}</strong></div></div>
+            <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="rounded-xl border border-border p-3">
+                <span className="block text-xs text-muted-foreground">Branding</span>
+                <strong className="mt-1 block text-foreground">{brandingAvailable ? "Available" : "Not available"}</strong>
+                {brandingAvailable && brandingLeadTimeDays > 0 && <span className="mt-1 block text-[11px] text-muted-foreground">Adds {brandingLeadTimeDays} days</span>}
+              </div>
+              <div className="rounded-xl border border-border p-3">
+                <span className="block text-xs text-muted-foreground">Lead time</span>
+                <strong className="mt-1 block text-foreground">{leadTimeDays > 0 ? String(leadTimeDays) + " business days" : "Confirm with team"}</strong>
+              </div>
+            </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <Link href={`/products/${product.slug}`} onClick={() => setIsQuickViewOpen(false)} className="btn-primary h-11 w-full rounded-md font-semibold text-sm flex items-center justify-center">VIEW PRODUCT</Link>
               <Button

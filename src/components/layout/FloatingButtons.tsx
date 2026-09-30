@@ -48,11 +48,11 @@ export function FloatingButtons() {
         onMouseLeave={() => setShowTooltip(false)}
       >
         <div
-          className={`absolute right-full mr-4 hidden sm:block bg-sp-navy text-white text-sm px-4 py-2 rounded-xl shadow-lg whitespace-nowrap transition-all duration-300 font-sans ${showTooltip ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}
+          className={`absolute right-full mr-4 hidden sm:block bg-primary text-primary-foreground text-sm px-4 py-2 rounded-xl shadow-lg whitespace-nowrap transition-all duration-300 font-sans ${showTooltip ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}
         >
           Need help with your corporate gifting?
           {/* Triangle pointer */}
-          <div className="absolute top-1/2 -right-2 -translate-y-1/2 border-8 border-transparent border-l-sp-navy" />
+          <div className="absolute top-1/2 -right-2 -translate-y-1/2 border-8 border-transparent border-l-primary" />
         </div>
 
         <Link

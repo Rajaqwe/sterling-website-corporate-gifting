@@ -40,7 +40,7 @@ export default function EventGiftsPage() {
               Build a considered gifting moment around your audience, event format, and budget.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <StaggerContainer staggerDelay={70} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { icon: CalendarDays, title: "Conference Kits", desc: "Cohesive sets including branded notebooks, pens, lanyards, USB drives, and drinkware — everything in one polished package." },
               { icon: Megaphone, title: "Promotional Merchandise", desc: "Cost-effective, high-utility items designed for mass distribution and maximum brand visibility at trade shows and expos." },
@@ -49,7 +49,8 @@ export default function EventGiftsPage() {
               { icon: Users, title: "Team Offsites", desc: "Fun, memorable gift sets for company offsites, retreats, and team-building events that boost camaraderie." },
               { icon: Sparkles, title: "Award Ceremonies", desc: "Distinguished trophies, plaques, and premium award kits that celebrate achievement with elegance." },
             ].map((item, i) => (
-              <Card key={i} className="border-none shadow-sm bg-secondary/20 overflow-hidden hover:shadow-md transition-all duration-300 group">
+              <Reveal key={i}>
+              <Card className="border-none shadow-sm bg-secondary/20 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-ui group">
                 <CardContent className="p-8">
                   <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-foreground dark:text-white transition-colors duration-300 mb-5">
                     <item.icon className="h-7 w-7" />
@@ -58,8 +59,9 @@ export default function EventGiftsPage() {
                   <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
                 </CardContent>
               </Card>
+            </Reveal>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 

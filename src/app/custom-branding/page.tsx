@@ -63,7 +63,6 @@ export default function CustomBrandingPage() {
                   <p className="text-muted-foreground text-sm leading-relaxed">{service.desc}</p>
                 </CardContent>
               </Card>
-            </Reveal>
             ))}
           </StaggerContainer>
         </div>

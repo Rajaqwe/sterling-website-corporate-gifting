@@ -30,6 +30,7 @@ import {
   Cpu,
   ExternalLink,
   Image as ImageIcon,
+  ClipboardCheck,
   LucideIcon,
 } from "lucide-react";
 
@@ -64,6 +65,7 @@ const navGroups: NavGroup[] = [
     items: [
       { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
       { name: "Quotes", href: "/admin/quotes", icon: FileText },
+      { name: "Sample Requests", href: "/admin/sample-requests", icon: ClipboardCheck },
       { name: "Inventory", href: "/admin/inventory", icon: Warehouse },
     ],
   },

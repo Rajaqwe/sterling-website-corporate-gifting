@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { formatINR } from "@/lib/currency";
 import { ProductConfiguratorClient } from "@/components/products/ProductConfiguratorClient";
+import { WhatsAppConciergeButton } from "@/components/contact/WhatsAppConciergeButton";
 
 export function ProductDetailClient({
   product,
@@ -178,15 +179,18 @@ export function ProductDetailClient({
               <div><span className="font-semibold text-foreground">Availability:</span> {product.stockStatus === 'IN_STOCK' ? <span className="text-emerald-600 font-semibold">In Stock</span> : <span className="text-amber-600 font-semibold">{product.stockStatus}</span>}</div>
             </div>
 
-            <Link
-              href={"/request-a-sample?product=" + encodeURIComponent(product.slug)}
-              className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 text-sm font-semibold text-foreground transition-[background-color,border-color,transform] duration-300 ease-out hover:-translate-y-0.5 hover:border-accent/60 hover:bg-accent/15"
-            >
-              <PackageCheck className="h-4 w-4 text-accent" />
-              Request a sample
-            </Link>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <WhatsAppConciergeButton productName={title} productUrl={shareUrl} label="Ask on WhatsApp" />
+              <Link
+                href={"/request-a-sample?product=" + encodeURIComponent(product.slug)}
+                className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 text-sm font-semibold text-foreground transition-[background-color,border-color,transform] duration-300 ease-out hover:-translate-y-0.5 hover:border-accent/60 hover:bg-accent/15"
+              >
+                <PackageCheck className="h-4 w-4 text-accent" />
+                Request a sample
+              </Link>
+            </div>
             <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
-              Evaluate the product before committing to a bulk order. Availability and any applicable sample charges are confirmed after review.
+              Ask questions on WhatsApp or request a sample before committing to a bulk order. Availability and any applicable sample charges are confirmed after review.
             </p>
             <div className="pt-2 border-t border-border/50 flex items-center gap-2">
               <Button

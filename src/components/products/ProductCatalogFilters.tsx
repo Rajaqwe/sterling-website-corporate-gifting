@@ -6,57 +6,139 @@ import { Button } from "@/components/ui/button";
 
 export function ActiveFilters() {
   const { searchParams, updateFilters, clearAllFilters } = useFilters();
-  
+
   const activeFilters: { key: string; value: string; label: string }[] = [];
-  
-  const category = searchParams.get("category");
-  if (category) activeFilters.push({ key: "category", value: category, label: `Category: ${category}` });
-  
+  const standardKeys = new Set([
+    "q",
+    "category",
+    "minPrice",
+    "maxPrice",
+    "minMoq",
+    "maxMoq",
+    "rating",
+    "isDiscounted",
+    "sort",
+    "page",
+  ]);
+
+  const query = searchParams.get("q");
+  if (query) {
+    activeFilters.push({
+      key: "q",
+      value: query,
+      label: `Search: “${query}”`,
+    });
+  }
+
+  searchParams.getAll("category").forEach((value) => {
+    activeFilters.push({
+      key: "category",
+      value,
+      label: `Category: ${value}`,
+    });
+  });
+
   const minPrice = searchParams.get("minPrice");
   const maxPrice = searchParams.get("maxPrice");
   if (minPrice || maxPrice) {
-    const label = minPrice && maxPrice ? `Budget: ₹${minPrice}–₹${maxPrice}` : minPrice ? `Budget: ₹${minPrice}+` : `Budget: Under ₹${maxPrice}`;
-    activeFilters.push({ key: "price", value: `${minPrice || ""}-${maxPrice || ""}`, label });
+    const label =
+      minPrice && maxPrice
+        ? `Budget: ₹${minPrice}–₹${maxPrice}`
+        : minPrice
+          ? `Budget: ₹${minPrice}+`
+          : `Budget: Under ₹${maxPrice}`;
+    activeFilters.push({
+      key: "price",
+      value: `${minPrice || ""}-${maxPrice || ""}`,
+      label,
+    });
   }
 
   const minMoq = searchParams.get("minMoq");
   const maxMoq = searchParams.get("maxMoq");
   if (minMoq || maxMoq) {
-    const label = minMoq && maxMoq ? `MOQ: ${minMoq}–${maxMoq}` : minMoq ? `MOQ: ${minMoq}+` : `MOQ: Under ${maxMoq}`;
-    activeFilters.push({ key: "moq", value: `${minMoq || ""}-${maxMoq || ""}`, label });
+    const label =
+      minMoq && maxMoq
+        ? `MOQ: ${minMoq}–${maxMoq}`
+        : minMoq
+          ? `MOQ: ${minMoq}+`
+          : `MOQ: Under ${maxMoq}`;
+    activeFilters.push({
+      key: "moq",
+      value: `${minMoq || ""}-${maxMoq || ""}`,
+      label,
+    });
+  }
+
+  const rating = searchParams.get("rating");
+  if (rating) {
+    activeFilters.push({
+      key: "rating",
+      value: rating,
+      label: `Rating: ${rating}★+`,
+    });
+  }
+
+  if (searchParams.get("isDiscounted") === "true") {
+    activeFilters.push({
+      key: "isDiscounted",
+      value: "true",
+      label: "On sale",
+    });
+  }
+
+  for (const key of new Set(searchParams.keys())) {
+    if (standardKeys.has(key)) continue;
+
+    searchParams.getAll(key).forEach((value) => {
+      activeFilters.push({
+        key,
+        value,
+        label: `${key.replace(/[-_]/g, " ")}: ${value}`,
+      });
+    });
   }
 
   if (activeFilters.length === 0) return null;
 
+  const removeFilter = (filter: { key: string; value: string }) => {
+    if (filter.key === "price") return updateFilters({ minPrice: null, maxPrice: null });
+    if (filter.key === "moq") return updateFilters({ minMoq: null, maxMoq: null });
+    if (filter.key === "q" || filter.key === "rating" || filter.key === "isDiscounted") {
+      return updateFilters({ [filter.key]: null });
+    }
+
+    const remaining = searchParams
+      .getAll(filter.key)
+      .filter((value) => value !== filter.value);
+
+    updateFilters({ [filter.key]: remaining });
+  };
+
   return (
-    <div className="flex flex-wrap items-center gap-2 mb-6">
-      <span className="text-sm text-muted-foreground mr-1">Active Filters:</span>
+    <div className="mb-6 flex flex-wrap items-center gap-2">
+      <span className="mr-1 text-sm text-muted-foreground">Active Filters:</span>
       {activeFilters.map((filter) => (
-        <span 
+        <span
           key={`${filter.key}-${filter.value}`}
-          className="inline-flex items-center gap-1 bg-secondary/80 text-secondary-foreground text-xs px-2.5 py-1 rounded-full border"
+          className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary/80 px-2.5 py-1 text-xs text-secondary-foreground"
         >
           {filter.label}
-          <button 
-            onClick={() =>
-              filter.key === "price"
-                ? updateFilters({ minPrice: "", maxPrice: "" })
-                : filter.key === "moq"
-                  ? updateFilters({ minMoq: "", maxMoq: "" })
-                  : updateFilters({ [filter.key]: "" })
-            }
-            className="rounded-full p-0.5 hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-ui"
+          <button
+            type="button"
+            onClick={() => removeFilter(filter)}
+            className="rounded-full p-0.5 transition-ui hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label={`Remove ${filter.label} filter`}
           >
-            <X className="h-3 w-3" />
+            <X className="h-3 w-3" aria-hidden="true" />
           </button>
         </span>
       ))}
-      <Button 
-        variant="ghost" 
-        size="sm" 
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={clearAllFilters}
-        className="h-7 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/70 px-2 transition-ui"
+        className="h-7 px-2 text-xs text-muted-foreground transition-ui hover:bg-secondary/70 hover:text-foreground"
       >
         Clear all
       </Button>

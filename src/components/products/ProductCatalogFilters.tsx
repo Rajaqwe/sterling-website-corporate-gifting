@@ -32,7 +32,7 @@ export function ActiveFilters() {
           {filter.label}
           <button 
             onClick={() => filter.key === "price" ? updateFilters({ minPrice: "", maxPrice: "" }) : updateFilters({ [filter.key]: "" })}
-            className="rounded-sm hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="rounded-full p-0.5 hover:bg-destructive/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-ui"
             aria-label={`Remove ${filter.label} filter`}
           >
             <X className="h-3 w-3" />
@@ -43,7 +43,7 @@ export function ActiveFilters() {
         variant="ghost" 
         size="sm" 
         onClick={clearAllFilters}
-        className="h-6 text-xs text-muted-foreground hover:text-foreground px-2"
+        className="h-7 text-xs text-muted-foreground hover:text-foreground hover:bg-secondary/70 px-2 transition-ui"
       >
         Clear all
       </Button>

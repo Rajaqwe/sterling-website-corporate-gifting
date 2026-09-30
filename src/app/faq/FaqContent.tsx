@@ -119,7 +119,7 @@ export function FaqContent() {
                 <Accordion multiple={false} className="rounded-xl border bg-background shadow-sm overflow-hidden">
                   {category.questions.map((item, qIdx) => (
                     <AccordionItem key={qIdx} className="px-6">
-                      <AccordionTrigger className="py-5 text-base font-semibold text-primary hover:no-underline">
+                      <AccordionTrigger className="py-5 text-base font-semibold text-primary hover:no-underline transition-ui">
                         {item.q}
                       </AccordionTrigger>
                       <AccordionContent>

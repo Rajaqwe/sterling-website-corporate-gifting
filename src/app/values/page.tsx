@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Card, CardContent } from "@/components/ui/card";
 import { Award, Users, Heart, Lightbulb, Eye, Leaf } from "lucide-react";
 import { MarketingHero } from "@/components/marketing/MarketingHero";
+import { Reveal, StaggerContainer } from "@/components/ui/reveal";
 
 export const metadata: Metadata = {
   title: 'Our Values | Sterling',
@@ -19,7 +20,7 @@ export default function ValuesPage() {
       {/* Values Grid */}
       <section className="pt-32 pb-20 md:py-24 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <StaggerContainer staggerDelay={70} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { 
                 icon: Award, 
@@ -58,7 +59,8 @@ export default function ValuesPage() {
                 accent: "bg-green-500/10 text-green-600"
               },
             ].map((value, i) => (
-              <Card key={i} className="border-none shadow-sm bg-secondary/20 overflow-hidden hover:shadow-md transition-all duration-300">
+              <Reveal key={i}>
+                <Card className="border-none shadow-sm bg-secondary/20 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-ui">
                 <CardContent className="p-8">
                   <div className={`inline-flex h-14 w-14 items-center justify-center rounded-2xl ${value.accent} mb-5`}>
                     <value.icon className="h-7 w-7" />
@@ -67,8 +69,9 @@ export default function ValuesPage() {
                   <p className="text-muted-foreground leading-relaxed">{value.desc}</p>
                 </CardContent>
               </Card>
+              </Reveal>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 

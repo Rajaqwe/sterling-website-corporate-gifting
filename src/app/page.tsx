@@ -12,15 +12,14 @@ import {
   Palette,
   PartyPopper,
   ReceiptText,
-  ShieldCheck,
   Sparkles,
-  Star,
   Truck,
   Users,
 } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { DemoVideoCarousel } from "@/components/home/DemoVideoCarousel";
+import { CorporateProcurementTrust } from "@/components/home/CorporateProcurementTrust";
 import { Reveal, StaggerContainer } from "@/components/ui/reveal";
 
 const needs = [
@@ -96,21 +95,18 @@ export default function Home() {
 
               {/* Enterprise Trust & Social Proof Bar */}
               <div className="mt-12 pt-8 border-t border-white/15 flex flex-wrap items-center gap-6 sm:gap-10 text-white/80 text-xs sm:text-sm font-medium">
-                <div className="flex items-center gap-2">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                  </span>
-                  <span className="font-semibold text-white">500+ Enterprise Clients</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Star className="h-4 w-4 fill-amber-300 text-amber-300" />
-                  <span className="font-bold text-white">4.9/5</span>
-                  <span className="text-white/70">Client Rating</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="h-4 w-4 text-amber-300" />
-                  <span>Pan-India Direct Delivery</span>
+                <div className="flex flex-wrap items-center gap-x-7 gap-y-3 text-white/80">
+                  {[
+                    "Corporate-first buying",
+                    "Bulk order support",
+                    "Custom branding",
+                    "GST-ready billing",
+                  ].map((signal) => (
+                    <div key={signal} className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                      <span className="font-medium">{signal}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </Reveal>
@@ -231,6 +227,8 @@ export default function Home() {
           </StaggerContainer>
         </div>
       </section>
+
+      <CorporateProcurementTrust />
 
       <section className="py-20 sm:py-28 bg-card/40 border-y border-border/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

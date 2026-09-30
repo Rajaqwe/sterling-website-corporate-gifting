@@ -31,7 +31,7 @@ export default function CustomBrandingPage() {
           </p>
           <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
             <Link href="/request-a-quote" className={cn(buttonVariants({ size: "lg" }), "btn-primary h-12 px-7 font-semibold")}>Start customization</Link>
-            <Link href="/corporate-gifts" className={cn(buttonVariants({ size: "lg", variant: "outline" }), "btn-primary h-12 border-white/70 bg-transparent px-7 font-semibold text-white hover:bg-white/10 hover:text-white")}>Browse brandable gifts</Link>
+            <Link href="/corporate-gifts" className={cn(buttonVariants({ size: "lg", variant: "outline" }), "btn-secondary h-12 px-7 font-semibold")}>Browse brandable gifts</Link>
           </div>
         </div>
       </section>

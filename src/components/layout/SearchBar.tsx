@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Search, X, Loader2, FolderSearch, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
@@ -16,26 +16,39 @@ export function SearchBar({ isLightText = false }: { isLightText?: boolean }) {
   const router = useRouter();
   // Debounced search
   useEffect(() => {
+    const controller = new AbortController();
     const timer = setTimeout(async () => {
       if (query.trim().length >= 2) {
         setIsLoading(true);
         try {
-          const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+          const res = await fetch(
+            `/api/search?q=${encodeURIComponent(query)}`,
+            { signal: controller.signal }
+          );
+          if (!res.ok) throw new Error(`Search failed: ${res.status}`);
           const data = await res.json();
           setResults(data.products || data.results || []);
           setCategories(data.categories || []);
         } catch (e) {
-          console.error(e);
+          if ((e as DOMException).name !== "AbortError") {
+            console.error(e);
+            setResults([]);
+            setCategories([]);
+          }
         } finally {
-          setIsLoading(false);
+          if (!controller.signal.aborted) setIsLoading(false);
         }
       } else {
+        setIsLoading(false);
         setResults([]);
         setCategories([]);
       }
     }, 300);
 
-    return () => clearTimeout(timer);
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
   }, [query]);
 
   // Global hotkey Ctrl+K

@@ -59,7 +59,7 @@ jobs:
                   page.on('pageerror', err => pageErrors.push(err.message));
                   page.on('requestfailed', req => failedRequests.push(req.url() + ' :: ' + (req.failure()?.errorText || 'failed')));
 
-                  const response = await page.goto('http://127.0.0.1:3000' + route, { waitUntil: 'domcontentloaded', timeout: 30000 }).catch(() => null);
+                  const response = await page.goto('http://127.0.0.1:3001' + route, { waitUntil: 'domcontentloaded', timeout: 30000 }).catch(() => null);
                   await page.waitForTimeout(700);
 
                   await page.evaluate((t) => {
@@ -129,7 +129,7 @@ jobs:
           npm start > /tmp/next-server.log 2>&1 &
           npx playwright test visual-audit.spec.ts --workers=1 --reporter=line
         env:
-          PORT: 3000
+          PORT: 3001
       - if: always()
         run: |
           echo "===== SERVER LOG ====="

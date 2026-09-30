@@ -10,6 +10,7 @@ import {
   Package, 
   Building2, 
   Settings,
+  FileCheck2,
   LogOut,
   X
 } from "lucide-react";
@@ -19,6 +20,7 @@ const navigation = [
   { name: "My Quotes", href: "/dashboard/quotes",   icon: FileText },
   { name: "Orders",    href: "/dashboard/orders",   icon: Package },
   { name: "Company",   href: "/dashboard/company",  icon: Building2 },
+  { name: "Procurement Support", href: "/procurement-support", icon: FileCheck2 },
   { name: "Settings",  href: "/dashboard/settings", icon: Settings },
 ];
 

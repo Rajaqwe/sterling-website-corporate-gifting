@@ -54,8 +54,8 @@ export default async function CorporateGiftsPage(
         />
       </Suspense>
       
-      <div className="container mx-auto px-4 pb-16 pt-28 sm:px-6 lg:px-8 lg:pt-32">
-        <div className="rounded-[24px] border border-border/70 bg-secondary/35 px-6 py-9 sm:px-9 sm:py-11">
+      <div className="container mx-auto px-4 pb-16 pt-24 sm:px-6 sm:pt-28 lg:px-8 lg:pt-32">
+        <div className="rounded-[24px] border border-border/70 bg-secondary/35 px-5 py-8 sm:px-9 sm:py-11">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-5">
             <div>
               <span className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Corporate gifting catalogue</span>
@@ -79,7 +79,7 @@ export default async function CorporateGiftsPage(
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-8 lg:flex-row">
+        <div className="mt-8 flex flex-col gap-8 sm:mt-10 lg:flex-row">
           <div className="flex-1 w-full min-w-0">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
               <div className="text-sm text-muted-foreground">

@@ -37,8 +37,8 @@ export function TieredPricingTable({
         </span>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-border/70 bg-card shadow-xs">
-        <table className="w-full text-left text-xs border-collapse">
+      <div className="overflow-x-auto rounded-xl border border-border/70 bg-card shadow-xs">
+        <table className="w-full min-w-[520px] text-left text-xs border-collapse">
           <thead>
             <tr className="bg-secondary/70 border-b border-border/70 text-muted-foreground font-semibold">
               <th className="py-2.5 px-3.5">Quantity Tier</th>
@@ -78,20 +78,22 @@ export function TieredPricingTable({
                       onSelectTierQuantity && onSelectTierQuantity(tier.minQuantity);
                     }
                   }}
-                  className={`transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset ${
+                  className={`transition-ui cursor-pointer touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset ${
                     isMatch
                       ? "bg-accent/15 font-semibold text-primary"
                       : "hover:bg-secondary/40 text-foreground"
                   }`}
                   data-active-tier={isMatch ? "true" : "false"}
                 >
-                  <td className="py-3 px-3.5 flex items-center gap-2">
+                  <td className="py-3 px-3.5">
+                    <div className="flex items-center gap-2">
                     {isMatch && (
                       <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-accent text-primary">
                         <Check className="h-2.5 w-2.5 stroke-[3]" />
                       </span>
                     )}
                     <span>{rangeLabel}</span>
+                    </div>
                   </td>
                   <td className="py-3 px-3.5 font-bold">
                     {formatINR(tier.unitPrice)}{" "}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { MobileFilterDrawer, ProductFilterSidebar } from "@/components/products/ProductFilterSidebar";
 import Link from "next/link";
 import { Package, ArrowRight } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
 import { Suspense } from "react";
 import { ProductCard } from "@/components/products/ProductCard";
 
@@ -47,7 +48,7 @@ export default async function CollectionsPage(
         <div className="max-w-lg text-center">
           <Package className="mx-auto mb-5 h-14 w-14 text-muted-foreground" />
           <h1 className="text-3xl font-serif font-bold text-primary">
-            {path.includes("corporate-gifts") ? "Corporate Gifts Catalogue" : "Gift Collections"}
+            "Gift Collections"
           </h1>
           <p className="mt-3 text-lg text-muted-foreground">
             We&apos;re having trouble loading the catalogue right now. Please try again in a moment.
@@ -63,13 +64,15 @@ export default async function CollectionsPage(
 
   return (
     <>
-      <Suspense fallback={<div className="fixed left-0 top-1/2 -translate-y-1/2 z-40 h-32 w-10 bg-muted animate-pulse rounded-r-xl border border-border/50" />}>
-              <FilterDrawer 
-                categories={filterData.categories} 
-                attributes={filterData.attributes}
-                totalResultsCount={products.length} 
-              />
-            </Suspense>
+      <div className="lg:hidden">
+        <Suspense fallback={<div className="fixed left-0 top-1/2 -translate-y-1/2 z-40 h-32 w-10 bg-muted animate-pulse rounded-r-xl border border-border/50" />}>
+          <MobileFilterDrawer
+            categories={filterData.categories}
+            attributes={filterData.attributes}
+            totalResultsCount={products.length}
+          />
+        </Suspense>
+      </div>
       <div className="container mx-auto px-4 pb-16 pt-28 sm:px-6 lg:px-8 lg:pt-32">
       <div className="rounded-[24px] border border-border/70 bg-[#0D1B2A] dark:bg-[#111827] px-6 py-9 text-white sm:px-9 sm:py-11">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-5">

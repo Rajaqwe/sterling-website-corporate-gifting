@@ -132,6 +132,7 @@ function NavGroupComponent({ group, pathname }: { group: NavGroup, pathname: str
               <Link
                 key={item.name}
                 href={item.href}
+                onClick={onClose}
                 className={cn(
                   active
                     ? "bg-accent text-primary"
@@ -156,13 +157,13 @@ function NavGroupComponent({ group, pathname }: { group: NavGroup, pathname: str
   );
 }
 
-export function AdminSidebar() {
+export function AdminSidebar({ onClose }: { onClose?: () => void } = {}) {
   const pathname = usePathname();
 
   return (
     <div className="flex h-full w-64 flex-col bg-secondary text-secondary-foreground">
       <div className="flex h-16 shrink-0 items-center px-6 border-b border-border/40">
-        <Link href="/admin">
+        <Link href="/admin" onClick={onClose}>
           <span className="font-serif text-xl font-bold tracking-widest text-primary uppercase">
             Sterling<span className="text-xs text-muted-foreground ml-2 tracking-normal">ADMIN</span>
           </span>
@@ -178,6 +179,7 @@ export function AdminSidebar() {
       <div className="flex flex-shrink-0 flex-col border-t border-border/40 p-4 gap-2">
         <Link
           href="/"
+          onClick={onClose}
           target="_blank"
           className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
         >

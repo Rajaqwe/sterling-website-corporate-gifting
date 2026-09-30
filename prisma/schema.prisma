@@ -32,6 +32,7 @@ model User {
   quoteMessages      QuoteMessage[]
   quotes             QuoteRequest[]
   reviews            Review[]
+  sampleRequests     SampleRequest[]
   wishlist           Wishlist?
 }
 
@@ -55,6 +56,31 @@ model Company {
   members            CompanyMember[]
   invoices           Invoice[]
   orders             Order[]
+}
+
+model SampleRequest {
+  id                String             @id @default(uuid())
+  referenceNumber   String             @unique
+  userId            String?
+  productId         String?
+  fullName          String
+  companyName       String
+  workEmail         String
+  phone             String
+  estimatedQuantity Int
+  sampleType        String             @default("PHYSICAL_SAMPLE")
+  deliveryLocation  String?
+  requiredBy        DateTime?
+  brandingRequired  Boolean            @default(false)
+  notes             String?
+  status            SampleRequestStatus @default(NEW)
+  internalNotes     String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  product           Product?            @relation(fields: [productId], references: [id], onDelete: SetNull)
+  user              User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+  @@index([status, createdAt])
+  @@index([productId])
 }
 
 model ProjectGalleryItem {
@@ -172,6 +198,7 @@ model Product {
   quoteItems              QuoteItem[]
   quotes                  QuoteRequest[]
   reviews                 Review[]
+  sampleRequests          SampleRequest[]
   wishlistItems           WishlistItem[]
 }
 
@@ -576,6 +603,16 @@ enum StockStatus {
 enum MediaType {
   IMAGE
   VIDEO
+}
+
+enum SampleRequestStatus {
+  NEW
+  REVIEWING
+  CONTACTED
+  APPROVED
+  FULFILLED
+  DECLINED
+  CANCELLED
 }
 
 enum QuoteStatus {

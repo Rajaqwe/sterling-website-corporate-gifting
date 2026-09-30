@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,19 +14,39 @@ import {
 } from "@/components/ui/breadcrumb";
 import React from "react";
 import { CommandSearch } from "./CommandSearch";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { AdminSidebar } from "./AdminSidebar";
 
 export function AdminHeader() {
   const pathname = usePathname();
   const segments = pathname.split("/").filter(Boolean);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   // Example: admin / products / 123
 
   return (
     <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-x-4 border-b border-border/40 bg-background px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-      <Button variant="ghost" size="icon" className="-m-2.5 p-2.5 md:hidden">
-        <span className="sr-only">Open sidebar</span>
-        <Menu className="h-6 w-6" aria-hidden="true" />
-      </Button>
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetTrigger
+          render={
+            <Button
+              variant="ghost"
+              size="icon"
+              className="-m-2.5 min-h-10 min-w-10 p-2.5 md:hidden"
+              aria-label="Open admin menu"
+            />
+          }
+        >
+          <Menu className="h-6 w-6" aria-hidden="true" />
+        </SheetTrigger>
+        <SheetContent
+          side="left"
+          className="w-64 max-w-[85vw] p-0"
+          aria-label="Admin navigation"
+        >
+          <AdminSidebar onClose={() => setMobileOpen(false)} />
+        </SheetContent>
+      </Sheet>
 
       <div className="h-6 w-px bg-border/60 md:hidden" aria-hidden="true" />
 

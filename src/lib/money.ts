@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/generated/prisma";
 
 /**
  * A strict Integer-based money utility to avoid floating-point math errors.

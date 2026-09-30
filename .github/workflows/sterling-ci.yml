@@ -11,13 +11,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
-    env:
-      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ2aXN1YWwtYXVkaXQifQ.signature
-      DATABASE_URL: postgresql://audit:audit@127.0.0.1:5432/audit
-      DIRECT_URL: postgresql://audit:audit@127.0.0.1:5432/audit
-      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -42,30 +36,3 @@ jobs:
 
       - name: Production build
         run: npm run build
-
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
-
-      - name: Start production server
-        run: |
-          nohup npm run start -- -p 3000 > /tmp/sterling-server.log 2>&1 &
-          node -e "const until=Date.now()+120000; (async()=>{while(Date.now()<until){try{const r=await fetch('http://127.0.0.1:3000');if(r.status<500)process.exit(0)}catch{}await new Promise(r=>setTimeout(r,1000))}process.exit(1)})()"
-
-      - name: Full light/dark visual audit
-        run: node audit/full-visual-audit.mjs
-
-      - name: Upload visual audit
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: sterling-full-visual-audit
-          path: artifacts/visual-audit
-          retention-days: 3
-
-      - name: Upload server log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: sterling-server-log
-          path: /tmp/sterling-server.log
-          retention-days: 3

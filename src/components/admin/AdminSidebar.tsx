@@ -3,13 +3,14 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { startTransition, useState } from "react";
+import { startTransition } from "react";
 import { cn } from "@/lib/utils";
-import { ChevronDown, ChevronRight } from "lucide-react";
-import { 
-  LayoutDashboard, 
-  Package, 
-  FileText, 
+import {
+  ChevronDown,
+  ChevronRight,
+  LayoutDashboard,
+  Package,
+  FileText,
   Users,
   Building2,
   Settings,
@@ -28,7 +29,7 @@ import {
   Bell,
   Cpu,
   ExternalLink,
-  LucideIcon
+  LucideIcon,
 } from "lucide-react";
 
 type NavItem = {
@@ -46,9 +47,7 @@ type NavGroup = {
 const navGroups: NavGroup[] = [
   {
     label: null,
-    items: [
-      { name: "Overview", href: "/admin", icon: LayoutDashboard, exact: true },
-    ]
+    items: [{ name: "Overview", href: "/admin", icon: LayoutDashboard, exact: true }],
   },
   {
     label: "Catalog",
@@ -57,7 +56,7 @@ const navGroups: NavGroup[] = [
       { name: "Categories", href: "/admin/categories", icon: Tag },
       { name: "Attributes", href: "/admin/attributes", icon: Layers },
       { name: "Branding Options", href: "/admin/branding", icon: Palette },
-    ]
+    ],
   },
   {
     label: "Commerce",
@@ -65,33 +64,29 @@ const navGroups: NavGroup[] = [
       { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
       { name: "Quotes", href: "/admin/quotes", icon: FileText },
       { name: "Inventory", href: "/admin/inventory", icon: Warehouse },
-    ]
+    ],
   },
   {
     label: "Customers",
     items: [
       { name: "Customers", href: "/admin/customers", icon: Users },
       { name: "Companies", href: "/admin/companies", icon: Building2 },
-    ]
+    ],
   },
   {
     label: "Finance",
-    items: [
-      { name: "Payments", href: "/admin/payments", icon: CreditCard },
-    ]
+    items: [{ name: "Payments", href: "/admin/payments", icon: CreditCard }],
   },
   {
     label: "Content",
-    items: [
-      { name: "Reviews", href: "/admin/reviews", icon: Star },
-    ]
+    items: [{ name: "Reviews", href: "/admin/reviews", icon: Star }],
   },
   {
     label: "Reports",
     items: [
       { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
       { name: "Exports", href: "/admin/exports", icon: FileDown },
-    ]
+    ],
   },
   {
     label: "Administration",
@@ -101,13 +96,23 @@ const navGroups: NavGroup[] = [
       { name: "System Health", href: "/admin/system", icon: Cpu },
       { name: "Audit Logs", href: "/admin/audit", icon: Activity },
       { name: "Settings", href: "/admin/settings", icon: Settings },
-    ]
+    ],
   },
 ];
 
-function NavGroupComponent({ group, pathname }: { group: NavGroup, pathname: string }) {
-  const isActive = group.items.some(item => 
-    item.exact ? pathname === item.href : pathname === item.href || pathname?.startsWith(item.href + '/')
+function NavGroupComponent({
+  group,
+  pathname,
+  onClose,
+}: {
+  group: NavGroup;
+  pathname: string;
+  onClose?: () => void;
+}) {
+  const isActive = group.items.some((item) =>
+    item.exact
+      ? pathname === item.href
+      : pathname === item.href || pathname?.startsWith(item.href + "/")
   );
   const [open, setOpen] = React.useState(isActive || !group.label);
 
@@ -115,7 +120,8 @@ function NavGroupComponent({ group, pathname }: { group: NavGroup, pathname: str
     <div>
       {group.label && (
         <button
-          onClick={() => setOpen(o => !o)}
+          type="button"
+          onClick={() => setOpen((o) => !o)}
           className="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider hover:text-foreground transition-colors"
         >
           {group.label}
@@ -127,16 +133,14 @@ function NavGroupComponent({ group, pathname }: { group: NavGroup, pathname: str
           {group.items.map((item) => {
             const active = item.exact
               ? pathname === item.href
-              : pathname === item.href || pathname?.startsWith(item.href + '/');
+              : pathname === item.href || pathname?.startsWith(item.href + "/");
             return (
               <Link
                 key={item.name}
                 href={item.href}
                 onClick={onClose}
                 className={cn(
-                  active
-                    ? "bg-accent text-primary"
-                    : "hover:bg-accent/50 hover:text-primary",
+                  active ? "bg-accent text-primary" : "hover:bg-accent/50 hover:text-primary",
                   "group flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors"
                 )}
               >
@@ -172,7 +176,7 @@ export function AdminSidebar({ onClose }: { onClose?: () => void } = {}) {
       <div className="flex flex-1 flex-col overflow-y-auto pt-4 pb-4">
         <nav className="flex-1 space-y-3 px-3">
           {navGroups.map((group, i) => (
-            <NavGroupComponent key={i} group={group} pathname={pathname} />
+            <NavGroupComponent key={i} group={group} pathname={pathname} onClose={onClose} />
           ))}
         </nav>
       </div>
@@ -186,13 +190,13 @@ export function AdminSidebar({ onClose }: { onClose?: () => void } = {}) {
           <ExternalLink className="h-4 w-4" />
           View Website
         </Link>
-        <button 
+        <button
           onClick={() => {
             startTransition(async () => {
               const { signOut } = await import("@/app/(auth)/actions");
               await signOut();
             });
-          }} 
+          }}
           className="group block w-full flex-shrink-0 text-left"
         >
           <div className="flex items-center">

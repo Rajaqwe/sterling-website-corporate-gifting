@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { ArrowUp } from "lucide-react";
 import Link from "next/link";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 export function FloatingButtons() {
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -56,7 +57,7 @@ export function FloatingButtons() {
         </div>
 
         <Link
-          href="https://wa.me/919054935136?text=Hi%20Sterling%20Prime,%20I%20need%20help%20with%20a%20gifting%20requirement."
+          href={buildWhatsAppUrl("Hi Sterling Prime, I need help with a corporate gifting requirement. Please help me with the right next step.")}
           target="_blank"
           rel="noopener noreferrer"
           className="whatsapp-pulse flex h-14 w-14 touch-manipulation items-center justify-center rounded-full bg-[#25D366] text-white shadow-xl hover:scale-110 transition-transform duration-300 relative motion-reduce:animate-none"

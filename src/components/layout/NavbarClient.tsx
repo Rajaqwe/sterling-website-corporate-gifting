@@ -201,7 +201,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                           key={link.name} 
                           href={link.href}
                           onClick={() => setIsMobileMenuOpen(false)}
-                          className={`text-lg font-medium py-3 transition-colors motion-safe:animate-fade-in ${
+                          className={`text-lg font-medium py-3 transition-ui motion-safe:animate-fade-in ${
                             pathname.startsWith(link.href) ? "text-accent font-semibold" : "text-foreground hover:text-primary"
                           }`}
                           style={{ animationDelay: `${idx * 100}ms`, animationFillMode: 'both' }}
@@ -240,7 +240,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                 </div>
                 
                 <div className="p-4 bg-secondary/20 border-t border-border/40 pb-safe flex flex-col gap-3">
-                  <Link href="/request-a-quote" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-center gap-2 w-full bg-accent hover:bg-gold-hover text-accent-foreground py-3 rounded-xl font-medium transition-colors shadow-sm">
+                  <Link href="/request-a-quote" onClick={() => setIsMobileMenuOpen(false)} className="flex min-h-11 items-center justify-center gap-2 w-full bg-accent hover:bg-gold-hover text-accent-foreground py-3 rounded-xl font-medium transition-ui shadow-sm">
                     <Briefcase className="h-5 w-5" />
                     Request a Quote
                   </Link>

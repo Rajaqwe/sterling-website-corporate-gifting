@@ -19,6 +19,7 @@ const footerLinks = {
     { name: "Contact Us", href: "/contact" },
     { name: "FAQ", href: "/faq" },
     { name: "Shipping & Delivery", href: "/shipping-delivery" },
+    { name: "Procurement Support", href: "/procurement-support" },
   ],
 };
 

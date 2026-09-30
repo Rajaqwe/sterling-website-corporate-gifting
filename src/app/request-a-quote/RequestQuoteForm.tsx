@@ -185,7 +185,7 @@ export function RequestQuoteForm() {
                 </div>
 
                 {/* Section 3: Shipping Details - shown when checkbox is ticked */}
-                <div className={`grid transition-[grid-template-rows,opacity] duration-[var(--motion-standard)] ease-[var(--ease-standard)] ${showShipping ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                <div className={`grid transition-[grid-template-rows,opacity] duration-500 ease-out ${showShipping ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                   <div className="overflow-hidden">
                     <div className="space-y-6 pt-2">
                       <h3 className="text-xl font-heading font-bold text-sp-navy dark:text-white border-b border-border pb-2 flex items-center gap-3">

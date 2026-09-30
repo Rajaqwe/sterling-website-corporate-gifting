@@ -162,6 +162,11 @@ export default async function OrderDetailPage(props: { params: Promise<{ id: str
  </Card>
 
  <Card>
+ <CardHeader><CardTitle>Procurement Reference</CardTitle></CardHeader>
+ <CardContent className="space-y-2"><div className="text-sm font-medium">Purchase Order</div><div className="font-mono text-sm text-muted-foreground">{order.purchaseOrderNumber || "Not provided"}</div></CardContent>
+ </Card>
+
+ <Card>
  <CardHeader>
  <CardTitle>Customer Details</CardTitle>
  </CardHeader>

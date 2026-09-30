@@ -132,7 +132,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                 <Link 
                   key={link.name} 
                   href={link.href}
-                  className={`text-sm font-medium px-4 py-1.5 rounded-full transition-all duration-300 relative ${
+                  className={`text-sm font-medium px-4 py-1.5 rounded-full transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--motion-ui)] ease-[var(--ease-standard)] relative ${
                     isActive 
                       ? "bg-accent/20 text-accent font-semibold shadow-sm border border-accent/30" 
                       : isScrolled 
@@ -166,7 +166,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
 
             <CartDrawer isLightText={isLightText && !isScrolled} />
 
-            <Link href="/request-a-quote" className="btn-gold h-10 px-5 text-xs font-heading font-bold uppercase tracking-wider flex items-center gap-2 shadow-md hover:shadow-lg transition-all duration-300">
+            <Link href="/request-a-quote" className="btn-gold h-10 px-5 text-xs font-heading font-bold uppercase tracking-wider flex items-center gap-2 shadow-md hover:shadow-lg transition-ui">
               <Briefcase className="h-3.5 w-3.5" />
               <span>Request a Quote</span>
             </Link>

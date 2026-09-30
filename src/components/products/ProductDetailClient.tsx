@@ -46,9 +46,13 @@ export function ProductDetailClient({
   const shareText = `Check out this amazing corporate gift: ${title}`;
   const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(shareUrl);
-    toast.success("Link copied to clipboard!");
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("Link copied to clipboard!");
+    } catch {
+      toast.error("Could not copy the link. Please copy the URL manually.");
+    }
   };
 
   const handleNativeShare = () => {
@@ -174,7 +178,7 @@ export function ProductDetailClient({
             <div className="pt-2 border-t border-border/50 flex items-center gap-2">
               <Button
                 variant="outline"
-                className={`h-10 flex items-center justify-center gap-1.5 transition-all px-3 ${isLiked ? "border-red-200 bg-red-50/50 dark:bg-red-950/20" : ""}`}
+                className={`h-10 flex items-center justify-center gap-1.5 transition-ui px-3 ${isLiked ? "border-red-200 bg-red-50/50 dark:bg-red-950/20" : ""}`}
                 onClick={handleLike}
                 disabled={isLiking}
                 aria-label="Like Product"
@@ -184,7 +188,7 @@ export function ProductDetailClient({
               </Button>
 
               <DropdownMenu>
-                <DropdownMenuTrigger className="h-10 w-10 flex items-center justify-center border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md" aria-label="Share">
+                <DropdownMenuTrigger className="h-10 w-10 flex items-center justify-center border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md transition-ui" aria-label="Share">
                   <Share2 className="h-4 w-4" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-48 bg-card shadow-lg rounded-xl border border-border/60">

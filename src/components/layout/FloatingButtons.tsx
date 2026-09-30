@@ -40,7 +40,7 @@ export function FloatingButtons() {
   const bottomPositionClass = isNearBottom ? "bottom-24" : "bottom-6";
 
   return (
-    <div className={`fixed right-6 z-50 flex flex-col-reverse items-end gap-4 transition-all duration-300 ease-out ${bottomPositionClass}`}>
+    <div className={`fixed right-4 sm:right-6 z-50 flex flex-col-reverse items-end gap-4 transition-all duration-300 ease-out ${bottomPositionClass}`}>
       {/* WhatsApp Floating Button */}
       <div
         className="relative flex items-center"
@@ -48,7 +48,7 @@ export function FloatingButtons() {
         onMouseLeave={() => setShowTooltip(false)}
       >
         <div
-          className={`absolute right-full mr-4 bg-sp-navy text-white text-sm px-4 py-2 rounded-xl shadow-lg whitespace-nowrap transition-all duration-300 font-sans ${showTooltip ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}
+          className={`absolute right-full mr-4 hidden sm:block bg-sp-navy text-white text-sm px-4 py-2 rounded-xl shadow-lg whitespace-nowrap transition-all duration-300 font-sans ${showTooltip ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4 pointer-events-none'}`}
         >
           Need help with your corporate gifting?
           {/* Triangle pointer */}
@@ -59,7 +59,7 @@ export function FloatingButtons() {
           href="https://wa.me/919054935136?text=Hi%20Sterling%20Prime,%20I%20need%20help%20with%20a%20gifting%20requirement."
           target="_blank"
           rel="noopener noreferrer"
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-xl hover:scale-110 transition-transform duration-300 relative"
+          className="whatsapp-pulse flex h-14 w-14 touch-manipulation items-center justify-center rounded-full bg-[#25D366] text-white shadow-xl hover:scale-110 transition-transform duration-300 relative motion-reduce:animate-none"
           aria-label="Chat on WhatsApp"
         >
           <svg className="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">

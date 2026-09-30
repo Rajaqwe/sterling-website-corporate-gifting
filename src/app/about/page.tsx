@@ -41,7 +41,6 @@ export default function AboutPage() {
                   </div>
                 </CardContent>
               </Card>
-              </Reveal>
             ))}
           </StaggerContainer>
         </div>

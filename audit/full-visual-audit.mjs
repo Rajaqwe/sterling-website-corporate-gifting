@@ -253,19 +253,19 @@ async function main() {
   const lines = [
     '# Sterling Full Light/Dark Visual Audit',
     '',
-    \`Base: \${BASE}\`,
-    \`Checks: \${counts.checks} (\${counts.passed} pass / \${counts.failed} fail)\`,
-    \`Screenshots: \${counts.screenshots}\`,
+    `Base: ${BASE}`,
+    `Checks: ${counts.checks} (${counts.passed} pass / ${counts.failed} fail)`,
+    `Screenshots: ${counts.screenshots}`,
     '',
     '## Failures',
-    ...report.routes.filter(x=>!x.ok).map(x=>\`- \${x.route} — \${x.viewport} — \${x.mode}: status=\${x.status}; overflow=\${x.metrics.overflowX}; brokenImages=\${x.brokenImages.length}; console=\${x.consoleErrors.length}; pageErrors=\${x.pageErrors.length}; contrast=\${x.contrastRisks.length}; invisibleControls=\${x.invisibleControls.length}\${x.error?' — '+x.error:''}\`),
+    ...report.routes.filter(x=>!x.ok).map(x=>`- ${x.route} — ${x.viewport} — ${x.mode}: status=${x.status}; overflow=${x.metrics.overflowX}; brokenImages=${x.brokenImages.length}; console=${x.consoleErrors.length}; pageErrors=${x.pageErrors.length}; contrast=${x.contrastRisks.length}; invisibleControls=${x.invisibleControls.length}${x.error?' — '+x.error:''}`),
     '',
     '## Protected route coverage',
     'Admin/dashboard pages are intentionally verified for their expected unauthenticated login redirect in this run.',
     '',
     '## Dynamic route templates',
-    ...dynamicRouteTemplates.map(x=>\`- \${x}\`),
-    ...(report.discoveredDynamic.length ? ['','## Discovered product pages',...report.discoveredDynamic.map(x=>\`- \${x}\`)] : []),
+    ...dynamicRouteTemplates.map(x=>`- ${x}`),
+    ...(report.discoveredDynamic.length ? ['','## Discovered product pages',...report.discoveredDynamic.map(x=>`- ${x}`)] : []),
   ];
   await fs.writeFile(path.join(OUT,'report.md'), lines.join('\n'));
   console.log(JSON.stringify({counts, discoveredDynamic:report.discoveredDynamic, failed:report.routes.filter(x=>!x.ok).map(x=>({route:x.route,viewport:x.viewport,mode:x.mode,status:x.status,finalUrl:x.finalUrl,overflow:x.metrics.overflowX,broken:x.brokenImages,contrast:x.contrastRisks.length,console:x.consoleErrors.slice(0,3),pageErrors:x.pageErrors.slice(0,3),error:x.error}))},null,2));

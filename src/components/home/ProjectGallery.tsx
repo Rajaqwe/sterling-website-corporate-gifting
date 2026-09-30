@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Camera, MapPin, PackageCheck } from "lucide-react";
 import { prisma } from "@/lib/prisma/client";
@@ -44,12 +43,12 @@ export async function ProjectGallery({ limit = 6, showHeading = true }: { limit?
             <Reveal key={project.id}>
               <article className="group overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm transition-[border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-1 hover:border-accent/40 hover:shadow-xl dark:bg-card/60">
                 <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                  <Image
+                  <img
                     src={project.imageUrl}
                     alt={project.altText || project.title}
-                    fill
-                    sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                   />
                   {project.projectType && (
                     <span className="absolute left-4 top-4 rounded-full border border-white/30 bg-black/55 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm">

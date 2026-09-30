@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Leaf, Recycle, TreePine, Heart, Package, Globe } from "lucide-react";
 import { MarketingHero } from "@/components/marketing/MarketingHero";
+import { Reveal, StaggerContainer } from "@/components/ui/reveal";
 
 export const metadata: Metadata = {
   title: 'Sustainability | Sterling',
@@ -28,7 +29,7 @@ export default function SustainabilityPage() {
               Every decision we make is guided by our commitment to a better future.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <StaggerContainer staggerDelay={70} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { icon: Leaf, title: "Eco-Friendly Products", desc: "Items made from recycled, biodegradable, or highly renewable materials. Bamboo, organic cotton, recycled plastics, and more." },
               { icon: Package, title: "Responsible Packaging", desc: "We minimize unnecessary plastic and use recyclable, compostable packaging materials wherever possible." },
@@ -37,7 +38,8 @@ export default function SustainabilityPage() {
               { icon: TreePine, title: "Carbon-Conscious Logistics", desc: "Optimized shipping routes and consolidated deliveries to minimize our transportation carbon footprint." },
               { icon: Globe, title: "Community Impact", desc: "Supporting local artisans and social enterprises through our product sourcing to create positive community impact." },
             ].map((item, i) => (
-              <Card key={i} className="border-none shadow-sm bg-secondary/20 overflow-hidden hover:shadow-md transition-all duration-300 group">
+              <Reveal key={i}>
+                <Card className="border-none shadow-sm bg-secondary/20 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-ui group">
                 <CardContent className="p-8">
                   <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-green-500/10 text-green-600 group-hover:bg-green-600 group-hover:text-foreground dark:text-white transition-colors duration-300 mb-5">
                     <item.icon className="h-7 w-7" />
@@ -46,8 +48,9 @@ export default function SustainabilityPage() {
                   <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
                 </CardContent>
               </Card>
+              </Reveal>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 

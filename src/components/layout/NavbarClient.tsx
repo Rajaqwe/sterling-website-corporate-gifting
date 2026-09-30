@@ -50,11 +50,23 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
   const [isServicesOpen, setIsServicesOpen] = useState(false);
 
   useEffect(() => {
+    let frame = 0;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        setIsScrolled(window.scrollY > 20);
+        frame = 0;
+      });
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   const pathname = usePathname();

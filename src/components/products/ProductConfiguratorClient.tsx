@@ -91,6 +91,7 @@ export function ProductConfiguratorClient({
     startTransition(async () => {
       const res = await addToCart(product.id, quantity, selectedVariantId, configuration);
       if (res.success) {
+        window.dispatchEvent(new Event("cart-updated"));
         toast.success("Added to cart successfully!");
       } else {
         incrementCart(-quantity);

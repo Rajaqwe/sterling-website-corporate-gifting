@@ -119,7 +119,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                     the mark light (brightness-0 invert would paint a solid
                     white box over the hero).
                 */}
-                <Image src="/logos/sterling-logo-full.svg" alt="Sterling Logo" fill className={`object-contain transition-all duration-500 ${isDarkBg ? "invert mix-blend-screen" : "mix-blend-multiply dark:mix-blend-normal"}`} priority />
+                <Image src="/logos/sterling-logo-full.svg" alt="Sterling Logo" fill className={`object-contain transition-[filter,opacity] duration-500 ${isDarkBg ? "invert mix-blend-screen" : "mix-blend-multiply dark:mix-blend-normal"}`} priority />
               </div>
             </Link>
           </div>
@@ -214,12 +214,14 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                     <div className="py-4">
                       <button 
                         onClick={() => setIsServicesOpen(!isServicesOpen)}
+                        aria-expanded={isServicesOpen}
+                        aria-controls="mobile-corporate-services"
                         className="flex items-center justify-between w-full text-lg font-medium text-foreground py-2"
                       >
                         Corporate Services
                         <ChevronDown className={`h-5 w-5 transition-transform duration-200 ${isServicesOpen ? "rotate-180 text-primary" : "text-muted-foreground"}`} />
                       </button>
-                      <div className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isServicesOpen ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0"}`}>
+                      <div id="mobile-corporate-services" className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${isServicesOpen ? "grid-rows-[1fr] opacity-100 mt-2" : "grid-rows-[0fr] opacity-0"}`}>
                         <div className="overflow-hidden">
                           <div className="flex flex-col pl-4 border-l-2 border-primary/20 space-y-3 py-2">
                             {mobileFooterLinks.map(link => (

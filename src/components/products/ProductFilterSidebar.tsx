@@ -99,7 +99,7 @@ export function FilterControls({
             variant="ghost"
             size="sm"
             onClick={clearAllFilters}
-            className="text-xs text-muted-foreground hover:text-primary h-7 px-2"
+            className="text-xs text-muted-foreground hover:text-primary h-9 px-2 transition-ui touch-manipulation"
           >
             <RotateCcw className="h-3 w-3 mr-1" />
             Reset
@@ -123,7 +123,7 @@ export function FilterControls({
                     key={cat.id}
                     type="button"
                     onClick={() => toggleArrayFilter("category", val)}
-                    className={`flex items-center justify-between text-left text-sm py-1.5 px-2.5 rounded-lg transition-colors ${isSelected
+                    className={`flex items-center justify-between text-left text-sm min-h-10 py-1.5 px-2.5 rounded-lg transition-ui touch-manipulation ${isSelected
                         ? "bg-primary text-primary-foreground font-medium"
                         : "text-foreground hover:bg-secondary/70"
                       }`}
@@ -165,7 +165,7 @@ export function FilterControls({
                       />
                       <Label
                         htmlFor={`attr-${attr.id}-${val.id}`}
-                        className="text-sm font-normal cursor-pointer flex-1 flex justify-between"
+                        className="text-sm font-normal cursor-pointer flex-1 min-h-10 flex items-center justify-between py-1"
                       >
                         <span>{actualVal}</span>
                         <span className="text-xs text-muted-foreground">({val.count})</span>

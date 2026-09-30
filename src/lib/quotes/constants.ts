@@ -1,4 +1,4 @@
-import { QuoteStatus } from '@prisma/client';
+import { QuoteStatus } from '@/generated/prisma';
 
 export const ALLOWED_QUOTE_TRANSITIONS: Record<QuoteStatus, QuoteStatus[]> = {
   NEW: ['REVIEWING', 'REJECTED', 'CANCELLED'],

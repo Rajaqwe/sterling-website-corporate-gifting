@@ -153,6 +153,12 @@ export default async function OrderDetailPage(props: { params: Promise<{ id: str
             </div>
           </div>
 
+          <div className="border rounded-md bg-background p-5 space-y-2">
+            <h3 className="font-medium text-lg">Procurement Reference</h3>
+            <p className="text-xs text-muted-foreground">Purchase-order reference attached to this corporate order.</p>
+            <p className="font-mono text-sm font-semibold text-foreground">{order.purchaseOrderNumber || "Not provided"}</p>
+          </div>
+
           <div className="border rounded-md bg-background p-5 space-y-4">
             <h3 className="font-medium text-lg border-b pb-2">Addresses</h3>
             

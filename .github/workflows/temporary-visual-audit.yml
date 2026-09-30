@@ -1,0 +1,155 @@
+name: Temporary Visual Audit
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  visual-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: audit-placeholder
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx prisma generate
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: |
+          cat > visual-audit.spec.ts <<'EOF'
+          import { test } from '@playwright/test';
+          import fs from 'node:fs';
+
+          const routes = [
+            '/', '/about', '/corporate-gifts', '/gift-collections', '/personalised-gifts',
+            '/employee-gifting', '/event-gifts', '/custom-branding', '/bulk-orders',
+            '/contact', '/careers', '/faq', '/request-a-quote', '/sustainability', '/values',
+            '/privacy-policy', '/refund-policy', '/shipping-delivery', '/terms-and-conditions',
+            '/cart', '/checkout', '/login', '/register', '/forgot-password', '/reset-password',
+            '/dashboard', '/dashboard/orders', '/dashboard/quotes', '/dashboard/company',
+            '/dashboard/settings', '/admin', '/admin/orders', '/admin/quotes', '/admin/products',
+            '/admin/customers', '/admin/inventory', '/products/test-product'
+          ];
+          const themes = ['light', 'dark'] as const;
+          const viewports = [
+            { name: 'desktop', width: 1440, height: 1000 },
+            { name: 'mobile', width: 390, height: 844 }
+          ];
+
+          fs.mkdirSync('visual-audit', { recursive: true });
+
+          for (const viewport of viewports) {
+            for (const theme of themes) {
+              for (const route of routes) {
+                test(viewport.name + ' ' + theme + ' ' + route, async ({ page }) => {
+                  await page.setViewportSize({ width: viewport.width, height: viewport.height });
+
+                  const consoleErrors:string[] = [];
+                  const pageErrors:string[] = [];
+                  const failedRequests:string[] = [];
+                  page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
+                  page.on('pageerror', err => pageErrors.push(err.message));
+                  page.on('requestfailed', req => failedRequests.push(req.url() + ' :: ' + (req.failure()?.errorText || 'failed')));
+
+                  const response = await page.goto('http://127.0.0.1:3000' + route, { waitUntil: 'domcontentloaded', timeout: 30000 }).catch(() => null);
+                  await page.waitForTimeout(700);
+
+                  await page.evaluate((t) => {
+                    document.documentElement.classList.toggle('dark', t === 'dark');
+                    document.documentElement.style.colorScheme = t;
+                  }, theme);
+                  await page.waitForTimeout(350);
+
+                  const findings = await page.evaluate(() => {
+                    const visible = (el: Element) => {
+                      const s = getComputedStyle(el as HTMLElement);
+                      const r = (el as HTMLElement).getBoundingClientRect();
+                      return s.display !== 'none' && s.visibility !== 'hidden' && parseFloat(s.opacity || '1') > 0.05 && r.width > 0 && r.height > 0;
+                    };
+                    const brokenImages = Array.from(document.images)
+                      .filter(img => visible(img) && (!img.complete || img.naturalWidth === 0))
+                      .map(img => ({ alt: img.alt, src: img.currentSrc || img.src }));
+
+                    const clipped = Array.from(document.querySelectorAll('a,button,input,select,textarea'))
+                      .filter(visible)
+                      .map(el => ({ tag: el.tagName, text: (el.textContent || '').trim().slice(0,80), r: (el as HTMLElement).getBoundingClientRect().toJSON() }))
+                      .filter(x => x.r.left < -2 || x.r.right > innerWidth + 2);
+
+                    const contrastRisks = Array.from(document.querySelectorAll('h1,h2,h3,h4,h5,h6,p,a,button,label,span'))
+                      .filter(visible)
+                      .map(el => {
+                        const txt = (el.textContent || '').trim().replace(/\s+/g,' ');
+                        if (!txt || txt.length < 3) return null;
+                        const cs = getComputedStyle(el as HTMLElement);
+                        const fg = cs.color.match(/rgba?\(([^)]+)\)/);
+                        const bg = cs.backgroundColor.match(/rgba?\(([^)]+)\)/);
+                        if (!fg || !bg || bg[1].split(',').length < 3) return null;
+                        const f = fg[1].split(',').map(Number), b = bg[1].split(',').map(Number);
+                        const lum=(c:number[])=>{const q=c.slice(0,3).map(v=>{const x=v/255;return x<=0.03928?x/12.92:Math.pow((x+0.055)/1.055,2.4)});return .2126*q[0]+.7152*q[1]+.0722*q[2]};
+                        const ratio=(Math.max(lum(f),lum(b))+.05)/(Math.min(lum(f),lum(b))+.05);
+                        return ratio < (parseFloat(cs.fontSize) >= 18 ? 3 : 4.5) ? { text:txt.slice(0,90), ratio:Number(ratio.toFixed(2)), color:cs.color, background:cs.backgroundColor } : null;
+                      }).filter(Boolean).slice(0,20);
+
+                    return {
+                      title: document.title,
+                      h1Count: document.querySelectorAll('h1').length,
+                      horizontalOverflow: document.documentElement.scrollWidth > innerWidth + 2,
+                      scrollWidth: document.documentElement.scrollWidth,
+                      innerWidth,
+                      brokenImages,
+                      clipped,
+                      contrastRisks
+                    };
+                  });
+
+                  const safeRoute = route.replace(/[^a-z0-9]+/gi,'_').replace(/^_|_$/g,'') || 'home';
+                  const base = 'visual-audit/' + viewport.name + '__' + theme + '__' + safeRoute;
+                  await page.screenshot({ path: base + '.png', fullPage: true });
+
+                  const result = { viewport: viewport.name, theme, route, status: response?.status() ?? null, consoleErrors, pageErrors, failedRequests, findings };
+                  fs.writeFileSync(base + '.json', JSON.stringify(result, null, 2));
+
+                  if (findings.brokenImages.length || findings.horizontalOverflow) {
+                    throw new Error('Visual defect: brokenImages=' + findings.brokenImages.length + ' horizontalOverflow=' + findings.horizontalOverflow);
+                  }
+                });
+              }
+            }
+          }
+          EOF
+      - run: |
+          npm start > /tmp/next-server.log 2>&1 &
+          npx playwright test visual-audit.spec.ts --workers=1 --reporter=line
+        env:
+          PORT: 3000
+      - if: always()
+        run: |
+          echo "===== SERVER LOG ====="
+          tail -200 /tmp/next-server.log || true
+          echo "===== AUDIT SUMMARY ====="
+          node - <<'EOF'
+          const fs=require('fs');
+          for(const file of fs.readdirSync('visual-audit').filter(f=>f.endsWith('.json'))){
+            const x=JSON.parse(fs.readFileSync('visual-audit/'+file));
+            console.log(JSON.stringify({
+              route:x.route,viewport:x.viewport,theme:x.theme,status:x.status,
+              console:x.consoleErrors.length,page:x.pageErrors.length,requests:x.failedRequests.length,
+              broken:x.findings.brokenImages.length,overflow:x.findings.horizontalOverflow,
+              clipped:x.findings.clipped.length,contrast:x.findings.contrastRisks.length,title:x.findings.title
+            }));
+          }
+          EOF
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sterling-visual-audit
+          path: visual-audit/
+          retention-days: 2

@@ -229,7 +229,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                                 key={link.name}
                                 href={link.href}
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="text-muted-foreground hover:text-primary transition-colors block"
+                                className="text-muted-foreground hover:text-primary transition-ui block py-1"
                               >
                                 {link.name}
                               </Link>
@@ -249,7 +249,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
 
                   {user ? (
                     <div className="flex flex-col gap-3">
-                      <Link href={(user.app_metadata?.role === 'ADMIN' || user.app_metadata?.role === 'SUPER_ADMIN') ? "/admin" : "/dashboard"} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between bg-background p-3 rounded-xl border border-border/60 hover:border-primary/50 transition-colors">
+                      <Link href={(user.app_metadata?.role === 'ADMIN' || user.app_metadata?.role === 'SUPER_ADMIN') ? "/admin" : "/dashboard"} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-between bg-background p-3 rounded-xl border border-border/60 hover:border-primary/50 transition-ui">
                         <div className="flex items-center gap-3">
                           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                             <LayoutDashboard className="h-4 w-4 text-primary" />
@@ -268,7 +268,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                       </button>
                     </div>
                   ) : (
-                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-xl font-medium transition-colors">
+                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-primary-foreground py-3 rounded-xl font-medium transition-ui">
                       <User className="h-5 w-5" />
                       Sign In / Register
                     </Link>

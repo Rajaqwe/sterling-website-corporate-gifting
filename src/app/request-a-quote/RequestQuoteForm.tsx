@@ -101,7 +101,7 @@ export function RequestQuoteForm() {
                 <p className="text-muted-foreground max-w-md mx-auto text-lg mb-8">
                   {state.message}
                 </p>
-                <Button onClick={() => setState(null)} variant="outline" className="border-sp-purple text-sp-purple hover:bg-sp-purple hover:text-white rounded-full px-8 h-12">
+                <Button onClick={() => setState(null)} variant="outline" className="border-accent text-accent hover:bg-accent hover:text-accent-foreground rounded-full px-8 h-12 transition-ui">
                   Submit Another Request
                 </Button>
               </div>
@@ -173,7 +173,7 @@ export function RequestQuoteForm() {
                   </div>
 
                   {/* Checkbox to reveal Section 3 */}
-                  <label className="flex items-start gap-4 mt-4 p-5 bg-gradient-to-r from-sp-orange/5 to-sp-magenta/5 border border-sp-orange/20 rounded-xl cursor-pointer hover:border-sp-orange/40 transition-colors group" onClick={() => setShowShipping(v => !v)}>
+                  <label className="flex items-start gap-4 mt-4 p-5 bg-gradient-to-r from-sp-orange/5 to-sp-magenta/5 border border-sp-orange/20 rounded-xl cursor-pointer hover:border-sp-orange/40 transition-ui group touch-manipulation" onClick={() => setShowShipping(v => !v)}>
                     <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300 ${showShipping ? 'bg-sp-orange border-sp-orange text-white' : 'border-border bg-background'}`}>
                       {showShipping && <svg className="w-3.5 h-3.5" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
                     </span>
@@ -185,7 +185,7 @@ export function RequestQuoteForm() {
                 </div>
 
                 {/* Section 3: Shipping Details - shown when checkbox is ticked */}
-                <div className={`grid transition-[grid-template-rows,opacity] duration-500 ease-in-out ${showShipping ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                <div className={`grid transition-[grid-template-rows,opacity] duration-[var(--motion-standard)] ease-[var(--ease-standard)] ${showShipping ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                   <div className="overflow-hidden">
                     <div className="space-y-6 pt-2">
                       <h3 className="text-xl font-heading font-bold text-sp-navy dark:text-white border-b border-border pb-2 flex items-center gap-3">

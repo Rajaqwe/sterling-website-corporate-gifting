@@ -132,7 +132,7 @@ export default function Home() {
             ].map(({ title, description, icon: Icon }) => (
               <div 
                 key={title} 
-                className="group relative flex flex-col items-center text-center p-4 rounded-xl border border-border/40 bg-background/50 hover:bg-background hover:border-accent/40 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
+                className="group relative flex flex-col items-center text-center p-4 rounded-xl border border-border/40 bg-background/50 hover:bg-background hover:border-accent/40 hover:shadow-md transition-[background-color,border-color,box-shadow,transform] duration-[var(--motion-ui)] ease-[var(--ease-standard)] hover:-translate-y-0.5"
               >
                 <div className="mb-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-accent/15 text-accent group-hover:bg-accent group-hover:text-primary transition-colors duration-300">
                   <Icon className="h-4 w-4" />
@@ -153,7 +153,7 @@ export default function Home() {
               <Reveal key={need.title}>
                 <Link 
                   href={need.href} 
-                  className="group relative flex min-h-72 overflow-hidden rounded-[24px] border border-border/60 hover:border-amber-400/50 bg-primary p-7 text-white shadow-md hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5"
+                  className="group relative flex min-h-72 overflow-hidden rounded-[24px] border border-border/60 hover:border-amber-400/50 bg-primary p-7 text-white shadow-md hover:shadow-2xl transition-[border-color,box-shadow,transform] duration-[var(--motion-standard)] ease-[var(--ease-standard)] hover:-translate-y-1.5"
                 >
                   <div 
                     className="absolute inset-0 bg-cover bg-center opacity-55 transition-transform duration-700 group-hover:scale-[1.08] group-hover:opacity-65" 
@@ -198,7 +198,7 @@ export default function Home() {
               <Link 
                 key={budget.label} 
                 href={budget.href} 
-                className="group flex min-h-28 flex-col justify-between rounded-[20px] border border-border/80 bg-card dark:bg-card/70 p-5 shadow-sm hover:shadow-xl hover:border-accent/50 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden"
+                className="group flex min-h-28 flex-col justify-between rounded-[20px] border border-border/80 bg-card dark:bg-card/70 p-5 shadow-sm hover:shadow-xl hover:border-accent/50 transition-[border-color,box-shadow,transform] duration-[var(--motion-ui)] ease-[var(--ease-standard)] hover:-translate-y-1 relative overflow-hidden"
               >
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#C5A880] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Price Tier</span>
@@ -218,7 +218,7 @@ export default function Home() {
           <StaggerContainer staggerDelay={100} className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {workflow.map(([step, title, description]) => (
               <Reveal key={step}>
-                <article className="group relative rounded-2xl border border-border/60 bg-card p-7 shadow-sm hover:shadow-xl hover:border-accent/40 transition-all duration-500 hover:-translate-y-1.5 overflow-hidden dark:bg-card/50">
+                <article className="group relative rounded-2xl border border-border/60 bg-card p-7 shadow-sm hover:shadow-xl hover:border-accent/40 transition-[border-color,box-shadow,transform] duration-[var(--motion-standard)] ease-[var(--ease-standard)] hover:-translate-y-1.5 overflow-hidden dark:bg-card/50">
                   <div className="absolute top-0 right-0 w-28 h-28 bg-accent/5 rounded-bl-full transition-transform duration-500 group-hover:scale-125 dark:bg-accent/10" />
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-accent text-lg font-black font-heading mb-6 transition-all duration-500 group-hover:bg-primary group-hover:text-primary-foreground shadow-sm">
                     {step.replace('#', '')}
@@ -237,7 +237,7 @@ export default function Home() {
           <SectionHeading eyebrow="Custom Branding" title="Make Every Gift Carry Your Brand" description="Logo embossing, laser engraving, UV printing, customized packaging, and branded unboxing experiences." align="center" />
           <div className="mt-12 flex flex-col md:flex-row items-center justify-center gap-6">
             <div className="group flex-1 w-full text-center">
-              <div className="relative overflow-hidden bg-background/80 h-56 rounded-[24px] mb-5 flex items-center justify-center border border-border/80 shadow-sm transition-all duration-500 hover:shadow-lg hover:-translate-y-1">
+              <div className="relative overflow-hidden bg-background/80 h-56 rounded-[24px] mb-5 flex items-center justify-center border border-border/80 shadow-sm transition-[border-color,box-shadow,transform] duration-[var(--motion-standard)] ease-[var(--ease-standard)] hover:shadow-lg hover:-translate-y-1">
                 <Box className="w-14 h-14 text-muted-foreground/60 transition-transform duration-500 group-hover:scale-110" />
               </div>
               <h4 className="font-heading font-semibold text-base text-foreground">1. Premium Blank Base</h4>

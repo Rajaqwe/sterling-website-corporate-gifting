@@ -153,7 +153,7 @@ export default function Home() {
               <Reveal key={need.title}>
                 <Link 
                   href={need.href} 
-                  className="group relative flex min-h-72 overflow-hidden rounded-[24px] border border-border/60 hover:border-amber-400/50 bg-primary p-7 text-white shadow-md hover:shadow-2xl transition-[border-color,box-shadow,transform] duration-500 ease-out hover:-translate-y-1.5"
+                  className="group relative flex min-h-72 overflow-hidden rounded-[24px] border border-border/60 hover:border-amber-400/50 bg-slate-950 dark:bg-slate-950 p-7 text-white shadow-md hover:shadow-2xl transition-[border-color,box-shadow,transform] duration-500 ease-out hover:-translate-y-1.5"
                 >
                   <div 
                     className="absolute inset-0 bg-cover bg-center opacity-55 transition-transform duration-700 group-hover:scale-[1.08] group-hover:opacity-65" 
@@ -264,7 +264,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-primary py-20 text-white sm:py-28">
+      <section className="bg-slate-950 py-20 text-white sm:py-28 dark:bg-slate-950">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading eyebrow="Built for gifting teams" title="The right pathway for every brief" description="Choose the route that best reflects what your team is trying to achieve." inverse />
           <StaggerContainer staggerDelay={70} className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -12,7 +12,7 @@ import { MarketingHero } from "@/components/marketing/MarketingHero";
 
 function SubmitButton({ pending }: { pending: boolean }) {
   return (
-    <Button type="submit" disabled={pending} className="w-full sm:w-auto h-12 px-8 text-base font-semibold">
+    <Button type="submit" disabled={pending} className="w-full sm:w-auto h-12 px-8 text-base font-semibold transition-ui">
       {pending ? (
         <>
           <span className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -135,10 +135,10 @@ export function ContactForm() {
                 {/* Success/Error Banner */}
                 {state && (
                   <div
-                    className={`flex items-start gap-3 p-4 rounded-lg mb-6 ${
+                    className={`flex items-start gap-3 rounded-lg border p-4 mb-6 motion-safe:animate-fade-in ${
                       state.success
-                        ? "bg-green-50 text-green-800 border border-green-200"
-                        : "bg-red-50 text-red-800 border border-red-200"
+                        ? "bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/20 dark:text-emerald-300 dark:border-emerald-900/50"
+                        : "bg-destructive/10 text-destructive border-destructive/20"
                     }`}
                   >
                     {state.success ? (

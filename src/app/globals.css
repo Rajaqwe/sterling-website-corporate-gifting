@@ -179,6 +179,7 @@
   }
   .shimmer-sweep::after {
     content: '';
+    pointer-events: none;
     position: absolute;
     top: -50%;
     left: -50%;
@@ -268,7 +269,7 @@
 
 /* Shared transition utility */
 .transition-ui {
-  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform;
   transition-duration: var(--motion-ui);
   transition-timing-function: var(--ease-standard);
 }

@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { DemoVideoCarousel } from "@/components/home/DemoVideoCarousel";
 import { CorporateProcurementTrust } from "@/components/home/CorporateProcurementTrust";
 import { VerifiedTestimonials } from "@/components/home/VerifiedTestimonials";
+import { ProjectGallery } from "@/components/home/ProjectGallery";
 import { Reveal, StaggerContainer } from "@/components/ui/reveal";
 
 const needs = [
@@ -264,6 +265,8 @@ export default function Home() {
       </section>
 
       <VerifiedTestimonials />
+
+      <ProjectGallery />
 
       <section className="bg-slate-950 py-20 text-white sm:py-28 dark:bg-slate-950">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

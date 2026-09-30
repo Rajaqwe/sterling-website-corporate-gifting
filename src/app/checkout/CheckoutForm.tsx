@@ -24,6 +24,7 @@ const checkoutSchema = z.object({
   city: z.string().min(2, "City is required"),
   state: z.string().min(2, "State is required"),
   postalCode: z.string().min(4, "Postal code is required"),
+  purchaseOrderNumber: z.string().trim().max(80, "PO reference is too long").optional(),
 });
 
 type CheckoutValues = z.infer<typeof checkoutSchema>;
@@ -58,6 +59,7 @@ export function CheckoutForm({ quote, summary }: { quote: any, summary: any }) {
         city: data.city,
         state: data.state,
         postalCode: data.postalCode,
+        purchaseOrderNumber: data.purchaseOrderNumber,
       };
 
       // 1. Create DB Order
@@ -202,7 +204,7 @@ export function CheckoutForm({ quote, summary }: { quote: any, summary: any }) {
                   <input type="radio" name="payment" value="po" checked={paymentMethod === 'po'} onChange={() => setPaymentMethod('po')} className="mt-1 mr-4 accent-accent" />
                   <div>
                     <div className="font-semibold text-primary">Corporate Purchase Order (PO) / Bank Transfer</div>
-                    <div className="text-xs text-muted-foreground mt-1">Generate an invoice and pay via NEFT/RTGS within Net 30 terms.</div>
+                    <div className="text-xs text-muted-foreground mt-1">Use your company purchase-order process or arrange a bank transfer for this approved order.</div>
                   </div>
                 </label>
                 <label className={`flex items-start p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'card' ? 'border-accent bg-accent/5 ring-1 ring-accent/30' : 'border-border/60 hover:bg-secondary/20'}`}>
@@ -212,6 +214,14 @@ export function CheckoutForm({ quote, summary }: { quote: any, summary: any }) {
                     <div className="text-xs text-muted-foreground mt-1">Pay instantly online using a company card or UPI.</div>
                   </div>
                 </label>
+              {paymentMethod === "po" && (
+                <div className="mt-2 space-y-2 rounded-xl border border-border/60 bg-secondary/20 p-4">
+                  <Label htmlFor="purchaseOrderNumber">Purchase Order Reference</Label>
+                  <Input id="purchaseOrderNumber" placeholder="e.g. PO-2026-1042" {...register("purchaseOrderNumber")} className={errors.purchaseOrderNumber ? "border-destructive" : ""} />
+                  <p className="text-xs text-muted-foreground">Optional internal reference to help your procurement team match the order.</p>
+                  {errors.purchaseOrderNumber && <span className="text-xs text-destructive">{errors.purchaseOrderNumber.message}</span>}
+                </div>
+              )}
               </CardContent>
             </Card>
           </form>

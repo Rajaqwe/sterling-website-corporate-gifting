@@ -6,15 +6,16 @@ test('homepage has correct title and renders hero section', async ({ page }) => 
   await expect(page.locator('h1').first()).toBeVisible();
 });
 
-test('corporate catalog filters work', async ({ page }) => {
+test('corporate catalog search and desktop filters are available', async ({ page }) => {
   await page.goto('/corporate-gifts');
-  await expect(page.locator('h1', { hasText: 'Corporate Catalog' })).toBeVisible();
-  
-  // Fill the search input
+  await expect(page.locator('h1', { hasText: 'Find a gift that fits the brief.' })).toBeVisible();
+
   const searchInput = page.getByPlaceholder('Search corporate gifts...');
+  await expect(searchInput).toBeVisible();
+  await expect(page.getByTestId('filter-sidebar')).toBeVisible();
+
   await searchInput.fill('Notebook');
   await searchInput.press('Enter');
-  
-  // Verify URL updated
+
   await expect(page).toHaveURL(/.*q=Notebook/);
 });

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Reveal, StaggerContainer } from "@/components/ui/reveal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Stamp, Package, Palette, Layers, Printer, Scissors } from "lucide-react";
 
@@ -44,7 +45,7 @@ export default function CustomBrandingPage() {
               From subtle elegance to bold statements — we bring your brand to life on every product.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <StaggerContainer staggerDelay={70} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               { icon: Stamp, title: "Laser Engraving", desc: "Precision etching that creates a permanent, premium finish on metals, leather, and wood products. Ideal for executive gifts." },
               { icon: Printer, title: "UV & Screen Printing", desc: "Vibrant, full-color printing for suitable drinkware, textiles, and packaging materials." },
@@ -62,8 +63,9 @@ export default function CustomBrandingPage() {
                   <p className="text-muted-foreground text-sm leading-relaxed">{service.desc}</p>
                 </CardContent>
               </Card>
+            </Reveal>
             ))}
-          </div>
+          </StaggerContainer>
         </div>
       </section>
 

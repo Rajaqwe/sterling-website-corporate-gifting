@@ -39,7 +39,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const safeName = s => s.replace(/^\/$/, 'home').replace(/[^a-zA-Z0-9_-]+/g, '_').replace(/^_+|_+$/g, '') || 'home';
 
 function parseRgb(s) {
-  const m = s.match(/rgba?\\(([^)]+)\\)/i);
+  const m = s.match(/rgba?\(([^)]+)\)/i);
   if (!m) return null;
   const v = m[1].split(',').map(x => parseFloat(x.trim()));
   return { r:v[0], g:v[1], b:v[2], a:Number.isFinite(v[3]) ? v[3] : 1 };
@@ -81,7 +81,7 @@ async function main() {
         return u.origin === new URL(BASE).origin ? u.pathname : null;
       } catch { return null; }
     }).filter(Boolean);
-    const dynamic = [...new Set(sameOrigin.filter(p => /^\\/products\\/[^/]+$/.test(p)))];
+    const dynamic = [...new Set(sameOrigin.filter(p => /^\/products\/[^/]+$/.test(p)))];
     report.discoveredDynamic = dynamic;
     for (const p of dynamic) if (!routes.includes(p)) routes.push(p);
   } catch {}
@@ -124,7 +124,7 @@ async function main() {
           result.finalUrl = page.url();
           await page.waitForLoadState('networkidle', {timeout:15000}).catch(()=>{});
           await sleep(300);
-          result.loginRedirect = /\\/login(?:\\?|$)/.test(new URL(page.url()).pathname) &&
+          result.loginRedirect = /\/login(?:\?|$)/.test(new URL(page.url()).pathname) &&
             (route.startsWith('/admin') || route.startsWith('/dashboard'));
           result.metrics = await page.evaluate(() => {
             const body = document.body;
@@ -186,7 +186,7 @@ async function main() {
             return s.display!=='none' && s.visibility!=='hidden' && (el.getAttribute('aria-hidden')!=='true') && (r.width < 2 || r.height < 2);
           }).slice(0,30).map(el => ({tag:el.tagName,text:(el.textContent||'').trim().slice(0,60),name:el.getAttribute('aria-label')||el.getAttribute('name')||''})));
           result.contrastRisks = await page.evaluate(() => {
-            const parse = s => {const m=s.match(/rgba?\\(([^)]+)\\)/i); if(!m)return null; const v=m[1].split(',').map(x=>parseFloat(x.trim())); return {r:v[0],g:v[1],b:v[2],a:Number.isFinite(v[3])?v[3]:1};};
+            const parse = s => {const m=s.match(/rgba?\(([^)]+)\)/i); if(!m)return null; const v=m[1].split(',').map(x=>parseFloat(x.trim())); return {r:v[0],g:v[1],b:v[2],a:Number.isFinite(v[3])?v[3]:1};};
             const lum = c => {const f=x=>{x/=255; return x<=.03928?x/12.92:Math.pow((x+.055)/1.055,2.4)};return .2126*f(c.r)+.7152*f(c.g)+.0722*f(c.b)};
             const cr=(a,b)=>{const x=lum(a),y=lum(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
             const visible=el=>{const s=getComputedStyle(el),r=el.getBoundingClientRect();return s.display!=='none'&&s.visibility!=='hidden'&&Number(s.opacity)>0&&r.width>0&&r.height>0};
@@ -267,7 +267,7 @@ async function main() {
     ...dynamicRouteTemplates.map(x=>\`- \${x}\`),
     ...(report.discoveredDynamic.length ? ['','## Discovered product pages',...report.discoveredDynamic.map(x=>\`- \${x}\`)] : []),
   ];
-  await fs.writeFile(path.join(OUT,'report.md'), lines.join('\\n'));
+  await fs.writeFile(path.join(OUT,'report.md'), lines.join('\n'));
   console.log(JSON.stringify({counts, discoveredDynamic:report.discoveredDynamic, failed:report.routes.filter(x=>!x.ok).map(x=>({route:x.route,viewport:x.viewport,mode:x.mode,status:x.status,finalUrl:x.finalUrl,overflow:x.metrics.overflowX,broken:x.brokenImages,contrast:x.contrastRisks.length,console:x.consoleErrors.slice(0,3),pageErrors:x.pageErrors.slice(0,3),error:x.error}))},null,2));
 
   await browser.close();

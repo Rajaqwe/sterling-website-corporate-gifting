@@ -29,7 +29,7 @@ function SocialIcon({ children, href, label }: { children: React.ReactNode; href
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-sp-purple hover:text-white transition-all duration-300"
+      className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-accent hover:text-primary transition-ui"
     >
       {children}
     </a>
@@ -38,7 +38,7 @@ function SocialIcon({ children, href, label }: { children: React.ReactNode; href
 
 export function Footer() {
   return (
-    <footer className="bg-[var(--footer-bg)] text-white border-t border-border/10">
+    <footer className="bg-primary text-primary-foreground border-t border-border/10">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
           
@@ -86,7 +86,7 @@ export function Footer() {
             <ul className="space-y-4">
               {footerLinks.services.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-white/70 hover:text-white transition-colors">
+                  <Link href={link.href} className="text-white/70 hover:text-white hover:translate-x-0.5 inline-block transition-ui">
                     {link.name}
                   </Link>
                 </li>

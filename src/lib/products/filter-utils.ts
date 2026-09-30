@@ -135,6 +135,9 @@ export function buildPrismaOrderBy(sort: string): any {
     case 'moq-asc': return { minimumOrderQuantity: 'asc' };
     case 'moq-desc': return { minimumOrderQuantity: 'desc' };
     case 'rating-desc': return { rating: 'desc' };
+    case 'popular':
+    case 'popularity':
+      return [{ reviewCount: 'desc' }, { likes: 'desc' }];
     case 'title': return { name: 'asc' };
     default: return { createdAt: 'desc' }; // default 'Newest'
   }

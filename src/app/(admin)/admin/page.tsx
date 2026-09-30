@@ -123,7 +123,7 @@ export default async function AdminOverview() {
  </div>
 
  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
- <Card className="border-border shadow-sm">
+ <Card className="border-border/70 shadow-sm transition-[border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md">
  <CardHeader className="flex flex-row items-center justify-between pb-2">
  <CardTitle className="text-sm font-medium text-muted-foreground">Pending Quotes</CardTitle>
  <FileText className="h-4 w-4 text-muted-foreground" />
@@ -134,7 +134,7 @@ export default async function AdminOverview() {
  </CardContent>
  </Card>
  
- <Card className="border-border shadow-sm">
+ <Card className="border-border/70 shadow-sm transition-[border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md">
  <CardHeader className="flex flex-row items-center justify-between pb-2">
  <CardTitle className="text-sm font-medium text-muted-foreground">Active Orders</CardTitle>
  <Package className="h-4 w-4 text-muted-foreground" />
@@ -145,7 +145,7 @@ export default async function AdminOverview() {
  </CardContent>
  </Card>
 
- <Card className="border-border shadow-sm">
+ <Card className="border-border/70 shadow-sm transition-[border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md">
  <CardHeader className="flex flex-row items-center justify-between pb-2">
  <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue (MTD)</CardTitle>
  <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -156,7 +156,7 @@ export default async function AdminOverview() {
  </CardContent>
  </Card>
 
- <Card className="border-border shadow-sm">
+ <Card className="border-border/70 shadow-sm transition-[border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md">
  <CardHeader className="flex flex-row items-center justify-between pb-2">
  <CardTitle className="text-sm font-medium text-muted-foreground">Corporate Clients</CardTitle>
  <Users className="h-4 w-4 text-muted-foreground" />
@@ -177,43 +177,43 @@ export default async function AdminOverview() {
  </h2>
  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
  {pendingOrders > 0 && (
- <Link href="/admin/orders?status=PENDING" className="group flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-lg hover:bg-amber-100 transition-colors">
+ <Link href="/admin/orders?status=PENDING" className="group flex items-start gap-3 rounded-xl border border-amber-500/25 bg-amber-500/10 p-4 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-0.5 hover:border-amber-500/40 hover:bg-amber-500/15 hover:shadow-sm">
  <Clock className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
  <div className="flex-1">
- <div className="font-semibold text-amber-900">{pendingOrders} Orders Pending</div>
- <div className="text-xs text-amber-700 mt-0.5">Awaiting confirmation</div>
+ <div className="font-semibold text-amber-800 dark:text-amber-200">{pendingOrders} Orders Pending</div>
+ <div className="mt-0.5 text-xs text-amber-700 dark:text-amber-300/80">Awaiting confirmation</div>
  </div>
- <ArrowRight className="h-4 w-4 text-amber-400 group-hover:text-amber-600 transition-colors" />
+ <ArrowRight className="h-4 w-4 text-amber-600/70 group-hover:text-amber-500 transition-colors" />
  </Link>
  )}
  {staleQuotes > 0 && (
- <Link href="/admin/quotes?status=NEW" className="group flex items-start gap-3 p-4 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors">
+ <Link href="/admin/quotes?status=NEW" className="group flex items-start gap-3 rounded-xl border border-orange-500/25 bg-orange-500/10 p-4 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-0.5 hover:border-orange-500/40 hover:bg-orange-500/15 hover:shadow-sm">
  <FileText className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
  <div className="flex-1">
- <div className="font-semibold text-orange-900">{staleQuotes} Stale Quotes</div>
- <div className="text-xs text-orange-700 mt-0.5">No activity in 3+ days</div>
+ <div className="font-semibold text-orange-800 dark:text-orange-200">{staleQuotes} Stale Quotes</div>
+ <div className="mt-0.5 text-xs text-orange-700 dark:text-orange-300/80">No activity in 3+ days</div>
  </div>
- <ArrowRight className="h-4 w-4 text-orange-400 group-hover:text-orange-600 transition-colors" />
+ <ArrowRight className="h-4 w-4 text-orange-600/70 group-hover:text-orange-500 transition-colors" />
  </Link>
  )}
  {expiringQuotes > 0 && (
- <Link href="/admin/quotes?status=APPROVED" className="group flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors">
+ <Link href="/admin/quotes?status=APPROVED" className="group flex items-start gap-3 rounded-xl border border-red-500/25 bg-red-500/10 p-4 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-0.5 hover:border-red-500/40 hover:bg-red-500/15 hover:shadow-sm">
  <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
  <div className="flex-1">
- <div className="font-semibold text-red-900">{expiringQuotes} Expiring Soon</div>
- <div className="text-xs text-red-700 mt-0.5">Approved quotes expiring in 3 days</div>
+ <div className="font-semibold text-red-800 dark:text-red-200">{expiringQuotes} Expiring Soon</div>
+ <div className="mt-0.5 text-xs text-red-700 dark:text-red-300/80">Approved quotes expiring in 3 days</div>
  </div>
- <ArrowRight className="h-4 w-4 text-red-400 group-hover:text-red-600 transition-colors" />
+ <ArrowRight className="h-4 w-4 text-red-600/70 group-hover:text-red-500 transition-colors" />
  </Link>
  )}
  {lowStockVariants > 0 && (
- <Link href="/admin/inventory" className="group flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors">
+ <Link href="/admin/inventory" className="group flex items-start gap-3 rounded-xl border border-blue-500/25 bg-blue-500/10 p-4 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-0.5 hover:border-blue-500/40 hover:bg-blue-500/15 hover:shadow-sm">
  <TrendingDown className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
  <div className="flex-1">
- <div className="font-semibold text-blue-900">{lowStockVariants} Low Stock</div>
- <div className="text-xs text-blue-700 mt-0.5">Variants under 10 units</div>
+ <div className="font-semibold text-blue-800 dark:text-blue-200">{lowStockVariants} Low Stock</div>
+ <div className="mt-0.5 text-xs text-blue-700 dark:text-blue-300/80">Variants under 10 units</div>
  </div>
- <ArrowRight className="h-4 w-4 text-blue-400 group-hover:text-blue-600 transition-colors" />
+ <ArrowRight className="h-4 w-4 text-blue-600/70 group-hover:text-blue-500 transition-colors" />
  </Link>
  )}
  </div>
@@ -230,7 +230,7 @@ export default async function AdminOverview() {
  </Card>
 
  <div className="grid gap-6 md:grid-cols-2 mt-6">
- <Card className="border-border shadow-sm">
+ <Card className="border-border/70 shadow-sm transition-[border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md">
  <CardHeader>
  <CardTitle className="text-foreground">Recent Quotes</CardTitle>
  </CardHeader>
@@ -249,7 +249,7 @@ export default async function AdminOverview() {
  </Link>
  <p className="text-xs text-muted-foreground">{quote.companyName} • {itemsCount} items</p>
  </div>
- <div className="text-sm font-medium px-2 py-1 bg-amber-100 text-amber-800 rounded">
+ <div className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:text-amber-200">
  {quote.status}
  </div>
  </div>
@@ -266,20 +266,20 @@ export default async function AdminOverview() {
  </CardContent>
  </Card>
 
- <Card className="border-border shadow-sm">
+ <Card className="border-border/70 shadow-sm transition-[border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md">
  <CardHeader>
  <CardTitle className="text-foreground">Quick Links</CardTitle>
  </CardHeader>
  <CardContent className="space-y-4">
- <Link href="/admin/products/new" className="flex items-center p-4 border rounded-lg hover:bg-secondary/20 transition-colors bg-background">
- <Package className="h-8 w-8 text-blue-600 p-1.5 bg-blue-50 rounded mr-4" />
+ <Link href="/admin/products/new" className="group flex items-center rounded-xl border border-border/70 bg-background p-4 transition-[background-color,border-color,box-shadow,transform] duration-300 ease-out hover:-translate-y-0.5 hover:border-primary/25 hover:bg-secondary/20 hover:shadow-sm">
+ <Package className="mr-4 h-8 w-8 rounded-lg bg-blue-500/10 p-1.5 text-blue-600 dark:text-blue-400" />
  <div>
- <p className="font-medium text-foreground">Add New Product</p>
+ <p className="font-medium text-foreground transition-colors group-hover:text-primary">Add New Product</p>
  <p className="text-sm text-muted-foreground">Create a new corporate gift listing</p>
  </div>
  </Link>
  <Link href="/admin/customers" className="flex items-center p-4 border rounded-lg hover:bg-secondary/20 transition-colors bg-background">
- <Users className="h-8 w-8 text-indigo-600 p-1.5 bg-indigo-50 rounded mr-4" />
+ <Users className="mr-4 h-8 w-8 rounded-lg bg-indigo-500/10 p-1.5 text-indigo-600 dark:text-indigo-400" />
  <div>
  <p className="font-medium text-foreground">Manage Clients</p>
  <p className="text-sm text-muted-foreground">View corporate accounts and users</p>

@@ -9,7 +9,21 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-type Item = ProjectGalleryPayload & { id: string; createdAt: string; updatedAt: string };
+type Item = {
+  id: string;
+  title: string;
+  description: string | null;
+  imageUrl: string;
+  altText: string | null;
+  projectType: string | null;
+  clientName: string | null;
+  quantityLabel: string | null;
+  deliveryLabel: string | null;
+  isPublished: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+};
 
 const EMPTY: ProjectGalleryPayload = {
   title: "",
@@ -49,7 +63,18 @@ export function ProjectGalleryManager({ initialItems }: { initialItems: Item[] }
 
   const edit = (item: Item) => {
     setEditingId(item.id);
-    setDraft({ ...item });
+    setDraft({
+      title: item.title,
+      description: item.description || "",
+      imageUrl: item.imageUrl,
+      altText: item.altText || "",
+      projectType: item.projectType || "",
+      clientName: item.clientName || "",
+      quantityLabel: item.quantityLabel || "",
+      deliveryLabel: item.deliveryLabel || "",
+      isPublished: item.isPublished,
+      sortOrder: item.sortOrder,
+    });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 

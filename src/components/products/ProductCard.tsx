@@ -177,15 +177,15 @@ export function ProductCard({ product, className = "", priority = false }: Produ
         
         {/* Actions */}
         <div className="flex gap-2 pt-3 mt-1">
-          <Button type="button" variant="outline" size="sm" className="h-9 px-3 shrink-0 rounded-xl hover:bg-accent/15 hover:text-accent hover:border-accent/40 transition-colors" onClick={() => setIsQuickViewOpen(true)} aria-label={`Quick view ${title}`}>
+          <Button type="button" variant="outline" size="sm" className="h-10 w-10 shrink-0 rounded-xl hover:bg-accent/15 hover:text-accent hover:border-accent/40 transition-ui touch-manipulation" onClick={() => setIsQuickViewOpen(true)} aria-label={`Quick view ${title}`}>
             <Eye className="h-4 w-4" />
           </Button>
           <Link href={`/products/${product.slug}`} className="flex-1">
-            <span className="btn-secondary h-9 w-full rounded-xl text-[11px] font-heading font-semibold flex items-center justify-center tracking-wider hover:border-accent/50 transition-colors">VIEW DETAILS</span>
+            <span className="btn-secondary h-10 w-full rounded-xl text-[11px] font-heading font-semibold flex items-center justify-center tracking-wider hover:border-accent/50 transition-ui touch-manipulation">VIEW DETAILS</span>
           </Link>
           <Button 
             type="button" 
-            className="flex-1 btn-primary h-9 rounded-xl text-[11px] font-heading font-semibold px-2 hover:shadow-md transition-ui disabled:opacity-70 disabled:pointer-events-none"
+            className="flex-1 btn-primary h-10 rounded-xl text-[11px] font-heading font-semibold px-2 hover:shadow-md transition-ui disabled:opacity-70 disabled:pointer-events-none"
             disabled={isAddingToCart}
             aria-busy={isAddingToCart}
             onClick={async (e) => {

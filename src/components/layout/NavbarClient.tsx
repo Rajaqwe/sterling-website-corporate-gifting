@@ -116,7 +116,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                   filter, so the same logo stays clean on both light and dark
                   surfaces without inversion or blend-mode hacks.
                 */}
-                <Image src="/logos/sterling-logo-full.svg" alt="Sterling Logo" fill className="object-contain transition-opacity duration-500" priority />
+                <Image src="/logos/sterling-prime-transparent.svg" alt="Sterling Logo" fill className="object-contain transition-opacity duration-500" priority />
               </div>
             </Link>
           </div>

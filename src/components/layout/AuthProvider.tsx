@@ -8,6 +8,16 @@ export function AuthProvider({ accessToken, children }: { accessToken: string | 
   const router = useRouter()
 
   useEffect(() => {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+    const isBrowserAuditPlaceholder =
+      supabaseUrl.includes("example.supabase.co") ||
+      supabaseAnonKey === "local-browser-audit-key";
+
+    if (isBrowserAuditPlaceholder) {
+      return;
+    }
+
     const supabase = createClient()
     
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {

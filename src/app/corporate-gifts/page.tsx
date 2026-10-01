@@ -35,22 +35,33 @@ export default async function CorporateGiftsPage(
 
   let products: any[] = [];
   let filterData: any = { categories: [], attributes: [] };
+  let lastError: unknown = null;
 
-  try {
-    [products, filterData] = await Promise.all([
-      prisma.product.findMany({
-        where,
-        include: {
-          category: true,
-          media: true,
-        },
-        orderBy,
-      }),
-      getAvailableFilters(),
-    ]);
-  } catch (error) {
-    console.error("[corporate-gifts] DB error:", error);
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      [products, filterData] = await Promise.all([
+        prisma.product.findMany({
+          where,
+          include: {
+            category: true,
+            media: true,
+          },
+          orderBy,
+        }),
+        getAvailableFilters(),
+      ]);
+      lastError = null;
+      break;
+    } catch (error) {
+      lastError = error;
+      console.error(`[corporate-gifts] DB error (attempt ${attempt}/2):`, error);
+      if (attempt === 1) {
+        await new Promise((resolve) => setTimeout(resolve, 800));
+      }
+    }
+  }
 
+  if (lastError) {
     return (
       <div className="container mx-auto flex min-h-[60vh] items-center justify-center px-4 py-24 sm:px-6 lg:px-8">
         <div className="max-w-lg text-center">

@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
   const baseUrl =
     configuredSiteUrl && !isLocalSiteUrl
       ? configuredSiteUrl.replace(/\/+$/, '')
-      : 'https://sterling-website-corporate-gifting-sterling17.vercel.app';
+      : 'https://sterling-website-corporate-gifting.vercel.app';
 
   return {
     rules: {

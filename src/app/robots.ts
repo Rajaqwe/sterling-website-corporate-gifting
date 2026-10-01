@@ -2,9 +2,13 @@ import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
   const configuredSiteUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
-  const baseUrl = configuredSiteUrl && !/localhost|127\\.0\\.0\\.1/i.test(configuredSiteUrl)
-    ? configuredSiteUrl.replace(/\\/+$/, '')
-    : 'https://sterling-website-corporate-gifting-sterling17.vercel.app';
+  const isLocalSiteUrl =
+    configuredSiteUrl === 'http://localhost:3000' ||
+    configuredSiteUrl === 'http://127.0.0.1:3000';
+  const baseUrl =
+    configuredSiteUrl && !isLocalSiteUrl
+      ? configuredSiteUrl.replace(/\/+$/, '')
+      : 'https://sterling-website-corporate-gifting-sterling17.vercel.app';
 
   return {
     rules: {

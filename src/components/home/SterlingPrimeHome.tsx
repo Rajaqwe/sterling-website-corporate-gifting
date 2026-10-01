@@ -23,12 +23,14 @@ import { DemoVideoCarousel } from "@/components/home/DemoVideoCarousel";
 import { CorporateProcurementTrust } from "@/components/home/CorporateProcurementTrust";
 import { VerifiedTestimonials } from "@/components/home/VerifiedTestimonials";
 import { ProjectGallery } from "@/components/home/ProjectGallery";
+import { ProcurementReadyBar } from "@/components/home/ProcurementReadyBar";
 
 const solutions = [
   { title: "Corporate Kits", description: "Polished gifting programs for teams, clients, and milestones.", href: "/corporate-gifts", icon: Box },
   { title: "Festive Hampers", description: "Celebration-ready selections with premium presentation.", href: "/gift-collections", icon: PartyPopper },
   { title: "Employee Rewards", description: "Useful, memorable gifts for recognition and appreciation.", href: "/employee-gifting", icon: Users },
   { title: "Client Gifts", description: "Thoughtful relationship gifting built around your brand.", href: "/corporate-gifts", icon: BriefcaseBusiness },
+  { title: "Gift Finder", description: "Narrow the catalogue by budget, quantity and gifting goal.", href: "/gift-finder", icon: Sparkles },
 ];
 
 const occasions = [
@@ -105,7 +107,7 @@ export default async function SterlingPrimeHome() {
                   <Link href="/request-a-quote" className="btn-gold h-12 rounded-full px-7 text-sm font-bold uppercase tracking-[0.08em]">
                     Get a quote <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
-                  <Link href="/corporate-gifts" className="btn-secondary h-12 rounded-full border-[#0F75BC] px-7 text-sm font-semibold text-[#0F75BC]">
+                  <Link href="/gift-finder" data-track-event="gift_finder_start" className="inline-flex h-12 items-center justify-center rounded-full border border-[#0F75BC] bg-background px-7 text-sm font-semibold text-[#0F75BC]">
                     Browse gifts
                   </Link>
                 </div>
@@ -140,6 +142,8 @@ export default async function SterlingPrimeHome() {
           </div>
         </div>
       </section>
+
+      <ProcurementReadyBar />
 
       <section className="border-y border-[#E4E1EE] bg-[#F7F5FB] py-7 dark:border-white/10 dark:bg-[#101d2c]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

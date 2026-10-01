@@ -22,9 +22,13 @@ import NextTopLoader from 'nextjs-toploader';
 import { Toaster } from 'sonner';
 
 const configuredSiteUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
-const SITE_URL = configuredSiteUrl && !/localhost|127\\.0\\.0\\.1/i.test(configuredSiteUrl)
-  ? configuredSiteUrl.replace(/\\/+$/, "")
-  : "https://sterling-website-corporate-gifting-sterling17.vercel.app";
+const isLocalSiteUrl =
+  configuredSiteUrl === "http://localhost:3000" ||
+  configuredSiteUrl === "http://127.0.0.1:3000";
+const SITE_URL =
+  configuredSiteUrl && !isLocalSiteUrl
+    ? configuredSiteUrl.replace(/\/+$/, "")
+    : "https://sterling-website-corporate-gifting-sterling17.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

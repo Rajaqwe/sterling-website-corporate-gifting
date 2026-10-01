@@ -17,14 +17,14 @@ const CORE_ROUTES = [
 ];
 
 async function stabilize(page: Page) {
-  await page.waitForLoadState("domcontentloaded");
+  await page.waitForLoadState("domcontentloaded", { timeout: 15000 });
   await page.evaluate(async () => {
     if (document.fonts?.ready) await document.fonts.ready;
     window.scrollTo(0, document.documentElement.scrollHeight);
     await new Promise((r) => setTimeout(r, 150));
     window.scrollTo(0, 0);
   });
-  await page.waitForTimeout(400);
+  await page.waitForTimeout(250);
 }
 
 async function health(page: Page) {
@@ -69,7 +69,7 @@ test.describe("Sterling browser audit", () => {
         page.on("console", onConsole);
         page.on("pageerror", onPageError);
         try {
-          const response = await page.goto(route, { waitUntil: "domcontentloaded", timeout: 45000 });
+          const response = await page.goto(route, { waitUntil: "domcontentloaded", timeout: 15000 });
           await stabilize(page);
           const status = response?.status() ?? 0;
           const h = await health(page);
@@ -103,7 +103,7 @@ test.describe("Sterling browser audit", () => {
         await page.setViewportSize({ width: viewport.width, height: viewport.height });
         await page.addInitScript((t) => localStorage.setItem("theme", t), theme);
         for (const route of CORE_ROUTES) {
-          await page.goto(route, { waitUntil: "domcontentloaded", timeout: 45000 });
+          await page.goto(route, { waitUntil: "domcontentloaded", timeout: 15000 });
           await stabilize(page);
           await page.screenshot({
             path: testInfo.outputPath("screenshots", theme, viewport.name, slug(route) + ".png"),
@@ -116,7 +116,7 @@ test.describe("Sterling browser audit", () => {
 
   test("critical storefront interactions work", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/corporate-gifts", { waitUntil: "domcontentloaded", timeout: 45000 });
+    await page.goto("/corporate-gifts", { waitUntil: "domcontentloaded", timeout: 15000 });
     await stabilize(page);
     const search = page.getByPlaceholder("Search corporate gifts...");
     await expect(search).toBeVisible();
@@ -124,12 +124,12 @@ test.describe("Sterling browser audit", () => {
     await search.press("Enter");
     await expect(page).toHaveURL(/q=Notebook/);
 
-    await page.goto("/products/plp-001", { waitUntil: "domcontentloaded", timeout: 45000 });
+    await page.goto("/products/plp-001", { waitUntil: "domcontentloaded", timeout: 15000 });
     await stabilize(page);
     await expect(page.getByRole("link", { name: /Get custom quote/i })).toBeVisible();
     await expect(page.getByRole("link", { name: /WhatsApp/i })).toBeVisible();
 
-    await page.goto("/gift-finder", { waitUntil: "domcontentloaded", timeout: 45000 });
+    await page.goto("/gift-finder", { waitUntil: "domcontentloaded", timeout: 15000 });
     await stabilize(page);
     await expect(page.locator("h1").first()).toBeVisible();
   });

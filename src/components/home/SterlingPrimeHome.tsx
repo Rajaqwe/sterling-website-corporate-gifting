@@ -145,21 +145,6 @@ export default async function SterlingPrimeHome() {
 
       <ProcurementReadyBar />
 
-      <section className="border-y border-[#E4E1EE] bg-[#F7F5FB] py-7 dark:border-white/10 dark:bg-[#101d2c]">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-5 text-center text-[11px] font-bold uppercase tracking-[0.22em] text-[#5B6280] dark:text-slate-400">
-            Trusted by business teams
-          </div>
-          <div className="grid grid-cols-3 gap-6 opacity-65 grayscale sm:grid-cols-6 sm:items-center">
-            {clientLogos.map(([src, alt]) => (
-              <div key={alt} className="flex h-12 items-center justify-center rounded-xl bg-white px-4 shadow-sm ring-1 ring-white/10 transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-md">
-                <Image src={src} alt={alt} width={110} height={36} className="max-h-8 w-auto object-contain" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="py-20 sm:py-24" id="solutions">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center">

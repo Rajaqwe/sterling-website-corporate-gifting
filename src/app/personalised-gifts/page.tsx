@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { FilterDrawer } from "@/components/products/ProductFilterSidebar";
-import { Card, CardContent } from "@/components/ui/card";
+import { ProductCard } from "@/components/products/ProductCard";
 import Link from "next/link";
-import { Package, Star, Clock } from "lucide-react";
-import Image from "next/image";
+import { Package } from "lucide-react";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
@@ -71,55 +70,30 @@ export default async function PersonalisedGiftsPage(
         />
       </Suspense>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-12">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 space-y-4 md:space-y-0">
+        <div className="rounded-[24px] border border-border/70 bg-secondary/35 px-5 py-8 sm:px-9 sm:py-11">
           <div>
-            <h1 className="text-4xl font-serif font-bold text-primary mb-2">Personalised Gifts</h1>
-            <p className="text-muted-foreground text-lg">Custom branded merchandise and tailored corporate gifts.</p>
+            <span className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Personalised corporate gifting</span>
+            <h1 className="mt-3 text-4xl font-serif font-bold text-primary sm:text-5xl">Make the gift unmistakably yours.</h1>
+            <p className="mt-3 max-w-2xl text-lg text-muted-foreground">Browse products suited to custom branding, personalised details, and company-ready presentation.</p>
           </div>
         </div>
 
-        <div className="flex-1 w-full">
+        <div className="mt-8 flex-1 w-full">
           {products.length === 0 ? (
-            <div className="text-center py-20 border rounded-lg bg-secondary/10">
+            <div className="text-center py-20 border rounded-2xl bg-surface-elevated">
               <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-xl font-medium text-primary">No personalised gifts found</h3>
               <p className="text-muted-foreground mt-2">Try adjusting your filters or search query.</p>
+              <div className="mt-6">
+                <Link href="/request-a-quote" className="btn-primary inline-flex h-11 items-center justify-center rounded-xl px-6 text-sm font-semibold">
+                  Request help choosing
+                </Link>
+              </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 xl:grid-cols-4">
               {products.map((product) => (
-                <Link key={product.id} href={`/products/${product.slug}`} className="group block">
-                  <Card className="h-full flex flex-col overflow-hidden transition-all hover:shadow-md border-transparent hover:border-primary/20">
-                    <div className="aspect-square bg-secondary/20 relative flex items-center justify-center p-6">
-                      <Package className="h-16 w-16 text-primary/40 group-hover:scale-110 transition-transform duration-300" />
-                      {product.isDiscounted && (
-                        <span className="absolute top-3 left-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">Sale</span>
-                      )}
-                    </div>
-                    <CardContent className="p-5 flex-1 flex flex-col">
-                      <div className="text-xs font-medium text-muted-foreground mb-2 flex justify-between items-center">
-                        <span>{(product as any).category?.name}</span>
-                        {product.rating && (
-                           <span className="flex items-center text-amber-500 font-bold">
-                             {product.rating.toString()} <Star className="w-3 h-3 ml-0.5 fill-current" />
-                           </span>
-                        )}
-                      </div>
-                      <h3 className="font-medium text-primary mb-2 line-clamp-2 group-hover:text-accent transition-colors flex-1">
-                        {product.name}
-                      </h3>
-                      <div className="flex items-center justify-between mt-4 border-t pt-4">
-                        <div className="flex flex-col">
-                           <span className="font-bold text-lg">₹{product.price.toString()}</span>
-                           <span className="text-xs text-muted-foreground line-clamp-1"><Clock className="w-3 h-3 inline mr-1" />{product.leadTimeDays} Days</span>
-                        </div>
-                        <span className="text-xs px-2 py-1 bg-secondary text-secondary-foreground rounded border">
-                          MOQ: {product.minimumOrderQuantity}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                <ProductCard key={product.id} product={product as any} />
               ))}
             </div>
           )}

@@ -71,7 +71,7 @@ export function QuoteShortlistButton({
   );
 }
 
-export function QuoteShortlistNav() {
+export function QuoteShortlistNav({ isLightText = false }: { isLightText?: boolean }) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
@@ -90,7 +90,7 @@ export function QuoteShortlistNav() {
       href="/quote-shortlist"
       data-track-event="quote_shortlist_nav"
       aria-label={`Quote shortlist${count ? `, ${count} saved` : ""}`}
-      className="relative inline-flex min-h-10 min-w-10 items-center justify-center rounded-full p-2 text-foreground hover:bg-secondary transition-ui touch-manipulation"
+      className={`relative inline-flex min-h-10 min-w-10 items-center justify-center rounded-full p-2 transition-ui touch-manipulation ${isLightText ? "text-white/90 hover:bg-white/10 hover:text-white" : "text-foreground hover:bg-secondary"}`}
     >
       <Bookmark className="h-5 w-5" />
       {count > 0 && (

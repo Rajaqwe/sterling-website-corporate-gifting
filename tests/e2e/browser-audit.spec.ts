@@ -4,7 +4,7 @@ const PUBLIC_ROUTES = [
   "/", "/about", "/corporate-gifts", "/gift-collections", "/personalised-gifts",
   "/bulk-orders", "/custom-branding", "/employee-gifting", "/event-gifts",
   "/gift-finder", "/project-gallery", "/reviews", "/procurement-support",
-  "/request-a-quote", "/request-a-sample", "/cart", "/checkout", "/contact",
+  "/request-a-quote", "/request-a-sample", "/cart", "/contact",
   "/faq", "/careers", "/sustainability", "/values", "/shipping-delivery",
   "/privacy-policy", "/terms-and-conditions", "/refund-policy", "/login",
   "/register", "/forgot-password", "/reset-password", "/products/plp-001"
@@ -18,12 +18,29 @@ const CORE_ROUTES = [
 
 async function stabilize(page: Page) {
   await page.waitForLoadState("domcontentloaded", { timeout: 15000 });
-  await page.evaluate(async () => {
-    if (document.fonts?.ready) await document.fonts.ready;
-    window.scrollTo(0, document.documentElement.scrollHeight);
-    await new Promise((r) => setTimeout(r, 150));
-    window.scrollTo(0, 0);
-  });
+  // Some protected routes can redirect immediately after DOMContentLoaded.
+  // Give navigation a chance to settle before evaluating the document.
+  try {
+    await page.waitForLoadState("load", { timeout: 5000 });
+  } catch {
+    // Continue with the best available document state.
+  }
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      await page.evaluate(async () => {
+        if (document.fonts?.ready) await document.fonts.ready;
+        window.scrollTo(0, document.documentElement.scrollHeight);
+        await new Promise((r) => setTimeout(r, 150));
+        window.scrollTo(0, 0);
+      });
+      break;
+    } catch (error) {
+      if (!(error instanceof Error) || !/Execution context was destroyed|navigation/i.test(error.message) || attempt === 2) {
+        throw error;
+      }
+      await page.waitForLoadState("domcontentloaded", { timeout: 5000 }).catch(() => undefined);
+    }
+  }
   await page.waitForTimeout(250);
 }
 
@@ -116,6 +133,14 @@ test.describe("Sterling browser audit", () => {
     }
     console.log("BROWSER_AUDIT_SUMMARY failures=" + failures.length);
     expect(failures, failures.join("\n")).toEqual([]);
+  });
+
+  test("protected checkout redirects safely when unauthenticated", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/checkout", { waitUntil: "domcontentloaded", timeout: 15000 });
+    await stabilize(page);
+    expect(page.url()).not.toMatch(/\/checkout(?:\?|$)/);
+    expect((await page.locator("body").innerText()).trim().length).toBeGreaterThan(20);
   });
 
   test("core routes are captured at desktop/mobile and light/dark", async ({ page }, testInfo) => {

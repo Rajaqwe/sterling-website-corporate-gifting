@@ -112,11 +112,9 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
             <Link href="/" className="flex items-center gap-2 group transition-[height,width]">
               <div className={`relative transition-[width,height] duration-500 ease-[var(--ease-standard)] ${isScrolled ? "w-[125px] h-[38px]" : "w-[155px] h-[46px]"}`}>
                 {/*
-                  The SVG embeds a PNG with an opaque white background.
-                  - Light backgrounds: multiply makes the white backdrop disappear.
-                  - Dark backgrounds: invert + screen does the same while keeping
-                    the mark light (brightness-0 invert would paint a solid
-                    white box over the hero).
+                  The shared Sterling Prime SVG has a transparent-background
+                  filter, so the same logo stays clean on both light and dark
+                  surfaces without inversion or blend-mode hacks.
                 */}
                 <Image src="/logos/sterling-logo-full.svg" alt="Sterling Logo" fill className="object-contain transition-opacity duration-500" priority />
               </div>

@@ -8,22 +8,22 @@ export const metadata: Metadata = {
 export default function TermsAndConditionsPage() {
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 md:py-24 max-w-4xl min-h-[80vh]">
-      <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-8 tracking-tight">Terms & Conditions</h1>
-      <div className="prose prose-slate max-w-none">
+      <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-8 tracking-tight">Terms & Conditions</h1>
+      <div className="prose prose max-w-none">
         
-      <p className="text-sm text-slate-500 mb-8">Last Updated: October 2024</p>
+      <p className="text-sm text-muted-foreground mb-8">Last Updated: October 2024</p>
       
-      <h2 className="text-2xl font-semibold mt-8 mb-4 text-slate-900">1. Orders & Pricing</h2>
-      <p className="mb-4 text-slate-700 leading-relaxed">All orders are subject to availability and acceptance. Prices are exclusive of applicable taxes unless stated otherwise. Bulk pricing tiers apply only to qualifying quantities.</p>
+      <h2 className="text-2xl font-semibold mt-8 mb-4 text-foreground">1. Orders & Pricing</h2>
+      <p className="mb-4 text-foreground/90 leading-relaxed">All orders are subject to availability and acceptance. Prices are exclusive of applicable taxes unless stated otherwise. Bulk pricing tiers apply only to qualifying quantities.</p>
       
-      <h2 className="text-2xl font-semibold mt-8 mb-4 text-slate-900">2. Customization</h2>
-      <p className="mb-4 text-slate-700 leading-relaxed">Clients are responsible for providing high-quality artwork for branding. Once a digital proof is approved by the client, Sterling is not liable for errors in the approved design.</p>
+      <h2 className="text-2xl font-semibold mt-8 mb-4 text-foreground">2. Customization</h2>
+      <p className="mb-4 text-foreground/90 leading-relaxed">Clients are responsible for providing high-quality artwork for branding. Once a digital proof is approved by the client, Sterling is not liable for errors in the approved design.</p>
       
-      <h2 className="text-2xl font-semibold mt-8 mb-4 text-slate-900">3. Payments</h2>
-      <p className="mb-4 text-slate-700 leading-relaxed">For custom and bulk orders, a standard advance payment is required before production begins. Final payment terms are strictly as per the agreed invoice.</p>
+      <h2 className="text-2xl font-semibold mt-8 mb-4 text-foreground">3. Payments</h2>
+      <p className="mb-4 text-foreground/90 leading-relaxed">For custom and bulk orders, a standard advance payment is required before production begins. Final payment terms are strictly as per the agreed invoice.</p>
       
-      <h2 className="text-2xl font-semibold mt-8 mb-4 text-slate-900">4. Intellectual Property</h2>
-      <p className="mb-4 text-slate-700 leading-relaxed">All website content, design, and imagery are the intellectual property of Sterling and may not be used without explicit permission.</p>
+      <h2 className="text-2xl font-semibold mt-8 mb-4 text-foreground">4. Intellectual Property</h2>
+      <p className="mb-4 text-foreground/90 leading-relaxed">All website content, design, and imagery are the intellectual property of Sterling and may not be used without explicit permission.</p>
     
         
   <div className="mt-12 p-6 bg-muted/50 rounded-lg border border-slate-100">

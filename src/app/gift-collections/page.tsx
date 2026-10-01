@@ -74,12 +74,12 @@ export default async function CollectionsPage(
         </Suspense>
       </div>
       <div className="container mx-auto px-4 pb-16 pt-28 sm:px-6 lg:px-8 lg:pt-32">
-      <div className="rounded-[24px] border border-border/70 bg-[#0D1B2A] dark:bg-[#111827] px-6 py-9 text-white sm:px-9 sm:py-11">
+      <div className="rounded-[24px] border border-border/70 bg-secondary/35 px-5 py-8 sm:px-9 sm:py-11">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-5">
           <div>
-            <span className="text-xs font-bold uppercase tracking-[0.16em] text-amber-200">Curated collections</span>
-            <h1 className="mt-3 text-4xl font-serif font-bold sm:text-5xl">Find a considered starting point.</h1>
-            <p className="mt-3 max-w-2xl text-lg text-white/75">Explore products through the gifting moments, audiences, and themes that shape your brief.</p>
+            <span className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Curated collections</span>
+            <h1 className="mt-3 text-4xl font-serif font-bold text-primary sm:text-5xl">Find a considered starting point.</h1>
+            <p className="mt-3 max-w-2xl text-lg text-muted-foreground">Explore products through the gifting moments, audiences, and themes that shape your brief.</p>
           </div>
           
         </div>

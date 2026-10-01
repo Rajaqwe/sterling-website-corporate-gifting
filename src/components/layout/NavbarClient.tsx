@@ -187,8 +187,13 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                 <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
                 
                 <div className="p-4 border-b border-border/40 flex items-center justify-between">
-                  <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="font-heading text-2xl font-bold tracking-tight text-primary uppercase">
-                    Sterling
+                  <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="relative block h-10 w-36">
+                    <Image
+                      src="/logos/sterling-prime-transparent.svg"
+                      alt="Sterling Prime"
+                      fill
+                      className="object-contain object-left"
+                    />
                   </Link>
                   <SheetClose
                     aria-label="Close menu"

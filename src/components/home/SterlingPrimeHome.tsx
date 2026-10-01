@@ -23,7 +23,6 @@ import { DemoVideoCarousel } from "@/components/home/DemoVideoCarousel";
 import { CorporateProcurementTrust } from "@/components/home/CorporateProcurementTrust";
 import { VerifiedTestimonials } from "@/components/home/VerifiedTestimonials";
 import { ProjectGallery } from "@/components/home/ProjectGallery";
-import { ProcurementReadyBar } from "@/components/home/ProcurementReadyBar";
 
 const solutions = [
   { title: "Corporate Kits", description: "Polished gifting programs for teams, clients, and milestones.", href: "/corporate-gifts", icon: Box },
@@ -135,7 +134,6 @@ export default async function SterlingPrimeHome() {
         </div>
       </section>
 
-      <ProcurementReadyBar />
 
       <section className="py-20 sm:py-24" id="solutions">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

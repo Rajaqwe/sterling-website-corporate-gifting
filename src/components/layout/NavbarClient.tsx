@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetClose } from "@/com
 import { SearchBar } from "./SearchBar";
 import { useTheme } from "next-themes";
 import { CartDrawer } from "@/components/cart/CartDrawer";
+import { QuoteShortlistNav } from "@/components/shortlist/QuoteShortlistButton";
 
 const navLinks = [
   { name: "Corporate Gifts", href: "/corporate-gifts" },
@@ -163,6 +164,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                 </Link>
             )}
 
+            <QuoteShortlistNav />
             <CartDrawer isLightText={isLightText && !isScrolled} />
 
             <Link href="/request-a-quote" data-track-event="quote_cta_nav" className="btn-gold h-10 px-5 text-xs font-heading font-bold uppercase tracking-wider flex items-center gap-2 shadow-md hover:shadow-lg transition-ui">
@@ -174,6 +176,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
           {/* Mobile Menu */}
           <div className="md:hidden flex items-center gap-2">
             <SearchBar isLightText={isLightText && !isScrolled} />
+            <QuoteShortlistNav />
             <CartDrawer isLightText={isLightText && !isScrolled} />
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger aria-label="Open menu" className={`inline-flex min-h-10 min-w-10 items-center justify-center rounded-full p-2 transition-ui touch-manipulation hover:bg-secondary ${!isScrolled && (isLightText ? "text-white hover:bg-background/20" : "text-primary")}`}>

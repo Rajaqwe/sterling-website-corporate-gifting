@@ -86,6 +86,7 @@ export async function createQuote(payload: FormData | Record<string, any>) {
         productId: parsed.productId,
         categoryId: parsed.categoryId,
         quantity: parsed.quantity,
+        requiredDeliveryDate: parsed.requiredDeliveryDate,
         budgetPerRecipient: parsed.budgetPerRecipient,
         brandingRequired: parsed.brandingRequired,
         deliveryLocation: parsed.deliveryLocation,

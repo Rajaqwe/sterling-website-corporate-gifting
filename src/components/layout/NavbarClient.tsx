@@ -16,6 +16,7 @@ const navLinks = [
   { name: "Corporate Gifts", href: "/corporate-gifts" },
   { name: "Collections", href: "/gift-collections" },
   { name: "Personalised Gifts", href: "/personalised-gifts" },
+  { name: "Gift Finder", href: "/gift-finder" },
 ];
 
 const mobileFooterLinks = [
@@ -164,7 +165,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
 
             <CartDrawer isLightText={isLightText && !isScrolled} />
 
-            <Link href="/request-a-quote" className="btn-gold h-10 px-5 text-xs font-heading font-bold uppercase tracking-wider flex items-center gap-2 shadow-md hover:shadow-lg transition-ui">
+            <Link href="/request-a-quote" data-track-event="quote_cta_nav" className="btn-gold h-10 px-5 text-xs font-heading font-bold uppercase tracking-wider flex items-center gap-2 shadow-md hover:shadow-lg transition-ui">
               <Briefcase className="h-3.5 w-3.5" />
               <span>Request a Quote</span>
             </Link>

@@ -56,8 +56,8 @@ jobs:
       - name: Tailwind/PostCSS
         run: npx tailwindcss -i ./src/app/globals.css -o /tmp/sterling-tailwind.css
 
-      - name: Apply migrations for browser audit
-        run: npx prisma migrate deploy
+      - name: Initialize browser-audit database
+        run: npx prisma db push --accept-data-loss
 
       - name: Seed demo catalogue for browser audit
         run: npx tsx@4.20.5 prisma/seed-demo.ts

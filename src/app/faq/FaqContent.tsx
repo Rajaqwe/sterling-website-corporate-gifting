@@ -1,5 +1,5 @@
 "use client";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/lib/button-variants";
 
 import Link from 'next/link';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";

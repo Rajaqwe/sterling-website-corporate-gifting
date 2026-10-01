@@ -63,25 +63,6 @@ export default function CareersPage() {
         </div>
       </section>
 
-      {/* Why Join Us */}
-      <section className="py-16 bg-background">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-          <StaggerContainer staggerDelay={60} className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            {[
-              { label: "Fast Growth", value: "5x YoY" },
-              { label: "Team Size", value: "10+" },
-              { label: "Work Type", value: "Hybrid" },
-              { label: "Learning Budget", value: "₹80K/yr" },
-            ].map((stat, i) => (
-              <div key={i} className="p-5 rounded-xl bg-secondary/30">
-                <div className="text-xl md:text-2xl font-serif font-bold text-primary mb-1">{stat.value}</div>
-                <div className="text-xs text-muted-foreground font-medium">{stat.label}</div>
-              </div>
-            ))}
-          </StaggerContainer>
-        </div>
-      </section>
-
       {/* Current Openings */}
       <section className="py-20 md:py-24 bg-secondary/20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">

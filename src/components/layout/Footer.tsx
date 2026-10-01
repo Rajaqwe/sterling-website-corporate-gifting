@@ -20,6 +20,8 @@ const footerLinks = {
     { name: "FAQ", href: "/faq" },
     { name: "Shipping & Delivery", href: "/shipping-delivery" },
     { name: "Procurement Support", href: "/procurement-support" },
+    { name: "Gift Finder", href: "/gift-finder" },
+    { name: "Quote Shortlist", href: "/quote-shortlist" },
   ],
 };
 
@@ -30,7 +32,7 @@ function SocialIcon({ children, href, label }: { children: React.ReactNode; href
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-accent hover:text-primary transition-ui"
+      className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white/70 hover:bg-accent hover:text-white transition-ui"
     >
       {children}
     </a>

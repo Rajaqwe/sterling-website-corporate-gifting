@@ -12,6 +12,7 @@ import { ArrowRight, Clock3, Eye, Layers, PackageCheck, Palette, Sparkles } from
 import { formatINR } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
 import { WhatsAppConciergeButton } from "@/components/contact/WhatsAppConciergeButton";
+import { QuoteShortlistButton } from "@/components/shortlist/QuoteShortlistButton";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 interface ProductCardProps {
@@ -45,6 +46,16 @@ export function ProductCard({ product, className = "", priority = false }: Produ
   // Customization methods
   const customizations = product.customizations || product.customizationOptions || [];
   const primaryCustomizations = customizations.slice(0, 2);
+  const shortlistItem = {
+    id: product.id,
+    slug: product.slug,
+    name: title,
+    imageUrl: imageSrc,
+    category: displayCategory,
+    price: lowestBulkPrice,
+    moq: minimumOrderQuantity,
+    leadTimeDays,
+  };
 
   return (
     <Card
@@ -100,6 +111,9 @@ export function ProductCard({ product, className = "", priority = false }: Produ
           >
             MOQ: {minimumOrderQuantity} units
           </span>
+        </div>
+        <div className="absolute bottom-3 right-3 z-20">
+          <QuoteShortlistButton item={shortlistItem} compact />
         </div>
       </div>
 

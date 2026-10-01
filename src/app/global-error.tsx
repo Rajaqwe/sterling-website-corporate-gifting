@@ -21,7 +21,7 @@ export default function GlobalError({
               A critical error occurred. Please try again later or contact support if the issue persists.
             </p>
           </div>
-          <Button onClick={() => reset()}>Try again</Button>
+          <button type="button" onClick={() => reset()} className="inline-flex h-10 items-center justify-center rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition-ui hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Try again</button>
         </div>
       </body>
     </html>

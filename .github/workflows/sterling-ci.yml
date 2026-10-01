@@ -63,7 +63,7 @@ jobs:
         run: npx tsx@4.20.5 prisma/seed-demo.ts
 
       - name: Production build
-        run: npm run build
+        run: NODE_ENV=production npm run build
 
       - name: Install Chromium for browser audit
         run: npx playwright install --with-deps chromium

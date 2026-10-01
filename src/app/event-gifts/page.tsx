@@ -1,7 +1,5 @@
-import { buttonVariants } from "@/components/ui/button";
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Reveal, StaggerContainer } from "@/components/ui/reveal";
 import { CalendarDays, Megaphone, Crown, Rocket, Users, Sparkles } from "lucide-react";

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import {
   ArrowRight,
   Box,
@@ -41,14 +40,6 @@ const occasions = [
   { title: "Custom Branding", image: "/videos/posters/demo-1.jpg", href: "/custom-branding" },
 ];
 
-const clientLogos = [
-  ["/logos/tata.svg", "Tata"],
-  ["/logos/infosys.svg", "Infosys"],
-  ["/logos/tcs.svg", "TCS"],
-  ["/logos/wipro.svg", "Wipro"],
-  ["/logos/hcltech.svg", "HCLTech"],
-  ["/logos/techmahindra.svg", "Tech Mahindra"],
-];
 
 const process = [
   ["01", "Choose", "Share your gift type, occasion, quantity, budget and deadline."],

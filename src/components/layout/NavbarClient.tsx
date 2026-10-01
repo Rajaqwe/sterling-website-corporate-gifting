@@ -118,7 +118,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                     the mark light (brightness-0 invert would paint a solid
                     white box over the hero).
                 */}
-                <Image src="/logos/sterling-logo-full.svg" alt="Sterling Logo" fill className={`object-contain transition-[filter,opacity] duration-500 ${isDarkBg ? "invert mix-blend-screen" : "mix-blend-multiply dark:mix-blend-normal"}`} priority />
+                <Image src="/logos/sterling-logo-full.svg" alt="Sterling Logo" fill className="object-contain transition-opacity duration-500" priority />
               </div>
             </Link>
           </div>

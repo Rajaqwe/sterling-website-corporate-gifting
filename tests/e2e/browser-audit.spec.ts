@@ -122,7 +122,7 @@ test.describe("Sterling browser audit", () => {
     await expect(search).toBeVisible();
     await search.fill("Notebook");
     await search.press("Enter");
-    await expect(page).toHaveURL(/q=Notebook/);
+    await expect(page).toHaveURL(/\/corporate-gifts\?[^#]*q=Notebook/, { timeout: 10000 });
 
     await page.goto("/products/plp-001", { waitUntil: "domcontentloaded", timeout: 15000 });
     await stabilize(page);

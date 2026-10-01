@@ -46,7 +46,6 @@ export function FloatingButtons() {
   return (
     <div className={`fixed right-4 sm:right-6 z-50 flex flex-col-reverse items-end gap-4 transition-[bottom,opacity,transform] duration-300 ease-out ${bottomPositionClass}`}>
       {!isProductPage && (
-        {/* WhatsApp Floating Button */}
         <div
           className="relative flex items-center"
           onMouseEnter={() => setShowTooltip(true)}

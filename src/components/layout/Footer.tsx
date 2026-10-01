@@ -47,7 +47,7 @@ export function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="inline-block mb-6 relative h-16 w-56">
               <Image 
-                src="/logos/sterling-logo-full.svg" 
+                src="/logos/sterling-prime-transparent.svg" 
                 alt="Sterling Prime" 
                 fill 
                 className="object-contain object-left"

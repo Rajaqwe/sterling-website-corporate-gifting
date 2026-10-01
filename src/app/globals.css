@@ -7,39 +7,39 @@
     --font-sans: 'Inter', sans-serif;
     --font-serif: 'Playfair Display', serif;
     /* Premium Cream Background */
-    --background: 42 50% 93%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 42 50% 93%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 42 50% 93%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --background: 0 0% 100%;
+    --foreground: 232 37% 17%;
+    --card: 0 0% 100%;
+    --card-foreground: 232 37% 17%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 232 37% 17%;
     
     /* Sterling Deep Navy Primary */
-    --primary: 222 47% 11%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 205 85% 40%;
+    --primary-foreground: 0 0% 100%;
     
     /* Elegant soft warm gray for secondary */
-    --secondary: 42 20% 88%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 260 43% 97%;
+    --secondary-foreground: 232 37% 17%;
     
     /* Muted tones for subtle backgrounds */
-    --muted: 42 20% 88%;
-    --muted-foreground: 30 15% 35%;
+    --muted: 260 43% 97%;
+    --muted-foreground: 229 17% 43%;
     
     /* Sterling Gold / Champagne Accent */
-    --accent: 33 40% 59%;
-    --accent-foreground: 210 40% 98%;
-    --gold-hover: 33 40% 49%;
+    --accent: 311 52% 44%;
+    --accent-foreground: 0 0% 100%;
+    --gold-hover: 311 52% 36%;
     
     /* Elevated surface for depth */
-    --surface-elevated: 40 33% 98%;
+    --surface-elevated: 260 43% 99%;
     
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     
-    --border: 42 15% 82%;
-    --input: 42 15% 82%;
-    --ring: 222 47% 11%;
+    --border: 254 28% 91%;
+    --input: 254 28% 91%;
+    --ring: 205 85% 40%;
     --radius: 0.5rem;
 
     /* Semantic Status Tokens (Light Mode) */
@@ -54,34 +54,34 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --background: 210 74% 10%;
+    --foreground: 0 0% 100%;
+    --card: 210 55% 13%;
+    --card-foreground: 0 0% 100%;
+    --popover: 210 55% 13%;
+    --popover-foreground: 0 0% 100%;
     
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 205 85% 40%;
+    --primary-foreground: 0 0% 100%;
     
-    --secondary: 40 20% 15%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 210 40% 17%;
+    --secondary-foreground: 0 0% 100%;
     
-    --muted: 40 20% 15%;
-    --muted-foreground: 40 10% 75%;
+    --muted: 210 40% 17%;
+    --muted-foreground: 220 15% 75%;
     
-    --accent: 33 40% 59%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --gold-hover: 33 40% 49%;
+    --accent: 311 52% 50%;
+    --accent-foreground: 0 0% 100%;
+    --gold-hover: 311 52% 44%;
 
-    --surface-elevated: 40 20% 12%;
+    --surface-elevated: 210 50% 12%;
     
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 358 80% 43%;
+    --destructive-foreground: 0 0% 100%;
     
-    --border: 40 20% 18%;
-    --input: 40 20% 18%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 210 30% 22%;
+    --input: 210 30% 22%;
+    --ring: 205 85% 70%;
 
     /* Semantic Status Tokens (Dark Mode) */
     --status-success: 142.1 70.6% 45.3%; /* Green 500 */
@@ -141,7 +141,7 @@
   }
 
   .btn-gold {
-    @apply relative inline-flex items-center justify-center rounded-full font-heading font-semibold text-primary shadow-md transition duration-300 ease-out hover:shadow-[0_10px_25px_-5px_rgba(197,168,128,0.45)] hover:-translate-y-0.5 active:translate-y-0 overflow-hidden bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#C5A880];
+    @apply relative inline-flex items-center justify-center rounded-full font-heading font-semibold text-white shadow-md transition duration-300 ease-out hover:shadow-[0_10px_25px_-5px_rgba(169,54,148,0.32)] hover:-translate-y-0.5 active:translate-y-0 overflow-hidden bg-gradient-to-br from-[#A93694] to-[#D6303F];
   }
 
   /* Luxury Glassmorphism */

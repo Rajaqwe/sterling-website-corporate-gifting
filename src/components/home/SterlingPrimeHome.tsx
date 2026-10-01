@@ -148,7 +148,7 @@ export default async function SterlingPrimeHome() {
           </div>
           <div className="grid grid-cols-3 gap-6 opacity-65 grayscale sm:grid-cols-6 sm:items-center">
             {clientLogos.map(([src, alt]) => (
-              <div key={alt} className="flex h-10 items-center justify-center transition-all duration-300 hover:opacity-100 hover:grayscale-0">
+              <div key={alt} className="flex h-12 items-center justify-center rounded-xl bg-white px-4 shadow-sm ring-1 ring-white/10 transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-md">
                 <Image src={src} alt={alt} width={110} height={36} className="max-h-8 w-auto object-contain" />
               </div>
             ))}

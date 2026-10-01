@@ -75,7 +75,6 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
   useEffect(() => setMounted(true), []);
   
   const darkHeroPages = [
-    "/",
     "/about",
     "/bulk-orders",
     "/careers",
@@ -186,7 +185,7 @@ export function NavbarClient({ user, onSignOut }: { user: any; onSignOut: () => 
                 <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
                 
                 <div className="p-4 border-b border-border/40 flex items-center justify-between">
-                  <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="font-serif text-2xl font-bold tracking-widest text-primary uppercase">
+                  <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="font-heading text-2xl font-bold tracking-tight text-primary uppercase">
                     Sterling
                   </Link>
                   <SheetClose

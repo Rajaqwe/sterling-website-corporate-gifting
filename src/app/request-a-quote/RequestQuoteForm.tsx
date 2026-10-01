@@ -10,6 +10,7 @@ import { createQuote } from "@/app/actions/quotes";
 import { useEffect, useRef, useState } from "react";
 import { RecipientCsvUploader } from "@/components/forms/RecipientCsvUploader";
 import { MarketingHero } from "@/components/marketing/MarketingHero";
+import { readQuoteShortlist, QUOTE_SHORTLIST_STORAGE_KEY } from "@/lib/quote-shortlist";
 
 export function RequestQuoteForm({
   initialValues,
@@ -69,6 +70,16 @@ export function RequestQuoteForm({
     setIsPending(true);
 
     // Save draft
+    const shortlist = readQuoteShortlist();
+    if (shortlist.length > 0) {
+      const shortlistNames = shortlist.map((item) => item.name).join(", ");
+      const existingRequirements = String(formData.get("additionalRequirements") || "").trim();
+      formData.set(
+        "additionalRequirements",
+        [existingRequirements, `Quote shortlist: ${shortlistNames}`].filter(Boolean).join("\n\n")
+      );
+    }
+
     const values = Object.fromEntries(formData.entries());
     window.localStorage.setItem("sterling-quote-preferences", JSON.stringify({
       ...values,
@@ -80,6 +91,8 @@ export function RequestQuoteForm({
       setState({ success: result.success, message: result.error || "Quote requested successfully." });
       if (result.success) {
         window.localStorage.removeItem("sterling-quote-preferences");
+        window.localStorage.removeItem(QUOTE_SHORTLIST_STORAGE_KEY);
+        window.dispatchEvent(new Event("sterling-quote-shortlist-updated"));
         if (formRef.current) formRef.current.reset();
       }
     } finally {
@@ -126,7 +139,9 @@ export function RequestQuoteForm({
                 )}
 
                 <div className="text-center mb-8">
-                  <p className="text-sm text-muted-foreground">Your gifting preferences are saved on this device automatically.</p>
+                  <p className="text-sm text-muted-foreground">
+    Your gifting preferences are saved on this device automatically. Saved products from your quote shortlist are included in this request.
+  </p>
                 </div>
 
                 {/* Section 1: Contact Details */}

@@ -57,12 +57,12 @@ function slug(route: string) {
 }
 
 test.describe("Sterling browser audit", () => {
-  test("all public routes render in light and dark desktop modes", async ({ page }) => {
+  test("all public routes render in light and dark desktop modes", async ({ browser }) => {
     const failures: string[] = [];
     for (const theme of ["light", "dark"]) {
-      await page.setViewportSize({ width: 1440, height: 900 });
-      await page.addInitScript((t) => localStorage.setItem("theme", t), theme);
       for (const route of PUBLIC_ROUTES) {
+        const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+        await page.addInitScript((t) => localStorage.setItem("theme", t), theme);
         const consoleErrors: string[] = [];
         const networkErrors: string[] = [];
         const onConsole = (m: any) => m.type() === "error" && consoleErrors.push(m.text());
@@ -101,6 +101,7 @@ test.describe("Sterling browser audit", () => {
           page.removeListener("console", onConsole);
           page.removeListener("pageerror", onPageError);
           page.removeListener("response", onResponse);
+          await page.close();
         }
       }
     }
@@ -140,7 +141,7 @@ test.describe("Sterling browser audit", () => {
     await page.goto("/products/plp-001", { waitUntil: "domcontentloaded", timeout: 15000 });
     await stabilize(page);
     await expect(page.getByRole("link", { name: /Get custom quote/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /WhatsApp/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: "WhatsApp", exact: true })).toBeVisible();
 
     await page.goto("/gift-finder", { waitUntil: "domcontentloaded", timeout: 15000 });
     await stabilize(page);

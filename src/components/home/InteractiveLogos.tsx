@@ -116,7 +116,7 @@ function CompanyCard({
             <img 
               src={company.logoUrl} 
               alt={`${company.name} logo`} 
-              className="w-20 h-20 md:w-28 md:h-28 object-contain drop-shadow-sm transition-all duration-500 grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
+              className="w-20 h-20 md:w-28 md:h-28 object-contain drop-shadow-sm transition-transform duration-500 group-hover:scale-110"
             />
             <span className="text-2xl md:text-3xl font-bold tracking-wide text-foreground font-serif">
               {company.name}
@@ -167,7 +167,7 @@ function CompanyCard({
       onClick={onClick}
     >
       <div className={`absolute inset-0 flex flex-col items-center justify-center gap-6 transition-opacity duration-700 ${isActive ? "opacity-0" : "opacity-100"}`}>
-        <img src={company.logoUrl} alt={`${company.name} logo`} className="w-20 h-20 md:w-28 md:h-28 object-contain" />
+        <span className="flex h-24 w-40 items-center justify-center rounded-2xl bg-white px-5 py-3 shadow-sm ring-1 ring-border/40"><img src={company.logoUrl} alt={`${company.name} logo`} className="max-h-full max-w-full object-contain" /></span>
         <span className="text-2xl md:text-3xl font-bold tracking-wide text-foreground font-serif">{company.name}</span>
       </div>
       <div className={`absolute inset-0 bg-background flex flex-col justify-between p-8 md:p-10 transition-opacity duration-700 ${isActive ? "opacity-100" : "opacity-0 pointer-events-none"}`}>

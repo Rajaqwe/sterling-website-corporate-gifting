@@ -21,7 +21,10 @@ import { prisma } from "@/lib/prisma/client";
 import NextTopLoader from 'nextjs-toploader';
 import { Toaster } from 'sonner';
 
-const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://sterling-website-corporate-gifting.vercel.app";
+const configuredSiteUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+const SITE_URL = configuredSiteUrl && !/localhost|127\\.0\\.0\\.1/i.test(configuredSiteUrl)
+  ? configuredSiteUrl.replace(/\\/+$/, "")
+  : "https://sterling-website-corporate-gifting-sterling17.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

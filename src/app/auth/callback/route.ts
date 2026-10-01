@@ -29,6 +29,11 @@ export async function GET(request: Request) {
       
       return NextResponse.redirect(new URL(`/login?message=${encodeURIComponent("Google Login Failed: " + error.message)}&type=error`, request.url))
     }
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) {
+      return NextResponse.redirect(new URL('/login?message=Unable%20to%20read%20your%20new%20session&type=error', request.url));
+    }
+
     // Provision/reconcile the application profile without changing legacy
     // Prisma primary keys. This keeps OAuth and password login consistent.
     const dbUser = await getOrCreatePrismaUser(user);

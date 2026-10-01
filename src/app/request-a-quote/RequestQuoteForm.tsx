@@ -11,7 +11,16 @@ import { useEffect, useRef, useState } from "react";
 import { RecipientCsvUploader } from "@/components/forms/RecipientCsvUploader";
 import { MarketingHero } from "@/components/marketing/MarketingHero";
 
-export function RequestQuoteForm() {
+export function RequestQuoteForm({
+  initialValues,
+}: {
+  initialValues?: {
+    budgetPerRecipient?: number;
+    numberOfRecipients?: number;
+    eventType?: string;
+    productId?: string;
+  };
+}) {
   const [state, setState] = useState<{ success: boolean; message: string } | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -107,6 +116,7 @@ export function RequestQuoteForm() {
               </div>
             ) : (
               <form ref={formRef} action={clientAction} className="space-y-12">
+                {initialValues?.productId ? <input type="hidden" name="productId" value={initialValues.productId} /> : null}
 
                 {state && !state.success && (
                   <div className="flex items-start gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-950/30 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-900/50 text-sm">
@@ -156,15 +166,15 @@ export function RequestQuoteForm() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label htmlFor="numberOfRecipients">Number of Recipients *</Label>
-                      <Input id="numberOfRecipients" name="numberOfRecipients" type="number" placeholder="50" min="1" required className="h-12 focus-visible:ring-sp-magenta bg-muted/50 dark:bg-slate-900/50" />
+                      <Input id="numberOfRecipients" name="numberOfRecipients" type="number" placeholder="50" min="1" defaultValue={initialValues?.numberOfRecipients} required className="h-12 focus-visible:ring-sp-magenta bg-muted/50 dark:bg-slate-900/50" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="budgetPerRecipient">Budget Per Recipient (&#8377;)</Label>
-                      <Input id="budgetPerRecipient" name="budgetPerRecipient" type="number" placeholder="2,000" className="h-12 focus-visible:ring-sp-magenta bg-muted/50 dark:bg-slate-900/50" />
+                      <Input id="budgetPerRecipient" name="budgetPerRecipient" type="number" placeholder="2,000" defaultValue={initialValues?.budgetPerRecipient} className="h-12 focus-visible:ring-sp-magenta bg-muted/50 dark:bg-slate-900/50" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="eventType">Event / Occasion</Label>
-                      <Input id="eventType" name="eventType" placeholder="e.g. Diwali, Onboarding" className="h-12 focus-visible:ring-sp-magenta bg-muted/50 dark:bg-slate-900/50" />
+                      <Input id="eventType" name="eventType" placeholder="e.g. Diwali, Onboarding" defaultValue={initialValues?.eventType} className="h-12 focus-visible:ring-sp-magenta bg-muted/50 dark:bg-slate-900/50" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="requiredDeliveryDate">Required Delivery Date</Label>
@@ -228,7 +238,7 @@ export function RequestQuoteForm() {
 
                 {/* Submit Button */}
                 <div className="pt-8 border-t border-border/40 text-center">
-                  <Button type="submit" disabled={isPending || Object.values(errors).some(e => e !== "")} className="w-full sm:w-auto min-w-64 h-14 rounded-full bg-gradient-to-r from-sp-purple via-sp-magenta to-sp-orange text-white hover:opacity-90 font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 gap-2">
+                  <Button type="submit" data-track-event="quote_submit" disabled={isPending || Object.values(errors).some(e => e !== "")} className="w-full sm:w-auto min-w-64 h-14 rounded-full bg-gradient-to-r from-sp-purple via-sp-magenta to-sp-orange text-white hover:opacity-90 font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 gap-2">
                     {isPending ? (
                       <>
                         <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/50 border-t-white" />

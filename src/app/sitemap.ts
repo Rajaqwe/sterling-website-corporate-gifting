@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl =
     configuredSiteUrl && !isLocalSiteUrl
       ? configuredSiteUrl.replace(/\/+$/, '')
-      : 'https://sterling-website-corporate-gifting-sterling17.vercel.app';
+      : 'https://sterling-website-corporate-gifting.vercel.app';
 
   // Fetch active products for dynamic routes
   // Try catch in case DB is unpopulated during build

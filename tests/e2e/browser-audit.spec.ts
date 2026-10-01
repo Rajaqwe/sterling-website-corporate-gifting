@@ -64,10 +64,17 @@ test.describe("Sterling browser audit", () => {
       await page.addInitScript((t) => localStorage.setItem("theme", t), theme);
       for (const route of PUBLIC_ROUTES) {
         const consoleErrors: string[] = [];
+        const networkErrors: string[] = [];
         const onConsole = (m: any) => m.type() === "error" && consoleErrors.push(m.text());
         const onPageError = (e: Error) => consoleErrors.push(e.message);
+        const onResponse = (response: any) => {
+          if (response.status() >= 400 && response.status() !== 404) {
+            networkErrors.push(response.status() + " " + response.url());
+          }
+        };
         page.on("console", onConsole);
         page.on("pageerror", onPageError);
+        page.on("response", onResponse);
         try {
           const response = await page.goto(route, { waitUntil: "domcontentloaded", timeout: 15000 });
           await stabilize(page);
@@ -83,11 +90,17 @@ test.describe("Sterling browser audit", () => {
               failures.push("[" + theme + "] " + route + ": browser error: " + e);
             }
           }
+          for (const e of Array.from(new Set(networkErrors))) {
+            if (!/favicon|googletagmanager|google-analytics|clarity/i.test(e)) {
+              failures.push("[" + theme + "] " + route + ": network error: " + e);
+            }
+          }
         } catch (e) {
           failures.push("[" + theme + "] " + route + ": " + (e instanceof Error ? e.message : String(e)));
         } finally {
           page.removeListener("console", onConsole);
           page.removeListener("pageerror", onPageError);
+          page.removeListener("response", onResponse);
         }
       }
     }

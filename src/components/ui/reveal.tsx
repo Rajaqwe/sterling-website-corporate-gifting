@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 type AnimationVariant =
   | "fade"
   | "fade-up"
@@ -83,7 +85,7 @@ export function StaggerContainer({
       style={{
         "--stagger-delay": `${staggerDelay}ms`,
         "--stagger-initial-delay": `${initialDelay}ms`,
-      } as React.CSSProperties}
+      } as CSSProperties}
     >
       {children}
     </div>

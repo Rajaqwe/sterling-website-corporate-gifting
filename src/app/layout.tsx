@@ -28,7 +28,7 @@ const isLocalSiteUrl =
 const SITE_URL =
   configuredSiteUrl && !isLocalSiteUrl
     ? configuredSiteUrl.replace(/\/+$/, "")
-    : "https://sterling-website-corporate-gifting.vercel.app";
+    : "https://sterling-website-corporate-gifting-sterling17.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

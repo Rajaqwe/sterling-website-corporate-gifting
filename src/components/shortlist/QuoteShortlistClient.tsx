@@ -11,10 +11,11 @@ import {
   readQuoteShortlist,
   writeQuoteShortlist,
 } from "@/lib/quote-shortlist";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export function QuoteShortlistClient() {
   const [items, setItems] = useState<QuoteShortlistItem[]>([]);
+  const [quantity, setQuantity] = useState(50);
 
   useEffect(() => {
     const sync = () => setItems(readQuoteShortlist());
@@ -34,6 +35,15 @@ export function QuoteShortlistClient() {
   const clear = () => {
     writeQuoteShortlist([]);
   };
+
+  const referenceEstimate = useMemo(() => {
+    return items.reduce((total, item) => {
+      const price = typeof item.price === "number" && item.price > 0 ? item.price : 0;
+      return total + price * quantity;
+    }, 0);
+  }, [items, quantity]);
+
+  const pricedItemCount = items.filter((item) => typeof item.price === "number" && item.price > 0).length;
 
   if (items.length === 0) {
     return (
@@ -68,6 +78,41 @@ export function QuoteShortlistClient() {
           <RotateCcw className="mr-2 h-4 w-4" />
           Clear shortlist
         </Button>
+      </div>
+
+      <div className="rounded-2xl border border-accent/20 bg-accent/[0.06] p-5">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">Reference pricing</p>
+            <h2 className="mt-1 text-lg font-heading font-bold text-foreground">See the starting-price scale for your shortlist</h2>
+            <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
+              This is only a planning reference using the displayed starting prices. Final pricing can change with volume, branding, packaging, shipping and taxes.
+            </p>
+          </div>
+          <label className="w-full lg:w-44">
+            <span className="mb-1.5 block text-xs font-semibold text-muted-foreground">Units per selected product</span>
+            <input
+              type="number"
+              min={1}
+              max={1000000}
+              value={quantity}
+              onChange={(event) => setQuantity(Math.max(1, Number(event.target.value) || 1))}
+              className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm font-semibold text-foreground outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-accent"
+            />
+          </label>
+        </div>
+        <div className="mt-5 flex flex-wrap items-end justify-between gap-4 border-t border-accent/10 pt-4">
+          <div>
+            <span className="text-xs uppercase tracking-wide text-muted-foreground">Across {pricedItemCount} priced item{pricedItemCount === 1 ? "" : "s"}</span>
+            <p className="mt-1 text-2xl font-heading font-bold text-foreground">{formatINR(referenceEstimate)}</p>
+          </div>
+          <p className="max-w-md text-right text-xs leading-5 text-muted-foreground">
+            {pricedItemCount === items.length
+              ? `At ${quantity.toLocaleString("en-IN")} units for every saved product.`
+              : "Some saved products do not have a displayed starting price, so they are excluded from this reference."
+            }
+          </p>
+        </div>
       </div>
 
       <div className="grid gap-4">
@@ -119,7 +164,7 @@ export function QuoteShortlistClient() {
             <p className="text-xs text-muted-foreground">Sterling can review the saved products with your quantity, budget and delivery needs.</p>
           </div>
           <Link
-            href="/request-a-quote"
+            href={`/request-a-quote?numberOfRecipients=${quantity}`}
             data-track-event="shortlist_request_quote"
             className="btn-primary inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl px-5 text-sm font-semibold sm:w-auto"
           >

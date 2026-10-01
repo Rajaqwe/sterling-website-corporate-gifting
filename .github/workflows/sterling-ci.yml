@@ -56,14 +56,14 @@ jobs:
       - name: Tailwind/PostCSS
         run: npx tailwindcss -i ./src/app/globals.css -o /tmp/sterling-tailwind.css
 
-      - name: Production build
-        run: npm run build
-
       - name: Apply migrations for browser audit
         run: npx prisma migrate deploy
 
       - name: Seed demo catalogue for browser audit
         run: npx tsx@4.20.5 prisma/seed-demo.ts
+
+      - name: Production build
+        run: npm run build
 
       - name: Install Chromium for browser audit
         run: npx playwright install --with-deps chromium

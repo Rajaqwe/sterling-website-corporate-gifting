@@ -11,7 +11,29 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: sterling
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d sterling"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      NODE_ENV: development
+      NEXT_PUBLIC_APP_URL: http://127.0.0.1:3000
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/sterling
+      DIRECT_URL: postgresql://postgres:postgres@127.0.0.1:5432/sterling
+      NEXT_PUBLIC_WHATSAPP_NUMBER: 919054935136
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: local-browser-audit-key
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,3 +58,39 @@ jobs:
 
       - name: Production build
         run: npm run build
+
+      - name: Apply migrations for browser audit
+        run: npx prisma migrate deploy
+
+      - name: Seed demo catalogue for browser audit
+        run: npx tsx@4.20.5 prisma/seed-demo.ts
+
+      - name: Install Chromium for browser audit
+        run: npx playwright install --with-deps chromium
+
+      - name: Start Next.js for browser audit
+        run: |
+          npm run dev > /tmp/sterling-next.log 2>&1 &
+
+      - name: Wait for Next.js
+        run: |
+          for i in {1..90}; do
+            if curl -fsS http://127.0.0.1:3000/ >/dev/null; then exit 0; fi
+            sleep 2
+          done
+          cat /tmp/sterling-next.log
+          exit 1
+
+      - name: Run independent browser visual audit
+        run: npx playwright test tests/e2e/browser-audit.spec.ts --config=playwright.audit.config.ts
+
+      - name: Upload browser audit artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sterling-browser-audit
+          path: |
+            test-results/
+            playwright-report/
+            /tmp/sterling-next.log
+          if-no-files-found: warn

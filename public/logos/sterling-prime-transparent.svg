@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 520 120" role="img" aria-labelledby="title desc">
+<title id="title">Sterling Prime</title>
+<desc id="desc">Sterling Prime corporate gifting logo</desc>
+<defs>
+  <linearGradient id="wing" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#7B2C91"/>
+    <stop offset=".42" stop-color="#C33B83"/>
+    <stop offset=".72" stop-color="#EB7925"/>
+    <stop offset="1" stop-color="#E2CD27"/>
+  </linearGradient>
+</defs>
+<g transform="translate(4 8)">
+  <image xlink:href="/logos/sterling-logo.svg" href="/logos/sterling-logo.svg" x="0" y="7" width="104" height="98" preserveAspectRatio="xMidYMid meet"/>
+  <g aria-hidden="true">
+    <path d="M18 44c-1-18 9-31 27-37 5 15 0 31-14 42 12 2 20 7 22 17-17 5-29-2-35-22z" fill="url(#wing)" opacity=".0"/>
+  </g>
+  <text x="100" y="72" font-family="Poppins, Inter, Arial, sans-serif" font-size="58" font-style="italic" font-weight="800" letter-spacing="-2" fill="#0F75BC">Sterling</text>
+  <text x="258" y="101" font-family="Poppins, Inter, Arial, sans-serif" font-size="18" font-weight="800" letter-spacing="6" fill="#C4161C">PRIME</text>
+</g>
+</svg>

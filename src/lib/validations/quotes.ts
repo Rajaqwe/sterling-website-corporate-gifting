@@ -9,6 +9,7 @@ export const createQuoteSchema = z.object({
   productId: z.string().max(255).optional(),
   categoryId: z.string().max(255).optional(),
   quantity: z.coerce.number().min(1, "Must be at least 1").max(10000000, "Maximum quantity exceeded"),
+  requiredDeliveryDate: z.preprocess((value) => value === "" ? undefined : value, z.coerce.date().optional()),
   budgetPerRecipient: z.coerce.number().min(0, "Budget cannot be negative").max(10000000, "Maximum budget exceeded").optional(),
   brandingRequired: z.boolean().default(false),
   deliveryLocation: z.string().max(500).optional(),

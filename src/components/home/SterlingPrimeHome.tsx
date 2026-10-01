@@ -60,7 +60,7 @@ const features = [
   [Palette, "Custom branding", "Laser, print, packaging and other available finishes."],
   [Box, "Bulk friendly", "Built around corporate quantities and repeat programmes."],
   [Truck, "Delivery coordination", "Plan dispatches for multiple recipient locations."],
-];
+] as const;
 
 async function getFeaturedProducts() {
   try {
@@ -291,7 +291,7 @@ export default async function SterlingPrimeHome() {
       <VerifiedTestimonials limit={3} />
       <ProjectGallery />
 
-      <section className="bg-[linear-gradient(160deg,#0B2A4A_0%,#0F75BC_140%)] py-18 text-white sm:py-20">
+      <section className="bg-[linear-gradient(160deg,#0B2A4A_0%,#0F75BC_140%)] py-16 text-white sm:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">

@@ -183,6 +183,7 @@ export function ProductDetailClient({
               <WhatsAppConciergeButton productName={title} productUrl={shareUrl} label="Ask on WhatsApp" />
               <Link
                 href={"/request-a-sample?product=" + encodeURIComponent(product.slug)}
+                data-track-event="sample_request_cta"
                 className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-accent/40 bg-accent/10 px-4 text-sm font-semibold text-foreground transition-[background-color,border-color,transform] duration-300 ease-out hover:-translate-y-0.5 hover:border-accent/60 hover:bg-accent/15"
               >
                 <PackageCheck className="h-4 w-4 text-accent" />
@@ -301,6 +302,26 @@ export function ProductDetailClient({
           </section>
         )}
       </main>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-background/95 p-3 shadow-2xl backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:hidden">
+        <div className="mx-auto flex max-w-2xl gap-2">
+          <Link
+            href={`/request-a-quote?productId=${encodeURIComponent(product.id)}&numberOfRecipients=${minimumOrderQuantity}`}
+            data-track-event="product_quote_cta"
+            className="btn-primary flex h-12 flex-1 items-center justify-center rounded-xl text-sm font-bold"
+          >
+            Get custom quote
+          </Link>
+          <WhatsAppConciergeButton
+            productName={title}
+            productUrl={shareUrl}
+            quantity={minimumOrderQuantity}
+            label="WhatsApp"
+            compact
+            className="h-12 min-w-28 rounded-xl px-4"
+          />
+        </div>
+      </div>
     </div>
   );
 }

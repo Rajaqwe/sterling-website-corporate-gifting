@@ -35,6 +35,10 @@ export async function createQuote(payload: FormData | Record<string, any>) {
           rawData.customizationIds = JSON.parse(rawData.customizationIds);
         } catch(e) {}
       }
+
+      if (rawData.quantity == null || rawData.quantity === '') {
+        rawData.quantity = rawData.numberOfRecipients;
+      }
     } else {
       rawData = payload;
     }

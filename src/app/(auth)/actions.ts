@@ -7,6 +7,7 @@ import { rateLimit } from '@/lib/security/rate-limit'
 import { headers } from 'next/headers'
 import { mergeGuestCart } from '@/lib/cart/merge-guest-cart'
 import { assertEnv } from '@/lib/env'
+import { getOrCreatePrismaUser } from '@/lib/auth/server'
 
 // Server-enforced password policy. The UI hint is not a security control.
 const PASSWORD_MIN_LENGTH = 10;
@@ -42,21 +43,28 @@ export async function login(formData: FormData) {
     return redirect(`/login?message=${encodeURIComponent(error.message)}`)
   }
 
-  let isAdmin = false;
-  if (data?.user) {
-    const { prisma } = await import('@/lib/prisma/client');
-    const dbUser = await prisma.user.findUnique({
-      where: { id: data.user.id },
-      select: { role: true }
-    });
-    const role = dbUser?.role || data.user.app_metadata?.role;
-    isAdmin = role === 'ADMIN' || role === 'SUPER_ADMIN';
-    await mergeGuestCart(data.user.id);
+  if (!data?.user) {
+    return redirect('/login?message=Authentication failed&type=error')
   }
 
+  const dbUser = await getOrCreatePrismaUser(data.user);
+
+  if (!dbUser) {
+    await supabase.auth.signOut();
+    return redirect('/login?message=Unable to create your account profile&type=error')
+  }
+
+  if (!dbUser.isActive) {
+    await supabase.auth.signOut();
+    return redirect('/login?message=Your account has been deactivated&type=error')
+  }
+
+  await mergeGuestCart(dbUser.id);
+
   revalidatePath('/', 'layout')
-  
-  if (isAdmin) {
+
+  const role = dbUser.role || data.user.app_metadata?.role;
+  if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
     redirect('/admin')
   } else {
     redirect('/dashboard')

@@ -70,7 +70,7 @@ jobs:
 
       - name: Start Next.js for browser audit
         run: |
-          npm run dev > /tmp/sterling-next.log 2>&1 &
+          NODE_ENV=production npm run start > /tmp/sterling-next.log 2>&1 &
 
       - name: Wait for Next.js
         run: |

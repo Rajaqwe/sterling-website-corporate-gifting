@@ -12,6 +12,7 @@ import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
 import { HideOnDashboard } from "@/components/layout/HideOnDashboard";
 import { createClient } from "@/lib/supabase/server";
 import { FloatingButtons } from "@/components/layout/FloatingButtons";
+import { Analytics } from "@/components/analytics/Analytics";
 
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/components/layout/AuthProvider";
@@ -20,8 +21,13 @@ import { prisma } from "@/lib/prisma/client";
 import NextTopLoader from 'nextjs-toploader';
 import { Toaster } from 'sonner';
 
+const SITE_URL = process.env.NEXT_PUBLIC_APP_URL || "https://sterling-website-corporate-gifting.vercel.app";
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  metadataBase: new URL(SITE_URL),
+  alternates: {
+    canonical: "/",
+  },
   title: {
     template: "%s | Sterling Corporate",
     default: "Sterling | Premium B2B Corporate Gifting",
@@ -127,6 +133,7 @@ export default async function RootLayout({
         </AuthProvider>
         </ThemeProvider>
         <Toaster visibleToasts={3} />
+        <Analytics />
       </body>
     </html>
   );

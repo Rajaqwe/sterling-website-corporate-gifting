@@ -16,123 +16,116 @@ import { serializeData } from "@/lib/utils/serialize";
 
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const params = await props.params;
-  const product = await prisma.product.findUnique({
-    where: { slug: params.slug },
-    include: { category: true, media: true }
-  });
+  let product: any = null;
 
-  if (!product) {
-    return { title: "Product Not Found | Sterling" };
-  }
-
-  const primaryImage = product.media.find(m => m.isPrimary)?.url || product.media[0]?.url;
-
-  return {
-    title: product.seoTitle || `${product.name} | Sterling Corporate Gifting`,
-    description: product.seoDescription || product.shortDescription || `Buy ${product.name} from Sterling's premium corporate gifting collection.`,
-    openGraph: {
-      title: product.seoTitle || product.name,
-      description: product.seoDescription || product.shortDescription || "",
-      images: primaryImage ? [primaryImage] : [],
-      type: "website",
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: product.name,
-      images: primaryImage ? [primaryImage] : [],
-    }
-  };
-}
-
-export async function generateStaticParams() {
   try {
-    const products = await prisma.product.findMany({
-      select: { slug: true },
-      where: { status: 'ACTIVE' }
-    });
-
-    return products.map((product) => ({
-      slug: product.slug,
-    }));
-  } catch (error) {
-    // The build environment may not have database connectivity.
-    // Product pages can still be rendered on demand at runtime.
-    console.warn("Skipping product pre-rendering because the database is unavailable during build.", error);
-    return [];
-  }
-}
-
-export default async function ProductDetailPage(props: { params: Promise<{ slug: string }> }) {
-  const params = await props.params;
-  const slug = params.slug;
-
-  const product = await prisma.product.findUnique({
-    where: { slug },
-    include: {
-      category: true,
-      media: { orderBy: { sortOrder: 'asc' } },
-      variants: { orderBy: { sortOrder: 'asc' } },
-      bulkPricingTiers: { orderBy: { minQuantity: 'asc' } },
-      brandingOptions: {
-        include: { brandingOption: true }
-      },
-      reviews: {
-        include: {
-          user: {
-            select: {
-              fullName: true,
-              avatarUrl: true
-            }
-          }
+    product = await prisma.product.findUnique({
+      where: { slug },
+      include: {
+        category: true,
+        media: { orderBy: { sortOrder: 'asc' } },
+        variants: { orderBy: { sortOrder: 'asc' } },
+        bulkPricingTiers: { orderBy: { minQuantity: 'asc' } },
+        brandingOptions: {
+          include: { brandingOption: true }
         },
-        orderBy: { createdAt: 'desc' }
+        reviews: {
+          include: {
+            user: {
+              select: {
+                fullName: true,
+                avatarUrl: true
+              }
+            }
+          },
+          orderBy: { createdAt: 'desc' }
+        }
       }
+    });
+  } catch (error) {
+    console.error("Rich product query failed:", error);
+    try {
+      product = await prisma.product.findUnique({
+        where: { slug },
+        include: {
+          category: true,
+          media: { orderBy: { sortOrder: 'asc' } }
+        }
+      });
+
+      if (product) {
+        product = {
+          ...product,
+          variants: [],
+          bulkPricingTiers: [],
+          brandingOptions: [],
+          reviews: [],
+        };
+      }
+    } catch (fallbackError) {
+      console.error("Fallback product query failed:", fallbackError);
     }
-  });
+  }
 
   if (!product) {
     notFound();
   }
 
-  const relatedProducts = await prisma.product.findMany({
-    where: {
-      categoryId: product.categoryId,
-      id: { not: product.id },
-      status: 'ACTIVE'
-    },
-    include: {
-      category: true,
-      media: true,
-    },
-    take: 4
-  });
+  let relatedProducts: any[] = [];
 
-  // Get user session to pass wishlist/cart state
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  try {
+    relatedProducts = await prisma.product.findMany({
+      where: {
+        categoryId: product.categoryId,
+        id: { not: product.id },
+        status: 'ACTIVE'
+      },
+      include: {
+        category: true,
+        media: true,
+      },
+      take: 4
+    });
+  } catch (error) {
+    console.error("Related products query failed:", error);
+  }
 
+  let user: any = null;
   let isInWishlist = false;
   let isLiked = false;
-  if (user) {
-    const wishlist = await prisma.wishlist.findUnique({
-      where: { userId: user.id },
-      include: { items: { where: { productId: product.id } } }
-    });
-    if (wishlist && wishlist.items.length > 0) {
-      isInWishlist = true;
-    }
 
-    const like = await prisma.productLike.findUnique({
-      where: {
-        userId_productId: {
-          userId: user.id,
-          productId: product.id
-        }
+  try {
+    const supabase = await createClient();
+    const sessionResult = await supabase.auth.getUser();
+    user = sessionResult.data.user;
+
+    if (user) {
+      try {
+        const wishlist = await prisma.wishlist.findUnique({
+          where: { userId: user.id },
+          include: { items: { where: { productId: product.id } } }
+        });
+        isInWishlist = !!wishlist?.items.length;
+      } catch (error) {
+        console.warn("Wishlist state unavailable on product page:", error);
       }
-    });
-    if (like) {
-      isLiked = true;
+
+      try {
+        const like = await prisma.productLike.findUnique({
+          where: {
+            userId_productId: {
+              userId: user.id,
+              productId: product.id
+            }
+          }
+        });
+        isLiked = !!like;
+      } catch (error) {
+        console.warn("Like state unavailable on product page:", error);
+      }
     }
+  } catch (error) {
+    console.warn("Auth state unavailable on product page:", error);
   }
 
   // Map brandingOptions correctly since it's a join table

@@ -50,7 +50,7 @@ export function Footer() {
                 src="/logos/sterling-logo-full.svg" 
                 alt="Sterling Prime" 
                 fill 
-                className="object-contain object-left px-3"
+                className="object-contain object-left"
               />
             </Link>
             <p className="text-white/70 max-w-sm mb-6 leading-relaxed">

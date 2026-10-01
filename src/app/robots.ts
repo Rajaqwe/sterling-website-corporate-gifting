@@ -1,7 +1,10 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://sterling-website-corporate-gifting.vercel.app';
+  const configuredSiteUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+  const baseUrl = configuredSiteUrl && !/localhost|127\\.0\\.0\\.1/i.test(configuredSiteUrl)
+    ? configuredSiteUrl.replace(/\\/+$/, '')
+    : 'https://sterling-website-corporate-gifting-sterling17.vercel.app';
 
   return {
     rules: {

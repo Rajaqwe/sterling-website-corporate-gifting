@@ -41,6 +41,7 @@ export function ProductDetailClient({
   const [isPending, startTransition] = useTransition();
 
   const title = product.name || "Corporate Gift";
+  const minimumOrderQuantity = Number(product.minimumOrderQuantity ?? product.moq ?? 1);
   const displayPrice = product.price;
   const displaySku = product.sku;
   const leadTimeLabel = product.leadTimeDays ? `${product.leadTimeDays} business days` : "Lead time confirmed with your quote";

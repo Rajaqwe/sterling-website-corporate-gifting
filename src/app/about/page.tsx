@@ -2,7 +2,6 @@ import { buttonVariants } from "@/components/ui/button";
 
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Heart, Target, Users, Award, Globe, Sparkles } from "lucide-react";
 import { MarketingHero } from "@/components/marketing/MarketingHero";

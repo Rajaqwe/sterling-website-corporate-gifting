@@ -2,7 +2,6 @@
 import { buttonVariants } from "@/components/ui/button";
 
 import Link from 'next/link';
-import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { HelpCircle } from "lucide-react";
 

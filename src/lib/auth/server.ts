@@ -8,6 +8,90 @@ export type AuthContext = {
   user: User;
 };
 
+type SupabaseUserLike = {
+  id: string;
+  email?: string;
+  user_metadata?: {
+    full_name?: string | null;
+    avatar_url?: string | null;
+  };
+};
+
+/**
+ * Resolve the application user for a Supabase identity.
+ *
+ * The Supabase Auth user is the source of truth for authentication, while
+ * Prisma stores the application's profile/role. Older records can exist with
+ * the same email but a different Prisma id, so we deliberately match by id
+ * first and email second instead of mutating primary keys during login.
+ */
+export async function getOrCreatePrismaUser(
+  supabaseUser: SupabaseUserLike
+) {
+  const email = supabaseUser.email?.trim().toLowerCase();
+  if (!email) {
+    return null;
+  }
+
+  const include = {
+    companyMembers: {
+      where: { isActive: true },
+      include: { company: true },
+    },
+  } as const;
+
+  const byId = await prisma.user.findUnique({
+    where: { id: supabaseUser.id },
+    include,
+  });
+
+  if (byId) {
+    return byId;
+  }
+
+  // Backward compatibility for users provisioned before the Supabase id was
+  // used as the Prisma primary key. Keep the existing DB identity intact.
+  const byEmail = await prisma.user.findUnique({
+    where: { email },
+    include,
+  });
+
+  if (byEmail) {
+    return byEmail;
+  }
+
+  try {
+    return await prisma.user.create({
+      data: {
+        id: supabaseUser.id,
+        email,
+        fullName: supabaseUser.user_metadata?.full_name || null,
+        avatarUrl: supabaseUser.user_metadata?.avatar_url || null,
+        role: 'CUSTOMER',
+      },
+      include,
+    });
+  } catch (error) {
+    // Two requests can provision the same user at the same time. If another
+    // request won the race, use the record it created rather than failing login.
+    const existing = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { id: supabaseUser.id },
+          { email },
+        ],
+      },
+      include,
+    });
+
+    if (existing) {
+      return existing;
+    }
+
+    throw error;
+  }
+}
+
 /**
  * Retrieves the currently authenticated Supabase user and their corresponding Prisma User record.
  * If no user is authenticated, returns null.
@@ -20,15 +104,7 @@ export async function getAuthUser(): Promise<AuthContext | null> {
     return null;
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: supabaseUser.id },
-    include: {
-      companyMembers: {
-        where: { isActive: true },
-        include: { company: true },
-      },
-    },
-  });
+  const user = await getOrCreatePrismaUser(supabaseUser);
 
   if (!user) {
     return null;

@@ -80,23 +80,32 @@ test.describe("Sterling browser audit", () => {
           await stabilize(page);
           const status = response?.status() ?? 0;
           const h = await health(page);
-          if (status >= 400) failures.push("[" + theme + "] " + route + ": HTTP " + status);
-          if (h.overflow) failures.push("[" + theme + "] " + route + ": horizontal overflow");
-          if (h.textLength < 20) failures.push("[" + theme + "] " + route + ": almost no rendered text");
-          if (h.brokenImages.length) failures.push("[" + theme + "] " + route + ": broken images " + h.brokenImages.join(" | "));
-          if (h.fixedClipped.length) failures.push("[" + theme + "] " + route + ": clipped fixed UI " + h.fixedClipped.join(" | "));
+          const routeFailures: string[] = [];
+          if (status >= 400) routeFailures.push("HTTP " + status + " (final URL: " + page.url() + ")");
+          if (h.overflow) routeFailures.push("horizontal overflow (scrollWidth=" + h.scrollWidth + ", viewport=" + h.viewport + ")");
+          if (h.textLength < 20) routeFailures.push("almost no rendered text (length=" + h.textLength + ")");
+          if (h.brokenImages.length) routeFailures.push("broken images: " + h.brokenImages.join(" | "));
+          if (h.fixedClipped.length) routeFailures.push("clipped fixed UI: " + h.fixedClipped.join(" | "));
           for (const e of consoleErrors) {
-            if (!/favicon|googletagmanager|google-analytics|clarity/i.test(e)) {
-              failures.push("[" + theme + "] " + route + ": browser error: " + e);
-            }
+            if (!/favicon|googletagmanager|google-analytics|clarity/i.test(e)) routeFailures.push("browser error: " + e);
           }
           for (const e of Array.from(new Set(networkErrors))) {
-            if (!/favicon|googletagmanager|google-analytics|clarity/i.test(e)) {
-              failures.push("[" + theme + "] " + route + ": network error: " + e);
+            if (!/favicon|googletagmanager|google-analytics|clarity/i.test(e)) routeFailures.push("network error: " + e);
+          }
+          if (routeFailures.length) {
+            const prefix = "[" + theme + "] " + route + ": ";
+            for (const failure of routeFailures) {
+              const message = prefix + failure;
+              failures.push(message);
+              console.error("BROWSER_AUDIT_FAILURE " + message);
             }
+          } else {
+            console.log("BROWSER_AUDIT_OK [" + theme + "] " + route);
           }
         } catch (e) {
-          failures.push("[" + theme + "] " + route + ": " + (e instanceof Error ? e.message : String(e)));
+          const message = "[" + theme + "] " + route + ": " + (e instanceof Error ? e.message : String(e));
+          failures.push(message);
+          console.error("BROWSER_AUDIT_FAILURE " + message);
         } finally {
           page.removeListener("console", onConsole);
           page.removeListener("pageerror", onPageError);
@@ -105,6 +114,7 @@ test.describe("Sterling browser audit", () => {
         }
       }
     }
+    console.log("BROWSER_AUDIT_SUMMARY failures=" + failures.length);
     expect(failures, failures.join("\n")).toEqual([]);
   });
 

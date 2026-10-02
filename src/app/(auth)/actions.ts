@@ -21,6 +21,35 @@ function validatePassword(password: string): string | null {
   return null;
 }
 
+/**
+ * Resolve the public origin used for Supabase OAuth/password-reset callbacks.
+ *
+ * NEXT_PUBLIC_APP_URL is intentionally preferred when it is a real public URL.
+ * If an old/local .env value such as http://localhost:3000 is accidentally
+ * present in a production deployment, derive the origin from the forwarded
+ * production request headers instead of sending the user to localhost.
+ */
+async function getPublicAppUrl(): Promise<string> {
+  const configured = assertEnv('NEXT_PUBLIC_APP_URL').trim().replace(/\/$/, '');
+
+  if (!/^https?:\/\/localhost(?::\d+)?$/i.test(configured) &&
+      !/^https?:\/\/127\.0\.0\.1(?::\d+)?$/i.test(configured)) {
+    return configured;
+  }
+
+  const requestHeaders = await headers();
+  const forwardedHost = requestHeaders.get('x-forwarded-host') || requestHeaders.get('host');
+  const forwardedProto = requestHeaders.get('x-forwarded-proto') || 'https';
+
+  if (forwardedHost && !/^localhost(?::\d+)?$/i.test(forwardedHost) &&
+      !/^127\.0\.0\.1(?::\d+)?$/i.test(forwardedHost)) {
+    return `${forwardedProto}://${forwardedHost}`;
+  }
+
+  // Local development still gets the configured localhost URL.
+  return configured;
+}
+
 export async function login(formData: FormData) {
   const ip = (await headers()).get('x-forwarded-for') || 'anonymous';
   const limitCheck = await rateLimit(`login_${ip}`, 5, 60000); // 5 attempts per minute
@@ -81,10 +110,11 @@ export async function signOut() {
 
 export async function signInWithOAuth(provider: 'google' | 'apple') {
   const supabase = await createClient()
+  const publicAppUrl = await getPublicAppUrl();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `${assertEnv('NEXT_PUBLIC_APP_URL')}/auth/callback`,
+      redirectTo: `${publicAppUrl}/auth/callback`,
     },
   })
 
@@ -139,13 +169,10 @@ export async function signup(formData: FormData) {
   })
 
   if (error) {
-    // Log the real cause server-side; return a generic message so attackers
-    // cannot enumerate registered emails from the signup response.
     console.error('Signup failed:', error.message);
     return redirect(`/register?message=${encodeURIComponent('Could not create your account. If this email is already registered, try signing in or resetting your password.')}&type=error`)
   }
 
-  // Provision Prisma User
   if (data?.user) {
     const { prisma } = await import('@/lib/prisma/client');
     const existingUser = await prisma.user.findUnique({ where: { id: data.user.id } });
@@ -161,7 +188,7 @@ export async function signup(formData: FormData) {
           });
         } catch (e) {
           console.error("Could not reconnect orphaned Prisma user on signup", e);
-          finalUserId = userByEmail.id; // Fallback
+          finalUserId = userByEmail.id;
         }
       } else {
         const fullName = [firstName, lastName].filter(Boolean).join(' ') || null;
@@ -221,16 +248,15 @@ export async function resetPassword(formData: FormData) {
     return redirect(`/forgot-password?message=${encodeURIComponent('Please enter a valid email address.')}&type=error`)
   }
 
+  const publicAppUrl = await getPublicAppUrl();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${assertEnv('NEXT_PUBLIC_APP_URL')}/auth/callback?next=/reset-password`,
+    redirectTo: `${publicAppUrl}/auth/callback?next=/reset-password`,
   })
 
   if (error) {
     console.error('Password reset request failed:', error.message);
   }
 
-  // Always show the same response so the endpoint cannot be used to
-  // discover which emails have accounts.
   return redirect(`/forgot-password?message=${encodeURIComponent('If an account exists for that email, a password reset link has been sent.')}&type=success`)
 }
 

@@ -2,68 +2,80 @@ import { createClient } from '@/lib/supabase/server'
 import { getOrCreatePrismaUser } from '@/lib/auth/server'
 import { NextResponse } from 'next/server'
 
+const PRODUCTION_APP_URL = 'https://sterling-website-corporate-gifting-sterling17.vercel.app'
+
+function getSafeOrigin(request: Request): string {
+  const requestUrl = new URL(request.url)
+  if (process.env.NODE_ENV !== 'production') return requestUrl.origin
+
+  const forwardedHost = request.headers.get('x-forwarded-host')
+  if (forwardedHost && !/^(localhost|127\.0\.0\.1)(?::\d+)?$/i.test(forwardedHost)) {
+    const proto = request.headers.get('x-forwarded-proto') || 'https'
+    return `${proto}://${forwardedHost}`
+  }
+
+  if (!/^(localhost|127\.0\.0\.1)(?::\d+)?$/i.test(requestUrl.hostname)) {
+    return requestUrl.origin
+  }
+
+  return PRODUCTION_APP_URL
+}
+
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
+  const origin = getSafeOrigin(request)
   const code = requestUrl.searchParams.get('code')
-  const rawNext = requestUrl.searchParams.get('next');
-  
-  // Validate next parameter to prevent open redirects (P1-5)
-  const next = rawNext && rawNext.startsWith('/') && !rawNext.startsWith('//') 
-    ? rawNext 
-    : '/dashboard';
+  const rawNext = requestUrl.searchParams.get('next')
+
+  // Validate next parameter to prevent open redirects.
+  const next = rawNext && rawNext.startsWith('/') && !rawNext.startsWith('//')
+    ? rawNext
+    : '/dashboard'
 
   if (code) {
     const supabase = await createClient()
-    
-    // Attempt to exchange the code for a session
     const { error } = await supabase.auth.exchangeCodeForSession(code)
-    
+
     if (error) {
-      // LOG EXACT ERROR SERVER-SIDE FOR DEBUGGING OAUTH FAILURES
-      console.error("====== OAUTH EXCHANGE ERROR ======")
-      console.error("Error Status:", error.status)
-      console.error("Error Message:", error.message)
-      console.error("Error Name:", error.name)
-      console.error("Auth Code Used:", code.substring(0, 5) + "...")
-      console.error("==================================")
-      
-      return NextResponse.redirect(new URL(`/login?message=${encodeURIComponent("Google Login Failed: " + error.message)}&type=error`, request.url))
-    }
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
-      return NextResponse.redirect(new URL('/login?message=Unable%20to%20read%20your%20new%20session&type=error', request.url));
+      console.error('====== OAUTH EXCHANGE ERROR ======')
+      console.error('Error Status:', error.status)
+      console.error('Error Message:', error.message)
+      console.error('Error Name:', error.name)
+      console.error('Auth Code Used:', code.substring(0, 5) + '...')
+      console.error('==================================')
+      return NextResponse.redirect(new URL(`/login?message=${encodeURIComponent('Google Login Failed: ' + error.message)}&type=error`, origin))
     }
 
-    // Provision/reconcile the application profile without changing legacy
-    // Prisma primary keys. This keeps OAuth and password login consistent.
-    const dbUser = await getOrCreatePrismaUser(user);
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    if (userError || !user) {
+      return NextResponse.redirect(new URL('/login?message=Unable%20to%20read%20your%20new%20session&type=error', origin))
+    }
+
+    const dbUser = await getOrCreatePrismaUser(user)
 
     if (dbUser && dbUser.role !== user.app_metadata?.role) {
       try {
-        const { getSupabaseAdmin } = await import('@/lib/supabase/admin');
+        const { getSupabaseAdmin } = await import('@/lib/supabase/admin')
         await getSupabaseAdmin().auth.admin.updateUserById(user.id, {
           app_metadata: { role: dbUser.role }
-        });
+        })
       } catch (e) {
-        console.error("Failed to sync role to Supabase app_metadata", e);
+        console.error('Failed to sync role to Supabase app_metadata', e)
       }
     }
 
     if (dbUser) {
-      const { mergeGuestCart } = await import('@/lib/cart/merge-guest-cart');
-      await mergeGuestCart(dbUser.id);
+      const { mergeGuestCart } = await import('@/lib/cart/merge-guest-cart')
+      await mergeGuestCart(dbUser.id)
     }
 
-    // Success - redirect to dashboard
-    return NextResponse.redirect(new URL(next, request.url))
+    return NextResponse.redirect(new URL(next, origin))
   }
 
-  // If there's an explicit error from the provider, redirect to login
-  const error_description = requestUrl.searchParams.get('error_description')
-  if (error_description) {
-    return NextResponse.redirect(new URL(`/login?message=${encodeURIComponent(error_description)}&type=error`, request.url))
+  const errorDescription = requestUrl.searchParams.get('error_description')
+  if (errorDescription) {
+    return NextResponse.redirect(new URL(`/login?message=${encodeURIComponent(errorDescription)}&type=error`, origin))
   }
 
-  // If there is no code, it might be an Implicit Flow with a URL hash fragment
-  return NextResponse.redirect(new URL('/auth/confirm' + requestUrl.search, request.url))
+  return NextResponse.redirect(new URL('/auth/confirm' + requestUrl.search, origin))
 }

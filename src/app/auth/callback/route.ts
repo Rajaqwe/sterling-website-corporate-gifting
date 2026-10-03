@@ -8,16 +8,8 @@ function getSafeOrigin(request: Request): string {
   const requestUrl = new URL(request.url)
   if (process.env.NODE_ENV !== 'production') return requestUrl.origin
 
-  const forwardedHost = request.headers.get('x-forwarded-host')
-  if (forwardedHost && !/^(localhost|127\.0\.0\.1)(?::\d+)?$/i.test(forwardedHost)) {
-    const proto = request.headers.get('x-forwarded-proto') || 'https'
-    return `${proto}://${forwardedHost}`
-  }
-
-  if (!/^(localhost|127\.0\.0\.1)(?::\d+)?$/i.test(requestUrl.hostname)) {
-    return requestUrl.origin
-  }
-
+  // OAuth callbacks should always return to Sterling's stable public URL.
+  // Do not send users back to a deployment-specific Vercel hostname.
   return PRODUCTION_APP_URL
 }
 
@@ -27,7 +19,6 @@ export async function GET(request: Request) {
   const code = requestUrl.searchParams.get('code')
   const rawNext = requestUrl.searchParams.get('next')
 
-  // Validate next parameter to prevent open redirects.
   const next = rawNext && rawNext.startsWith('/') && !rawNext.startsWith('//')
     ? rawNext
     : '/dashboard'

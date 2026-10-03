@@ -1,6 +1,12 @@
 /* Mobile density pass: keep the Sterling experience compact on phones without changing tablet/desktop. */
 @media (max-width: 639px) {
-  html,
+  html {
+    font-size: 14px;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
   body {
     width: 100%;
     max-width: 100%;
@@ -20,57 +26,87 @@
 
   #main-content img,
   #main-content video,
-  #main-content iframe {
+  #main-content iframe,
+  #main-content svg {
     max-width: 100%;
   }
 
-  /* Reduce the fixed mobile header footprint. */
   header.fixed {
-    padding-top: 0.75rem !important;
-    padding-bottom: 0.75rem !important;
+    padding-top: 0.55rem !important;
+    padding-bottom: 0.55rem !important;
   }
 
   header.fixed a[aria-label="Sterling Prime home"] > span {
-    width: 125px !important;
-    height: 38px !important;
+    width: 108px !important;
+    height: 33px !important;
   }
 
-  /* Keep the mobile navigation controls from making the header feel oversized. */
   header.fixed .md\:hidden {
-    gap: 0.25rem !important;
+    gap: 0.15rem !important;
   }
 
-  /* Compact heading scale across the public site. */
   #main-content h1 {
-    font-size: clamp(1.8rem, 8vw, 2.35rem) !important;
+    font-size: clamp(1.65rem, 7vw, 2rem) !important;
     line-height: 1.08 !important;
+    letter-spacing: -0.02em;
   }
 
   #main-content h2 {
-    font-size: clamp(1.5rem, 6.5vw, 2rem) !important;
+    font-size: clamp(1.35rem, 5.8vw, 1.75rem) !important;
     line-height: 1.12 !important;
+    letter-spacing: -0.015em;
   }
 
   #main-content h3 {
+    font-size: clamp(1rem, 4.5vw, 1.2rem) !important;
     line-height: 1.2 !important;
   }
 
-  /* Reduce the large vertical whitespace used by desktop-first sections. */
+  #main-content p {
+    line-height: 1.5;
+  }
+
   #main-content section {
-    padding-top: clamp(2.75rem, 8vw, 3.5rem) !important;
-    padding-bottom: clamp(2.75rem, 8vw, 3.5rem) !important;
+    padding-top: 2.15rem !important;
+    padding-bottom: 2.15rem !important;
   }
 
-  /* Hero needs less top space because the fixed header is compact. */
   #main-content section:first-child {
-    padding-top: 5rem !important;
+    padding-top: 4.25rem !important;
   }
 
-  /* Make common content containers use the phone width efficiently. */
   #main-content .container {
     width: 100%;
     max-width: 100%;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: 0.9rem;
+    padding-right: 0.9rem;
+  }
+
+  #main-content button,
+  #main-content a[role="button"] {
+    min-height: 2.5rem;
+  }
+
+  #main-content [class*="gap-10"],
+  #main-content [class*="gap-12"],
+  #main-content [class*="gap-16"],
+  #main-content [class*="gap-20"] {
+    gap: 1.25rem !important;
+  }
+
+  #main-content [class*="p-10"],
+  #main-content [class*="p-12"],
+  #main-content [class*="p-16"] {
+    padding: 1.25rem !important;
+  }
+
+  #main-content [class*="mt-16"],
+  #main-content [class*="mb-16"],
+  #main-content [class*="my-16"],
+  #main-content [class*="mt-20"],
+  #main-content [class*="mb-20"],
+  #main-content [class*="my-20"] {
+    margin-top: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
   }
 }

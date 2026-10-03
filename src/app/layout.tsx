@@ -5,7 +5,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-sans', weight: ['400
 const poppins = Poppins({ subsets: ['latin'], variable: '--font-serif', weight: ['400', '500', '600', '700', '800'] });
 
 import "./globals.css";
-import { Suspense } from "react";
+import "./mobile.css";
 import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/layout/Navbar";
 import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
@@ -32,9 +32,7 @@ const SITE_URL =
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  alternates: {
-    canonical: "/",
-  },
+  alternates: { canonical: "/" },
   title: {
     template: "%s | Sterling Corporate",
     default: "Sterling | Premium B2B Corporate Gifting",
@@ -47,13 +45,7 @@ export const metadata: Metadata = {
     description: "Premium B2B Corporate Gifting platform for enterprise clients.",
     url: "/",
     siteName: "Sterling",
-    images: [
-      {
-        url: "/og-image.jpg", // Placeholder
-        width: 1200,
-        height: 630,
-      }
-    ],
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
     locale: "en_US",
     type: "website",
   },
@@ -83,15 +75,7 @@ export const viewport = {
 
 export default async function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  // NOTE: previously this called both getSession() AND getUser() on every request.
-  // getUser() makes a real network round trip to the Supabase Auth server, so doing
-  // that on top of getSession() doubled auth latency on every single page load for
-  // a value (the cart count) that isn't security-sensitive. getSession() alone is
-  // sufficient here; reserve getUser() for places that need server-verified identity
-  // (e.g. admin/role checks), not for display-only data like an item count badge.
+}: Readonly<{ children: React.ReactNode }>) {
   const supabase = await createClient();
   const { data: { session } } = await supabase.auth.getSession();
   const user = session?.user ?? null;
@@ -111,33 +95,20 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
-      <body
-        className={cn(
-          "min-h-screen bg-background font-sans antialiased flex flex-col overflow-x-hidden", inter.variable, poppins.variable
-        )}
-      >
+      <body className={cn("min-h-screen bg-background font-sans antialiased flex flex-col overflow-x-hidden", inter.variable, poppins.variable)}>
         <NextTopLoader color="#ca9d55" height={3} showSpinner={false} />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-        <AuthProvider accessToken={session?.access_token || null}>
-          <CartProvider initialCount={initialCartCount}>
-            <a
-              href="#main-content"
-              className="sr-only fixed left-4 top-4 z-[100] rounded-lg bg-background px-4 py-3 text-sm font-semibold text-foreground shadow-lg focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-ring"
-            >
-              Skip to content
-            </a>
-            <HideOnDashboard>
-              <Navbar />
-            </HideOnDashboard>
-            <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
-              {children}
-            </main>
-            <ConditionalFooter />
-            <HideOnDashboard>
-              <FloatingButtons />
-            </HideOnDashboard>
-          </CartProvider>
-        </AuthProvider>
+          <AuthProvider accessToken={session?.access_token || null}>
+            <CartProvider initialCount={initialCartCount}>
+              <a href="#main-content" className="sr-only fixed left-4 top-4 z-[100] rounded-lg bg-background px-4 py-3 text-sm font-semibold text-foreground shadow-lg focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-ring">
+                Skip to content
+              </a>
+              <HideOnDashboard><Navbar /></HideOnDashboard>
+              <main id="main-content" tabIndex={-1} className="flex-1 outline-none">{children}</main>
+              <ConditionalFooter />
+              <HideOnDashboard><FloatingButtons /></HideOnDashboard>
+            </CartProvider>
+          </AuthProvider>
         </ThemeProvider>
         <Toaster visibleToasts={3} />
         <Analytics />

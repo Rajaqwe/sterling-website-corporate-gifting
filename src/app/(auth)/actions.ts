@@ -9,38 +9,25 @@ import { mergeGuestCart } from '@/lib/cart/merge-guest-cart'
 import { assertEnv } from '@/lib/env'
 import { getOrCreatePrismaUser } from '@/lib/auth/server'
 
-// Server-enforced password policy. The UI hint is not a security control.
 const PASSWORD_MIN_LENGTH = 10;
 const PRODUCTION_APP_URL = 'https://sterling-website-corporate-gifting-sterling17.vercel.app';
 
 function validatePassword(password: string): string | null {
-  if (!password || password.length < PASSWORD_MIN_LENGTH) {
-    return `Password must be at least ${PASSWORD_MIN_LENGTH} characters long.`;
-  }
-  if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
-    return 'Password must contain both letters and numbers.';
-  }
+  if (!password || password.length < PASSWORD_MIN_LENGTH) return `Password must be at least ${PASSWORD_MIN_LENGTH} characters long.`;
+  if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) return 'Password must contain both letters and numbers.';
   return null;
 }
 
-/**
- * Resolve the public origin used for Supabase OAuth/password-reset callbacks.
- * Production must never use a localhost origin. Vercel's deployment URL is
- * preferred when available, with the stable Sterling production alias as a
- * final production fallback. Local development keeps its configured URL.
- */
+/** Always use the stable public Sterling origin for production OAuth redirects. */
 async function getPublicAppUrl(): Promise<string> {
   const configured = assertEnv('NEXT_PUBLIC_APP_URL').trim().replace(/\/$/, '');
   const isLocalConfigured = /^https?:\/\/(localhost|127\.0\.0\.1)(?::\d+)?$/i.test(configured);
   const isProduction = process.env.NODE_ENV === 'production';
 
   if (isProduction) {
-    const vercelUrl = process.env.VERCEL_URL?.trim().replace(/\/$/, '');
-    if (vercelUrl && !/^(localhost|127\.0\.0\.1)(?::\d+)?$/i.test(vercelUrl)) {
-      return vercelUrl.startsWith('http') ? vercelUrl : `https://${vercelUrl}`;
-    }
-    if (!isLocalConfigured) return configured;
-    return PRODUCTION_APP_URL;
+    // Never use VERCEL_URL here: it can point at a deployment-specific hostname,
+    // which can break OAuth allow-lists and produce inconsistent mobile redirects.
+    return isLocalConfigured ? PRODUCTION_APP_URL : configured;
   }
 
   if (!isLocalConfigured) return configured;
@@ -48,28 +35,21 @@ async function getPublicAppUrl(): Promise<string> {
   const requestHeaders = await headers();
   const forwardedHost = requestHeaders.get('x-forwarded-host') || requestHeaders.get('host');
   const forwardedProto = requestHeaders.get('x-forwarded-proto') || 'https';
-
   if (forwardedHost && !/^(localhost|127\.0\.0\.1)(?::\d+)?$/i.test(forwardedHost)) {
     return `${forwardedProto}://${forwardedHost}`;
   }
-
   return configured;
 }
 
 export async function login(formData: FormData) {
   const ip = (await headers()).get('x-forwarded-for') || 'anonymous';
   const limitCheck = await rateLimit(`login_${ip}`, 5, 60000);
-  
-  if (!limitCheck.success) {
-    return redirect(`/login?message=${encodeURIComponent('Too many login attempts. Please try again later.')}`)
-  }
+  if (!limitCheck.success) return redirect(`/login?message=${encodeURIComponent('Too many login attempts. Please try again later.')}`)
 
   const supabase = await createClient()
   const email = formData.get('email') as string
   const password = formData.get('password') as string
-
   const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-
   if (error) return redirect(`/login?message=${encodeURIComponent(error.message)}`)
   if (!data?.user) return redirect('/login?message=Authentication failed&type=error')
 
@@ -85,7 +65,6 @@ export async function login(formData: FormData) {
 
   await mergeGuestCart(dbUser.id);
   revalidatePath('/', 'layout')
-
   const role = dbUser.role || data.user.app_metadata?.role;
   if (role === 'ADMIN' || role === 'SUPER_ADMIN') redirect('/admin')
   redirect('/dashboard')
@@ -103,11 +82,8 @@ export async function signInWithOAuth(provider: 'google' | 'apple') {
   const publicAppUrl = await getPublicAppUrl();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
-    options: {
-      redirectTo: `${publicAppUrl}/auth/callback`,
-    },
+    options: { redirectTo: `${publicAppUrl}/auth/callback` },
   })
-
   if (error) return redirect(`/login?message=${encodeURIComponent(error.message)}&type=error`)
   if (data?.url) redirect(data.url)
 }
@@ -154,7 +130,6 @@ export async function signup(formData: FormData) {
         const fullName = [firstName, lastName].filter(Boolean).join(' ') || null;
         await prisma.user.create({ data: { id: data.user.id, email, fullName, role: 'CUSTOMER' } });
       }
-
       if (companyName && !userByEmail) {
         let slug = companyName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
         const existingCompany = await prisma.company.findUnique({ where: { slug } });

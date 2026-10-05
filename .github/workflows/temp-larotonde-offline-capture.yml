@@ -101,7 +101,7 @@ jobs:
                   return None
 
           def download_asset(url, referer=None):
-              nonlocal asset_count
+              global asset_count
               url = norm(url)
               if not url:
                   return None
@@ -291,10 +291,3 @@ jobs:
           path: larotonde-frontend-offline.zip
           retention-days: 1
 
-      - name: Delete temporary branch
-        if: always()
-        shell: bash
-        env:
-          GH_TOKEN: \${{ github.token }}
-        run: |
-          gh api --method DELETE "repos/\${GITHUB_REPOSITORY}/git/refs/heads/\${GITHUB_REF_NAME}" || true

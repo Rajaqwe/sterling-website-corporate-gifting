@@ -1,9 +1,9 @@
 name: Temporary La Rotonde Offline Capture
 
 on:
-  push:
+  pull_request:
     branches:
-      - temp/larotonde-offline-capture-20261005
+      - main
 
 permissions:
   contents: write

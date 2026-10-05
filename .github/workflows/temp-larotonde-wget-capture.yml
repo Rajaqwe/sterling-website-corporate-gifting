@@ -1,0 +1,53 @@
+name: Temporary La Rotonde Wget Capture
+on:
+  push:
+    branches:
+      - temp/larotonde-wget-capture-20261005
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mirror public frontend
+        shell: bash
+        run: |
+          set -euxo pipefail
+          rm -rf site
+          mkdir -p site
+          wget \
+            --recursive \
+            --page-requisites \
+            --html-extension \
+            --convert-links \
+            --adjust-extension \
+            --no-parent \
+            --domains=www.larotonde.qc.ca,larotonde.qc.ca \
+            --span-hosts \
+            --timeout=20 \
+            --tries=2 \
+            --waitretry=1 \
+            --execute robots=off \
+            --user-agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/128 Safari/537.36" \
+            --directory-prefix=site \
+            https://www.larotonde.qc.ca/en/ || true
+          test -f site/www.larotonde.qc.ca/en/index.html
+          printf '%s\n' "Source: https://www.larotonde.qc.ca/en/" > site/MIRROR-README.txt
+          printf '%s\n' "Static public mirror generated for offline development/reference." >> site/MIRROR-README.txt
+          printf '%s\n' "Interactive server-side services, ticketing, forms, analytics and third-party APIs are not included." >> site/MIRROR-README.txt
+          du -sh site
+          find site -type f | wc -l
+      - name: Create ZIP
+        run: |
+          cd site
+          zip -qr ../larotonde-frontend-wget.zip .
+          cd ..
+          ls -lh larotonde-frontend-wget.zip
+      - name: Upload ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: larotonde-frontend-wget
+          path: larotonde-frontend-wget.zip
+          retention-days: 1

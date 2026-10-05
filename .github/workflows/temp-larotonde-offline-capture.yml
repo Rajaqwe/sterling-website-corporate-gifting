@@ -1,0 +1,300 @@
+name: Temporary La Rotonde Offline Capture
+
+on:
+  push:
+    branches:
+      - temp/larotonde-offline-capture-20261005
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Capture public frontend
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check -q requests beautifulsoup4
+          cat > capture_site.py <<'PY'
+          import hashlib
+          import json
+          import mimetypes
+          import os
+          import re
+          import time
+          from collections import deque
+          from pathlib import Path
+          from urllib.parse import urljoin, urlparse, urldefrag, unquote
+
+          import requests
+          from bs4 import BeautifulSoup
+
+          ROOT = Path("capture")
+          ROOT.mkdir(parents=True, exist_ok=True)
+          SEEDS = ["https://www.larotonde.qc.ca/en/", "https://www.larotonde.qc.ca/"]
+          HOST = "www.larotonde.qc.ca"
+          MAX_PAGES = 250
+          MAX_ASSET_BYTES = 25 * 1024 * 1024
+          DELAY = 0.10
+
+          session = requests.Session()
+          session.headers.update({
+              "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36",
+              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+              "Accept-Language": "en-US,en;q=0.8,fr;q=0.6",
+          })
+
+          seen_pages, queued = set(), set()
+          asset_cache, errors = {}, []
+          page_count = asset_count = 0
+
+          def norm(url):
+              return urldefrag(url)[0] if url and urlparse(url).scheme in ("http", "https") else None
+
+          def is_html_url(url):
+              p = urlparse(url)
+              if p.netloc.lower() != HOST:
+                  return False
+              last = p.path.rsplit("/", 1)[-1]
+              return p.path.endswith("/") or "." not in last or p.path.lower().endswith((".html", ".htm", ".php"))
+
+          def safe(s):
+              s = re.sub(r"[^A-Za-z0-9._-]+", "-", unquote(s)).strip("-")
+              return s[:120] or "asset"
+
+          def page_path(url):
+              p = urlparse(url)
+              path = p.path or "/"
+              if path == "/":
+                  return ROOT / "index.html"
+              if path.endswith("/"):
+                  return ROOT / path.lstrip("/") / "index.html"
+              return ROOT / path.lstrip("/")
+
+          def asset_path(url, ctype=""):
+              p = urlparse(url)
+              path = p.path or "/asset"
+              name = safe(Path(path).name or "asset")
+              if not Path(name).suffix:
+                  name += mimetypes.guess_extension(ctype.split(";")[0].strip()) or ""
+              base = ROOT / "assets" / safe(p.netloc) / Path(path).parent.as_posix().lstrip("/")
+              base.mkdir(parents=True, exist_ok=True)
+              if p.query:
+                  h = hashlib.sha1(p.query.encode()).hexdigest()[:10]
+                  name = f"{Path(name).stem}-{h}{Path(name).suffix}"
+              return base / name
+
+          def fetch(url, referer=None):
+              try:
+                  headers = {"Referer": referer} if referer else {}
+                  r = session.get(url, timeout=30, headers=headers, allow_redirects=True)
+                  r.raise_for_status()
+                  return r
+              except Exception as e:
+                  errors.append({"url": url, "error": str(e)})
+                  return None
+
+          def download_asset(url, referer=None):
+              nonlocal asset_count
+              url = norm(url)
+              if not url:
+                  return None
+              if url in asset_cache:
+                  return asset_cache[url]
+              r = fetch(url, referer)
+              if not r:
+                  asset_cache[url] = None
+                  return None
+              if len(r.content) > MAX_ASSET_BYTES:
+                  errors.append({"url": url, "error": f"asset too large: {len(r.content)} bytes"})
+                  asset_cache[url] = None
+                  return None
+              target = asset_path(r.url, r.headers.get("content-type", ""))
+              try:
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  target.write_bytes(r.content)
+                  asset_cache[url] = target
+                  asset_cache[r.url] = target
+                  asset_count += 1
+                  return target
+              except Exception as e:
+                  errors.append({"url": url, "error": f"write failed: {e}"})
+                  asset_cache[url] = None
+                  return None
+
+          def rel(frm, to):
+              return os.path.relpath(to, start=frm.parent).replace(os.sep, "/")
+
+          css_re = re.compile(r"url\(\s*(['\"]?)(.*?)\1\s*\)", re.I)
+
+          def rewrite_css(css, source_url, css_file):
+              def repl(m):
+                  raw = m.group(2).strip()
+                  if not raw or raw.startswith(("data:", "#", "blob:")):
+                      return m.group(0)
+                  u = norm(urljoin(source_url, raw))
+                  local = download_asset(u, source_url) if u else None
+                  return "url('" + rel(css_file, local) + "')" if local else m.group(0)
+              return css_re.sub(repl, css)
+
+          def rewrite_srcset(value, source_url, target):
+              out = []
+              for item in value.split(","):
+                  bits = item.strip().split()
+                  if not bits:
+                      continue
+                  u = norm(urljoin(source_url, bits[0]))
+                  local = download_asset(u, source_url) if u else None
+                  if local:
+                      bits[0] = rel(target, local)
+                  out.append(" ".join(bits))
+              return ", ".join(out)
+
+          q = deque()
+          for seed in SEEDS:
+              seed = norm(seed)
+              if seed:
+                  queued.add(seed)
+                  q.append(seed)
+
+          while q and page_count < MAX_PAGES:
+              url = q.popleft()
+              if url in seen_pages:
+                  continue
+              seen_pages.add(url)
+              time.sleep(DELAY)
+              r = fetch(url)
+              if not r:
+                  continue
+              ctype = r.headers.get("content-type", "").lower()
+              if "text/html" not in ctype and "<html" not in r.text[:1000].lower():
+                  continue
+
+              target = page_path(r.url)
+              target.parent.mkdir(parents=True, exist_ok=True)
+              soup = BeautifulSoup(r.text, "html.parser")
+
+              for tag in soup.find_all(True):
+                  for attr in ("src", "href", "poster"):
+                      if not tag.has_attr(attr):
+                          continue
+                      raw = tag.get(attr)
+                      if not raw or raw.startswith(("#", "data:", "javascript:", "mailto:", "tel:")):
+                          continue
+                      u = norm(urljoin(r.url, raw))
+                      if not u:
+                          continue
+                      rels = " ".join(tag.get("rel", [])).lower() if tag.name == "link" else ""
+                      if tag.name == "a" and is_html_url(u) and urlparse(u).netloc.lower() == HOST:
+                          if u not in queued and len(queued) < MAX_PAGES * 2:
+                              queued.add(u)
+                              q.append(u)
+                          tag[attr] = rel(target, page_path(u))
+                      elif is_html_url(u) and tag.name == "link" and "stylesheet" not in rels:
+                          continue
+                      else:
+                          local = download_asset(u, r.url)
+                          if local:
+                              tag[attr] = rel(target, local)
+
+                  for attr in ("srcset", "data-srcset"):
+                      if tag.has_attr(attr):
+                          tag[attr] = rewrite_srcset(tag.get(attr), r.url, target)
+
+                  for attr in ("data-src", "data-lazy-src", "data-original", "data-bg"):
+                      if tag.has_attr(attr):
+                          raw = tag.get(attr)
+                          if raw and not raw.startswith("data:"):
+                              u = norm(urljoin(r.url, raw))
+                              local = download_asset(u, r.url) if u else None
+                              if local:
+                                  tag[attr] = rel(target, local)
+
+                  if tag.has_attr("style"):
+                      tag["style"] = rewrite_css(tag["style"], r.url, target)
+
+              for style in soup.find_all("style"):
+                  style.string = rewrite_css(style.get_text() or "", r.url, target)
+
+              for link in soup.find_all("link"):
+                  rels = " ".join(link.get("rel", [])).lower()
+                  href = link.get("href")
+                  if href and ("stylesheet" in rels or link.get("as") == "style"):
+                      u = norm(urljoin(r.url, href))
+                      local = download_asset(u, r.url) if u else None
+                      if local:
+                          link["href"] = rel(target, local)
+                          if local.suffix.lower() == ".css":
+                              try:
+                                  css = local.read_text("utf-8", errors="ignore")
+                                  local.write_text(rewrite_css(css, u or r.url, local), "utf-8")
+                              except Exception as e:
+                                  errors.append({"url": u, "error": f"css process: {e}"})
+
+              for a in soup.find_all("a", href=True):
+                  href = a.get("href", "")
+                  if not href or href.startswith(("#", "javascript:", "mailto:", "tel:")):
+                      continue
+                  u = norm(urljoin(r.url, href))
+                  if u and urlparse(u).netloc.lower() == HOST and is_html_url(u):
+                      if u not in queued and len(queued) < MAX_PAGES * 2:
+                          queued.add(u)
+                          q.append(u)
+                      a["href"] = rel(target, page_path(u))
+
+              target.write_text(str(soup), "utf-8")
+              page_count += 1
+              print(f"[page {page_count}] {r.url} -> {target}")
+
+          report = {
+              "source": SEEDS,
+              "captured_at_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+              "pages_saved": page_count,
+              "assets_saved": asset_count,
+              "pages_seen": len(seen_pages),
+              "errors": errors,
+              "limits": {"max_pages": MAX_PAGES, "max_asset_bytes": MAX_ASSET_BYTES},
+              "note": "Public frontend snapshot. Server-side/backend functionality and third-party services are not included."
+          }
+          (ROOT / "capture-report.json").write_text(json.dumps(report, indent=2), "utf-8")
+          (ROOT / "README.md").write_text(
+              "La Rotonde frontend offline snapshot\n\n"
+              f"Captured: {report['captured_at_utc']}\n"
+              "Source: https://www.larotonde.qc.ca/en/\n\n"
+              f"Pages saved: {page_count}\nAssets saved: {asset_count}\n\n"
+              "Open index.html or en/index.html. Interactive third-party services, ticketing, analytics, forms, and server-side logic are not reproduced. "
+              "Check rights and site terms before reusing copyrighted text, photographs, video, logos, fonts, or other creative assets publicly or commercially.\n",
+              "utf-8"
+          )
+          PY
+          python capture_site.py
+
+      - name: Create ZIP
+        shell: bash
+        run: |
+          cd capture
+          zip -qr ../larotonde-frontend-offline.zip .
+          cd ..
+          ls -lh larotonde-frontend-offline.zip
+          unzip -l larotonde-frontend-offline.zip | tail -20
+
+      - name: Upload ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: larotonde-frontend-offline
+          path: larotonde-frontend-offline.zip
+          retention-days: 1
+
+      - name: Delete temporary branch
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: \${{ github.token }}
+        run: |
+          gh api --method DELETE "repos/\${GITHUB_REPOSITORY}/git/refs/heads/\${GITHUB_REF_NAME}" || true

@@ -12,6 +12,7 @@ import { ConditionalFooter } from "@/components/layout/ConditionalFooter";
 import { HideOnDashboard } from "@/components/layout/HideOnDashboard";
 import { createClient } from "@/lib/supabase/server";
 import { FloatingButtons } from "@/components/layout/FloatingButtons";
+import { QuoteChatWidget } from "@/components/chat/QuoteChatWidget";
 import { Analytics } from "@/components/analytics/Analytics";
 
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -107,6 +108,7 @@ export default async function RootLayout({
               <main id="main-content" tabIndex={-1} className="flex-1 outline-none">{children}</main>
               <ConditionalFooter />
               <HideOnDashboard><FloatingButtons /></HideOnDashboard>
+              <HideOnDashboard><QuoteChatWidget /></HideOnDashboard>
             </CartProvider>
           </AuthProvider>
         </ThemeProvider>

@@ -60,6 +60,22 @@ export async function POST(request: Request) {
 
     const quantity = quantityRanges[quantityRange];
     const brandingRequired = input.brandingRequired === true;
+
+    // Preview/dev submissions are validation-only: never store personal details
+    // or touch the production database from a test deployment.
+    const isPreviewTest =
+      process.env.VERCEL_ENV === "preview" ||
+      process.env.NODE_ENV !== "production";
+
+    if (isPreviewTest) {
+      const quoteNumber =
+        "STQ-TEST-" + randomUUID().slice(0, 8).toUpperCase();
+      return NextResponse.json(
+        { ok: true, mode: "preview-test", quoteNumber },
+        { status: 201 },
+      );
+    }
+
     const notes = [
       "Approximate quantity selected: " + quantityRange,
       "Branding requested: " + (brandingRequired ? "Yes" : "No"),

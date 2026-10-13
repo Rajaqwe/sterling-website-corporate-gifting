@@ -30,7 +30,7 @@ const quantityOptions = [
   { label: "500+ pieces", value: 500 },
 ];
 
-export function QuoteChatWidget() {
+export function QuoteChatWidget({ isPreviewEnvironment = false }: { isPreviewEnvironment?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState<Step>("category");
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -208,6 +208,11 @@ export function QuoteChatWidget() {
 
           <div ref={transcriptRef} className="flex-1 space-y-3 overflow-y-auto bg-[#f7f8fa] px-3.5 py-4">
             <div className="mb-1 text-center text-[11px] text-slate-400">STERLING CORPORATE GIFTING</div>
+            {isPreviewEnvironment && (
+              <div role="status" className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs leading-5 text-amber-900">
+                <strong>Preview test mode:</strong> use dummy details. Submissions are not saved.
+              </div>
+            )}
             {messages.map((message, index) => (
               <div
                 key={index}
@@ -303,7 +308,7 @@ export function QuoteChatWidget() {
                   {isSubmitting ? "Sending request…" : "Request my quote"}
                   {!isSubmitting && <Send className="h-4 w-4" />}
                 </button>
-                <p className="text-[10px] leading-4 text-slate-400">Your details will be used to respond to this quote request.</p>
+                <p className="text-[10px] leading-4 text-slate-400">{isPreviewEnvironment ? "Preview test mode — use dummy details. Nothing is saved." : "Your details will be used to respond to this quote request."}</p>
               </form>
             )}
 

@@ -108,7 +108,7 @@ export default async function RootLayout({
               <main id="main-content" tabIndex={-1} className="flex-1 outline-none">{children}</main>
               <ConditionalFooter />
               <HideOnDashboard><FloatingButtons /></HideOnDashboard>
-              <HideOnDashboard><QuoteChatWidget /></HideOnDashboard>
+              <HideOnDashboard><QuoteChatWidget isPreviewEnvironment={process.env.VERCEL_ENV === "preview" || process.env.NODE_ENV !== "production"} /></HideOnDashboard>
             </CartProvider>
           </AuthProvider>
         </ThemeProvider>

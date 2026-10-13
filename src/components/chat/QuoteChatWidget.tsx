@@ -48,6 +48,7 @@ export function QuoteChatWidget() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [quoteNumber, setQuoteNumber] = useState("");
+  const [isTestSubmission, setIsTestSubmission] = useState(false);
   const transcriptRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -131,13 +132,17 @@ export function QuoteChatWidget() {
         throw new Error(result.error || "We couldn’t submit your request. Please try again.");
       }
 
+      const testSubmission = result.mode === "preview-test";
+      setIsTestSubmission(testSubmission);
       setQuoteNumber(String(result.quoteNumber || ""));
       setMessages((current) => [
         ...current,
         { role: "user", text: "I’ve shared my contact details." },
         {
           role: "bot",
-          text: "Thanks, " + contact.fullName.split(" ")[0] + "! Your quote request has been received. Our team can now review your requirement.",
+          text: testSubmission
+            ? "Thanks, " + contact.fullName.split(" ")[0] + "! The preview test worked. No request or contact details were saved."
+            : "Thanks, " + contact.fullName.split(" ")[0] + "! Your quote request has been received. Our team can now review your requirement.",
         },
       ]);
       setStep("done");
@@ -162,6 +167,7 @@ export function QuoteChatWidget() {
     });
     setLocationInput("");
     setQuoteNumber("");
+    setIsTestSubmission(false);
     setError("");
     setStep("category");
     setMessages([
@@ -304,9 +310,9 @@ export function QuoteChatWidget() {
             {step === "done" && (
               <div className="space-y-3 rounded-xl border border-emerald-100 bg-white p-4 text-center shadow-sm">
                 <CheckCircle2 className="mx-auto h-8 w-8 text-emerald-600" />
-                <p className="text-sm font-semibold text-slate-800">Quote request submitted</p>
+                <p className="text-sm font-semibold text-slate-800">{isTestSubmission ? "Preview test successful" : "Quote request submitted"}</p>
                 {quoteNumber && <p className="text-xs text-slate-500">Reference: {quoteNumber}</p>}
-                <p className="text-xs leading-5 text-slate-500">Thanks for considering Sterling. Keep this reference for your records.</p>
+                <p className="text-xs leading-5 text-slate-500">{isTestSubmission ? "Test mode only: this request and its contact details were not saved anywhere." : "Thanks for considering Sterling. Keep this reference for your records."}</p>
                 <button type="button" onClick={restartChat} className="text-xs font-semibold text-teal-700 underline underline-offset-4">Start another request</button>
               </div>
             )}
